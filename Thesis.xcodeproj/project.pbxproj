@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		BBAB21D52EA8CCDE006A0375 /* Theis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Theis.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBAB21D52EA8CCDE006A0375 /* Thesis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Thesis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		BBAB21D72EA8CCDE006A0375 /* Theis */ = {
+		BBAB21D72EA8CCDE006A0375 /* Thesis */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Theis;
+			path = Thesis;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -32,7 +32,7 @@
 		BBAB21CC2EA8CCDE006A0375 = {
 			isa = PBXGroup;
 			children = (
-				BBAB21D72EA8CCDE006A0375 /* Theis */,
+				BBAB21D72EA8CCDE006A0375 /* Thesis */,
 				BBAB21D62EA8CCDE006A0375 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -40,7 +40,7 @@
 		BBAB21D62EA8CCDE006A0375 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BBAB21D52EA8CCDE006A0375 /* Theis.app */,
+				BBAB21D52EA8CCDE006A0375 /* Thesis.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,9 +48,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		BBAB21D42EA8CCDE006A0375 /* Theis */ = {
+		BBAB21D42EA8CCDE006A0375 /* Thesis */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BBAB21E02EA8CCE0006A0375 /* Build configuration list for PBXNativeTarget "Theis" */;
+			buildConfigurationList = BBAB21E02EA8CCE0006A0375 /* Build configuration list for PBXNativeTarget "Thesis" */;
 			buildPhases = (
 				BBAB21D12EA8CCDE006A0375 /* Sources */,
 				BBAB21D22EA8CCDE006A0375 /* Frameworks */,
@@ -61,13 +61,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				BBAB21D72EA8CCDE006A0375 /* Theis */,
+				BBAB21D72EA8CCDE006A0375 /* Thesis */,
 			);
-			name = Theis;
+			name = Thesis;
 			packageProductDependencies = (
 			);
 			productName = Theis;
-			productReference = BBAB21D52EA8CCDE006A0375 /* Theis.app */;
+			productReference = BBAB21D52EA8CCDE006A0375 /* Thesis.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -85,7 +85,7 @@
 					};
 				};
 			};
-			buildConfigurationList = BBAB21D02EA8CCDE006A0375 /* Build configuration list for PBXProject "Theis" */;
+			buildConfigurationList = BBAB21D02EA8CCDE006A0375 /* Build configuration list for PBXProject "Thesis" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -99,7 +99,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				BBAB21D42EA8CCDE006A0375 /* Theis */,
+				BBAB21D42EA8CCDE006A0375 /* Thesis */,
 			);
 		};
 /* End PBXProject section */
@@ -301,7 +301,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		BBAB21D02EA8CCDE006A0375 /* Build configuration list for PBXProject "Theis" */ = {
+		BBAB21D02EA8CCDE006A0375 /* Build configuration list for PBXProject "Thesis" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BBAB21DE2EA8CCE0006A0375 /* Debug */,
@@ -310,7 +310,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BBAB21E02EA8CCE0006A0375 /* Build configuration list for PBXNativeTarget "Theis" */ = {
+		BBAB21E02EA8CCE0006A0375 /* Build configuration list for PBXNativeTarget "Thesis" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BBAB21E12EA8CCE0006A0375 /* Debug */,
