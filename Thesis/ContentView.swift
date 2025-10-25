@@ -5,14 +5,6 @@
 //  Created by Kansinee Klinkhachon on 25/10/2568 BE.
 //
 
-
-//
-//  ContentView.swift
-//  Thesis
-//
-//  Created by Kansinee Klinkhachon on 25/10/2568 BE.
-//
-
 import SwiftUI
 
 struct ContentView: View {
