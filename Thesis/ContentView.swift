@@ -29,7 +29,7 @@ struct ContentView: View {
                 }
                 else if self.index == 2 {
                     
-                    Color.yellow
+                    KnowledgeView()
                     
                 }
                 else {

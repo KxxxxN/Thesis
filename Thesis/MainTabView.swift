@@ -15,6 +15,7 @@ struct MainTabView: View {
         ZStack {
             Color.mainColor
                 .clipShape(TabCorner(radius: 20, corners: [.topLeft, .topRight]))
+                .ignoresSafeArea(edges: .bottom)
 
             HStack {
                 tabButton(image: "Home2", selectedImage: "Home1", label: "หน้าหลัก", indexValue: 0)
@@ -40,12 +41,12 @@ struct MainTabView: View {
                 ZStack {
                     if self.index == indexValue {
                         Circle()
-                            .fill(Color.black)
+                            .fill(Color.tabbarColor)
                             .matchedGeometryEffect(id: "circleBG", in: animation)
                             .frame(width: 60, height: 60)
                             .overlay(
                                 Circle()
-                                    .stroke(Color.white, lineWidth: 5)
+                                    .stroke(Color.backgroundColor, lineWidth: 5)
                                     .matchedGeometryEffect(id: "circleBorder", in: animation)
                             )
                             .offset(y: -10)

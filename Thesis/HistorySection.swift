@@ -1,3 +1,11 @@
+//
+//  HistorySection.swift
+//  Thesis
+//
+//  Created by Kansinee Klinkhachon on 3/11/2568 BE.
+//
+import SwiftUI
+
 struct HistorySection: View {
     let items: [HistoryItem]
     
@@ -9,11 +17,11 @@ struct HistorySection: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(item.title)
-                            .font(.custom("Inter", size: 20).weight(.bold))
+                            .font(.noto(20, weight: .bold))
                             .foregroundColor(.white)
                         
                         Text(item.date)
-                            .font(.custom("Inter", size: 14).weight(.medium))
+                            .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.white)
                     }
                     
@@ -21,16 +29,16 @@ struct HistorySection: View {
                     
                     VStack(spacing: 0) {
                         Text(item.points)
-                            .font(.custom("Inter", size: 25).weight(.bold))
+                            .font(.system(size: 25, weight: .bold))
                             .foregroundColor(.white)
                         
                         Text(item.pointsLabel)
-                            .font(.custom("Inter", size: 15).weight(.bold))
+                            .font(.noto(15, weight: .bold))
                             .foregroundColor(.white)
                     }
                 }
                 .padding(16)
-                .background(Color(hex: "768572"))
+                .background(Color.secondColor)
                 .cornerRadius(20)
             }
         }

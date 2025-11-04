@@ -6,13 +6,41 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		BB50BD592EB8966E00A20141 /* NotoSansThai-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BB50BD582EB8966E00A20141 /* NotoSansThai-Thin.ttf */; };
+		BB50BD5E2EB8968400A20141 /* NotoSansThai-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BB50BD5A2EB8968400A20141 /* NotoSansThai-Light.ttf */; };
+		BB50BD5F2EB8968400A20141 /* NotoSansThai-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BB50BD5B2EB8968400A20141 /* NotoSansThai-Medium.ttf */; };
+		BB50BD602EB8968400A20141 /* NotoSansThai-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BB50BD5C2EB8968400A20141 /* NotoSansThai-Regular.ttf */; };
+		BB50BD612EB8968400A20141 /* NotoSansThai-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BB50BD5D2EB8968400A20141 /* NotoSansThai-SemiBold.ttf */; };
+		BB50BD632EB8968E00A20141 /* NotoSansThai-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BB50BD622EB8968E00A20141 /* NotoSansThai-Bold.ttf */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		BB50BD582EB8966E00A20141 /* NotoSansThai-Thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansThai-Thin.ttf"; sourceTree = "<group>"; };
+		BB50BD5A2EB8968400A20141 /* NotoSansThai-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansThai-Light.ttf"; sourceTree = "<group>"; };
+		BB50BD5B2EB8968400A20141 /* NotoSansThai-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansThai-Medium.ttf"; sourceTree = "<group>"; };
+		BB50BD5C2EB8968400A20141 /* NotoSansThai-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansThai-Regular.ttf"; sourceTree = "<group>"; };
+		BB50BD5D2EB8968400A20141 /* NotoSansThai-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansThai-SemiBold.ttf"; sourceTree = "<group>"; };
+		BB50BD622EB8968E00A20141 /* NotoSansThai-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansThai-Bold.ttf"; sourceTree = "<group>"; };
 		BBAB21D52EA8CCDE006A0375 /* Thesis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Thesis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BB50BD652EB8994F00A20141 /* Exceptions for "Thesis" folder in "Thesis" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = BBAB21D42EA8CCDE006A0375 /* Thesis */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		BBAB21D72EA8CCDE006A0375 /* Thesis */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BB50BD652EB8994F00A20141 /* Exceptions for "Thesis" folder in "Thesis" target */,
+			);
 			path = Thesis;
 			sourceTree = "<group>";
 		};
@@ -29,11 +57,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BB50BD572EB8959300A20141 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				BB50BD582EB8966E00A20141 /* NotoSansThai-Thin.ttf */,
+				BB50BD5A2EB8968400A20141 /* NotoSansThai-Light.ttf */,
+				BB50BD5B2EB8968400A20141 /* NotoSansThai-Medium.ttf */,
+				BB50BD5C2EB8968400A20141 /* NotoSansThai-Regular.ttf */,
+				BB50BD5D2EB8968400A20141 /* NotoSansThai-SemiBold.ttf */,
+				BB50BD622EB8968E00A20141 /* NotoSansThai-Bold.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
 		BBAB21CC2EA8CCDE006A0375 = {
 			isa = PBXGroup;
 			children = (
 				BBAB21D72EA8CCDE006A0375 /* Thesis */,
 				BBAB21D62EA8CCDE006A0375 /* Products */,
+				BB50BD572EB8959300A20141 /* Fonts */,
 			);
 			sourceTree = "<group>";
 		};
@@ -109,6 +151,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB50BD5E2EB8968400A20141 /* NotoSansThai-Light.ttf in Resources */,
+				BB50BD5F2EB8968400A20141 /* NotoSansThai-Medium.ttf in Resources */,
+				BB50BD632EB8968E00A20141 /* NotoSansThai-Bold.ttf in Resources */,
+				BB50BD602EB8968400A20141 /* NotoSansThai-Regular.ttf in Resources */,
+				BB50BD612EB8968400A20141 /* NotoSansThai-SemiBold.ttf in Resources */,
+				BB50BD592EB8966E00A20141 /* NotoSansThai-Thin.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,6 +301,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Thesis/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -280,6 +329,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Thesis/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

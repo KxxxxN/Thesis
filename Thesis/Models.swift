@@ -13,7 +13,8 @@ struct RecyclableItem: Identifiable {
     let id = UUID()
     let imageName: String
     let title: String
-    let count: String
+    let countNumber: Int
+//    let count: String
 }
 
 struct NavigationItem: Identifiable {
