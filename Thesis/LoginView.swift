@@ -166,7 +166,6 @@ struct LoginView: View {
             } //ปิด Vstack1
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.backgroundColor)
-            
             .navigationDestination(isPresented: $showRegister) {
                 RegisterView()
             }

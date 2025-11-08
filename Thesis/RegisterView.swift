@@ -204,7 +204,6 @@ struct RegisterView: View {
                                         
                         ScrollView {
                             Text("""
-                            ใส่เนื้อหานโยบายความเป็นส่วนตัวของคุณที่นี่...
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
                             """)
                             .font(.noto(16))
