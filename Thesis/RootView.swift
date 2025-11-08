@@ -1,3 +1,10 @@
+//
+//  RootView.swift
+//  Thesis
+//
+//  Created by Kansinee Klinkhachon on 5/11/2568 BE.
+//
+
 import SwiftUI
 
 struct RootView: View {
@@ -5,9 +12,9 @@ struct RootView: View {
 
     var body: some View {
         if isLoggedIn {
-            ContentView()   // เข้าแอปหลัก
+            ContentView()
         } else {
-            LoginView()     // หน้า Login
+            LoginView()
         }
     }
 }

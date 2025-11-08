@@ -16,28 +16,10 @@ struct ContentView: View {
         VStack(spacing: 0){
             
             ZStack{
-                
-                if self.index == 0 {
-                    
-                    MainAppView()
-                    
-                }
-                else if self.index == 1 {
-                    
-                    Color.red
-                    
-                }
-                else if self.index == 2 {
-                    
-                    KnowledgeView()
-                    
-                }
-                else {
-                    
-                    Color.green
-                    
-                }
-                
+                if self.index == 0 { MainAppView() }
+                else if self.index == 1 { Color.red }
+                else if self.index == 2 { KnowledgeView() }
+                else { AccountView() }
             }
             
             MainTabView(index: self.$index)
@@ -45,7 +27,6 @@ struct ContentView: View {
         }
         .edgesIgnoringSafeArea(.top)
         .edgesIgnoringSafeArea(.bottom)
-        
     }
 }
 
