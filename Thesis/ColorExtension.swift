@@ -14,10 +14,13 @@ extension Color {
     static let backgroundColor = Color(red: 0xF4/255, green: 0xF5/255, blue: 0xF7/255)
     static let tabbarColor = Color(red: 0x12/255, green: 0x18/255, blue: 0x10/255)
     static let tabbarButton = Color(red: 0x12/255, green: 0x18/255, blue: 0x10/255)
+    static let textFieldColor = Color(red: 0xD9/255, green: 0xD9/255, blue: 0xD9/255)
+    static let dangerColor = Color(red: 0xD7/255, green: 0x69/255, blue: 0x69/255)
     
     static let knowledgeBackground = Color(red: 0xE8/255, green: 0xE6/255, blue: 0xE2/255)
     static let wetWasteColor = Color(red: 0x00/255, green: 0x93/255, blue: 0x45/255)
     static let wasteCard = Color(red: 0xD9/255, green: 0xD5/255, blue: 0xCF/255)
+    
 }
 
 extension Font {
