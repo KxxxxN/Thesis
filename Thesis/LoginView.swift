@@ -168,7 +168,7 @@ struct LoginView: View {
             .background(Color.backgroundColor)
             
             .navigationDestination(isPresented: $showRegister) {
-//                RegisterView()
+                RegisterView()
             }
         }
     }
