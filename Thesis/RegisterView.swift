@@ -43,7 +43,7 @@ struct RegisterView: View {
                             Spacer()
                         }
                     }
-                    .padding(.bottom, 38)
+                    .padding(.bottom)
                     
                     // MARK: Form Fields
 //                    VStack(spacing: 26) {
@@ -178,6 +178,18 @@ struct RegisterView: View {
                     .frame(width: 345, alignment: .leading)
                     .padding(.top, 15)
                     
+                    Button(action: {
+                        print("สร้างบัญชี")
+//                        isLoggedIn = true
+                    }) {
+                        Text("สร้างบัญชี")
+                            .font(.noto(20, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(width: 155, height: 49)
+                            .background(Color.mainColor)
+                            .cornerRadius(20)
+                    }
+                    .padding(.top, 55)
                     Spacer()
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
