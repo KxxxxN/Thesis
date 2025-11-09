@@ -33,7 +33,7 @@ struct EmailForgotPassword: View {
                 }//ปิด Zstack1
                 .padding(.bottom)
                 
-                VStack(alignment: .leading, spacing: 5) { //เปิด Vstack2
+                VStack(alignment: .leading, spacing: 0) { //เปิด Vstack2
                     Text("อีเมล")
                         .font(.noto(20, weight: .bold))
                     
@@ -44,6 +44,9 @@ struct EmailForgotPassword: View {
                         .cornerRadius(20)
                 } //ปิด Vstack2
                 
+//                Button(action: {
+//                    showPrivacyPopup = true
+//                }){
                 NavigationLink(destination: OTPConfirmView()) {
                     Text("ส่งรหัส OTP")
                         .font(.noto(20, weight: .bold))

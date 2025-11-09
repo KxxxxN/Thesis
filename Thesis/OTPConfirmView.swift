@@ -76,7 +76,10 @@ struct OTPConfirmView: View {
                 .padding(.bottom, 45)
                 
                 // ปุ่มยืนยัน
-                NavigationLink(destination: OTPConfirmView()) {
+//                Button(action: {
+//                    showPrivacyPopup = true
+//                }){
+                NavigationLink(destination: ChangePasswordView()){
                     Text("ยืนยัน")
                         .font(.noto(20, weight: .bold))
                         .foregroundColor(.white)

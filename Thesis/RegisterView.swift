@@ -178,10 +178,10 @@ struct RegisterView: View {
                     .frame(width: 345, alignment: .leading)
                     .padding(.top, 15)
                     
-                    Button(action: {
-                        print("สร้างบัญชี")
-//                        isLoggedIn = true
-                    }) {
+//                    Button(action: {
+//                        print("สร้างบัญชี")
+//                    }) {
+                    NavigationLink(destination: LoginView()) {
                         Text("สร้างบัญชี")
                             .font(.noto(20, weight: .bold))
                             .foregroundColor(.white)
