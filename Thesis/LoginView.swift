@@ -14,6 +14,7 @@ struct LoginView: View {
     @State private var isPasswordVisible: Bool = false
     
     @State private var showRegister = false
+    @State private var showForgotPassword = false
     
     @AppStorage("isLoggedIn") var isLoggedIn = false
     
