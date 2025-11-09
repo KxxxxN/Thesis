@@ -64,9 +64,7 @@ struct LoginView: View {
                         .background(Color.textFieldColor)
                         .cornerRadius(20)
                         
-                        Button(action: {
-                                // forgot password action
-                        }) {
+                        NavigationLink(destination: EmailForgotPassword()) {
                             Text("ลืมรหัสผ่าน?")
                                 .font(.noto(15, weight: .medium))
                                 .foregroundColor(.mainColor)
@@ -76,7 +74,6 @@ struct LoginView: View {
                 }//ปิด Vstack2
                 
                 Button(action: {
-                    //                    print("Login tapped")
                     isLoggedIn = true
                 }) {
                     Text("เข้าสู่ระบบ")
@@ -93,10 +90,7 @@ struct LoginView: View {
                         .font(.noto(15,weight: .medium))
                         .foregroundColor(.black)
                         
-                    Button(action: {
-//                        print("Register")
-                        showRegister = true
-                    }){
+                    NavigationLink(destination: RegisterView()) {
                         Text("ลงทะเบียน")
                             .font(.noto(15,weight: .bold))
                             .foregroundColor(.mainColor)
@@ -166,9 +160,6 @@ struct LoginView: View {
             } //ปิด Vstack1
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.backgroundColor)
-            .navigationDestination(isPresented: $showRegister) {
-                RegisterView()
-            }
         }
     }
 }
