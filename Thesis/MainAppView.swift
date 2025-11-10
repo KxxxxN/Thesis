@@ -78,8 +78,6 @@ struct MainAppView: View {
         }
         .frame(maxHeight: .infinity, alignment: .top)
         .background(Color.backgroundColor)
-//        .edgesIgnoringSafeArea(.top)
-//        .edgesIgnoringSafeArea(.bottom)
     }
 }
 
