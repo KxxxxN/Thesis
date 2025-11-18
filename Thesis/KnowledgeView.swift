@@ -84,7 +84,7 @@ struct KnowledgeView: View {
                     VStack(spacing: 0) {
                         
                         Text("ความรู้ทั่วไป")
-                            .font(.noto(22, weight: .bold))
+                            .font(.noto(25, weight: .bold))
                             .minimumScaleFactor(0.7)
                             .foregroundColor(.black)
                             .padding(.top, 10)
@@ -96,7 +96,7 @@ struct KnowledgeView: View {
                             Image(current.binImage)
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 150, height: 200)
+                                .frame(width: 152, height: 235)
                                 .padding(.bottom, 20)
                             
                             // ปุ่มลูกศร
@@ -139,7 +139,7 @@ struct KnowledgeView: View {
                                     .background(Color.mainColor)
                                     .clipShape(Circle())
                                     .padding(.trailing, 29)
-                                    // *** ลบ .padding(.top, ...) เพื่อจัดให้อยู่กึ่งกลางแนวตั้ง ***
+                                    
                                 } else {
                                     Color.clear
                                         .frame(width: 50, height: 50)
@@ -152,31 +152,31 @@ struct KnowledgeView: View {
                         VStack(alignment: .leading, spacing: 0) {
                             HStack(spacing: 0) {
                                 Text(current.name + " ")
-                                    .font(.noto(20, weight: .bold))
+                                    .font(.noto(25, weight: .bold))
                                     .minimumScaleFactor(0.8)
                                     .foregroundColor(.black)
                                 Text(current.colorName)
-                                    .font(.noto(20, weight: .bold))
+                                    .font(.noto(25, weight: .bold))
                                     .minimumScaleFactor(0.8)
                                     .foregroundColor(current.color)
                             }
                             .padding(.bottom, 8)
                             
                             Text(current.description)
-                                .font(.noto(16))
+                                .font(.noto(20))
                                 .foregroundColor(.black)
                                 .multilineTextAlignment(.leading)
                                 .fixedSize(horizontal: false, vertical: true)
                                 .padding(.bottom, 20)
                             
                             Text("ตัวอย่างขยะ:")
-                                .font(.noto(18, weight: .bold))
+                                .font(.noto(20, weight: .bold))
                                 .foregroundColor(.black)
                                 .padding(.bottom, 20)
                             
                             WasteExamplesGrid(wasteExamples: current.examples)
                             
-                            Color.clear.frame(height: 30)
+                            Color.clear.frame(height: 40)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 35)
@@ -227,12 +227,12 @@ struct WasteCard: View {
                 .frame(width: 70)
                 
             Text(example.label)
-                .font(.noto(14, weight: .medium))
+                .font(.noto(16, weight: .medium))
                 .foregroundColor(.black)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.trailing, 8)
+                .padding(.trailing, 10)
         }
-        .frame(height: 80)
+        .frame(height: 85)
         .background(Color.wasteCard)
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
