@@ -160,20 +160,21 @@ struct KnowledgeView: View {
                                     .minimumScaleFactor(0.8)
                                     .foregroundColor(current.color)
                             }
-                            .padding(.bottom, 8)
+                            .padding(.bottom, 5)
+
                             
                             Text(current.description)
                                 .font(.noto(20))
                                 .foregroundColor(.black)
                                 .multilineTextAlignment(.leading)
                                 .fixedSize(horizontal: false, vertical: true)
-                                .frame(minHeight: 48, maxHeight: 48, alignment: .top)
-                                .padding(.bottom, 20)
+                                .frame(minHeight: 60, maxHeight: 60, alignment: .top)
+                                .padding(.bottom, 10)
                             
                             Text("ตัวอย่างขยะ:")
                                 .font(.noto(20, weight: .bold))
                                 .foregroundColor(.black)
-                                .padding(.bottom, 20)
+                                .padding(.bottom, 10)
                             
                             WasteExamplesGrid(wasteExamples: current.examples)
                             
@@ -196,7 +197,6 @@ struct KnowledgeView: View {
     }
 }
 
-// ---------------------------------------------------------------- //
 
 struct WasteExamplesGrid: View {
     let wasteExamples: [WasteExample]
@@ -225,7 +225,8 @@ struct WasteCard: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 60, height: 60)
-                .frame(width: 70)
+                .frame(width: 60)
+                .padding(10)
                 
             Text(example.label)
                 .font(.noto(16, weight: .medium))
