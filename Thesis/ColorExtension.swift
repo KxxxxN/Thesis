@@ -20,6 +20,8 @@ extension Color {
     static let knowledgeBackground = Color(red: 0xE8/255, green: 0xE6/255, blue: 0xE2/255)
     static let wetWasteColor = Color(red: 0x00/255, green: 0x93/255, blue: 0x45/255)
     static let wasteCard = Color(red: 0xD9/255, green: 0xD5/255, blue: 0xCF/255)
+    static let generalWasteColor = Color(red: 0x1A/255, green: 0x75/255, blue: 0xBB/255)
+    static let recycleWasteColor = Color(red: 0xE9/255, green: 0xAF/255, blue: 0x43/255)
 }
 
 extension Font {

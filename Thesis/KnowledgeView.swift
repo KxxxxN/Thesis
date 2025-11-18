@@ -44,8 +44,8 @@ struct KnowledgeView: View {
         ),
         WasteCategory(
             name: "ถังขยะทั่วไป",
-            colorName: "(สีเทา)",
-            color: Color.gray,
+            colorName: "(สีน้ำเงิน)",
+            color: .generalWasteColor,
             description: "สำหรับขยะทั่วไปไม่สามารถรีไซเคิลได้",
             binImage: "Bin2",
             examples: [
@@ -60,7 +60,7 @@ struct KnowledgeView: View {
         WasteCategory(
             name: "ถังขยะรีไซเคิล",
             colorName: "(สีเหลือง)",
-            color: Color.yellow,
+            color: .recycleWasteColor,
             description: "สำหรับขยะที่สามารถนำกลับมาใช้ใหม่หรือแปรรูปได้",
             binImage: "Bin3",
             examples: [
@@ -168,7 +168,7 @@ struct KnowledgeView: View {
                                 .foregroundColor(.black)
                                 .multilineTextAlignment(.leading)
                                 .fixedSize(horizontal: false, vertical: true)
-                                .frame(minHeight: 60, maxHeight: 60, alignment: .top)
+                                .frame(minHeight: 55, maxHeight: 55, alignment: .top)
                                 .padding(.bottom, 10)
                             
                             Text("ตัวอย่างขยะ:")
