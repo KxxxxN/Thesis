@@ -167,6 +167,7 @@ struct KnowledgeView: View {
                                 .foregroundColor(.black)
                                 .multilineTextAlignment(.leading)
                                 .fixedSize(horizontal: false, vertical: true)
+                                .frame(minHeight: 48, maxHeight: 48, alignment: .top)
                                 .padding(.bottom, 20)
                             
                             Text("ตัวอย่างขยะ:")

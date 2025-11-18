@@ -13,6 +13,7 @@
 		BB50BD602EB8968400A20141 /* NotoSansThai-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BB50BD5C2EB8968400A20141 /* NotoSansThai-Regular.ttf */; };
 		BB50BD612EB8968400A20141 /* NotoSansThai-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BB50BD5D2EB8968400A20141 /* NotoSansThai-SemiBold.ttf */; };
 		BB50BD632EB8968E00A20141 /* NotoSansThai-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BB50BD622EB8968E00A20141 /* NotoSansThai-Bold.ttf */; };
+		BB58872A2ECC845600B185A1 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = BB5887292ECC845600B185A1 /* SQLite */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB58872A2ECC845600B185A1 /* SQLite in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -107,6 +109,7 @@
 			);
 			name = Thesis;
 			packageProductDependencies = (
+				BB5887292ECC845600B185A1 /* SQLite */,
 			);
 			productName = Theis;
 			productReference = BBAB21D52EA8CCDE006A0375 /* Thesis.app */;
@@ -136,6 +139,9 @@
 			);
 			mainGroup = BBAB21CC2EA8CCDE006A0375;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				BB5887282ECC845600B185A1 /* XCRemoteSwiftPackageReference "SQLite.swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BBAB21D62EA8CCDE006A0375 /* Products */;
 			projectDirPath = "";
@@ -370,6 +376,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BB5887282ECC845600B185A1 /* XCRemoteSwiftPackageReference "SQLite.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.15.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BB5887292ECC845600B185A1 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB5887282ECC845600B185A1 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
+			productName = SQLite;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BBAB21CD2EA8CCDE006A0375 /* Project object */;
 }
