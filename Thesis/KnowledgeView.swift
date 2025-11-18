@@ -1,8 +1,8 @@
 //
-//  KnowledgeView.swift
-//  Thesis
+//  KnowledgeView.swift
+//  Thesis
 //
-//  Created by Penpitcha Sureepitak on 27/10/2568 BE.
+//  Created by Penpitcha Sureepitak on 27/10/2568 BE.
 //
 
 import SwiftUI
@@ -14,100 +14,194 @@ struct WasteExample: Identifiable {
     let label: String
 }
 
+struct WasteCategory {
+    let name: String
+    let colorName: String
+    let color: Color
+    let description: String
+    let binImage: String
+    let examples: [WasteExample]
+}
+
 struct KnowledgeView: View {
-    @State private var selectedTab = 2
+    @State private var currentIndex = 0
+    
+    let wasteCategories: [WasteCategory] = [
+        WasteCategory(
+            name: "ถังขยะเปียก",
+            colorName: "(สีเขียว)",
+            color: .wetWasteColor,
+            description: "สำหรับขยะที่ย่อยสลายได้เองตามธรรมชาติ",
+            binImage: "Bin1",
+            examples: [
+                WasteExample(image: "Foodscraps", label: "เศษอาหาร"),
+                WasteExample(image: "Egg", label: "เปลือกไข่"),
+                WasteExample(image: "Fruit", label: "เปลือกผลไม้"),
+                WasteExample(image: "Leaf", label: "ใบไม้"),
+                WasteExample(image: "Veget", label: "เศษผัก"),
+                WasteExample(image: "Stick", label:"กิ่งไม้")
+            ]
+        ),
+        WasteCategory(
+            name: "ถังขยะทั่วไป",
+            colorName: "(สีเทา)",
+            color: Color.gray,
+            description: "สำหรับขยะทั่วไปไม่สามารถรีไซเคิลได้",
+            binImage: "Bin2",
+            examples: [
+                WasteExample(image: "Chips", label: "ซองขนม"),
+                WasteExample(image: "Tissue", label: "กระดาษทิชชู่"),
+                WasteExample(image: "Foambox", label: "กล่องโฟม"),
+                WasteExample(image: "Chopstick", label: "ตะเกียบไม้"),
+                WasteExample(image: "Straw", label: "หลอด"),
+                WasteExample(image: "Spoon", label: "ช้อน-ส้อม พลาสติก")
+            ]
+        ),
+        WasteCategory(
+            name: "ถังขยะรีไซเคิล",
+            colorName: "(สีเหลือง)",
+            color: Color.yellow,
+            description: "สำหรับขยะที่สามารถนำกลับมาใช้ใหม่หรือแปรรูปได้",
+            binImage: "Bin3",
+            examples: [
+                WasteExample(image: "Bottle", label: "ขวดพลาสติก"),
+                WasteExample(image: "Box", label: "กล่องกระดาษ"),
+                WasteExample(image: "Plasticcup", label: "แก้วพลาสติก"),
+                WasteExample(image: "Glassbottle", label: "ขวดแก้ว"),
+                WasteExample(image: "Can", label: "กระป๋อง"),
+                WasteExample(image: "Bag", label: "ถุงพลาสติก")
+            ]
+        ),
+    ]
     
     var body: some View {
-        ZStack(alignment: .bottom) {
-            Color.backgroundColor
-                .ignoresSafeArea()
-            
-            VStack(spacing: 0) {
-                // Header
-                VStack {
-                    Text("ความรู้ทั่วไป")
-                        .font(.noto(25, weight: .bold))
-                        .foregroundColor(.black)
-                        .padding(.top, 65)
-                        .padding(.bottom, 24)
-                }
+        NavigationStack {
+            ZStack(alignment: .bottom) {
+                Color.backgroundColor
+                    .ignoresSafeArea()
                 
-                // Bin Image Section
-                ZStack(alignment: .trailing) {
-                    VStack {
-                        Image("bin1-photoroom-2")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 150, height: 232)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.bottom, 32)
-                    
-                    Button(action: {}) {
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 30))
-                            .foregroundColor(.white)
-                    }
-                    .frame(width: 50, height: 50)
-                    .background(Color.mainColor)
-                    .clipShape(Circle())
-                    .padding(.trailing, 29)
-                    .padding(.top, 91)
-                }
-                
-                // Content Section
-                VStack(alignment: .leading, spacing: 0) {
-                    HStack(spacing: 0) {
-                        Text("ถังขยะเปียก ")
-                            .font(.noto(25, weight: .bold))
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 0) {
+                        
+                        Text("ความรู้ทั่วไป")
+                            .font(.noto(22, weight: .bold))
+                            .minimumScaleFactor(0.7)
                             .foregroundColor(.black)
-                        Text("(สีเขียว)")
-                            .font(.noto(25, weight: .bold))
-                            .foregroundColor(Color.wetWasteColor)
+                            .padding(.top, 10)
+                            .padding(.bottom, 10)
+                        
+                        let current = wasteCategories[currentIndex]
+                        
+                        ZStack {
+                            Image(current.binImage)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 150, height: 200)
+                                .padding(.bottom, 20)
+                            
+                            // ปุ่มลูกศร
+                            HStack {
+                                // ปุ่มซ้าย
+                                if currentIndex > 0 { // ใช้ currentIndex > 0 แทน == 1 || == 2 เพื่อให้ครอบคลุมกรณีที่มีถังขยะมากกว่า 3 ถัง
+                                    Button(action: {
+                                        withAnimation(.easeInOut) {
+                                            currentIndex -= 1
+                                        }
+                                    }) {
+                                        Image(systemName: "chevron.left")
+                                            .font(.system(size: 30))
+                                            .foregroundColor(.white)
+                                    }
+                                    .frame(width: 50, height: 50)
+                                    .background(Color.mainColor)
+                                    .clipShape(Circle())
+                                    .padding(.leading, 29)
+                                } else {
+                                    Color.clear
+                                        .frame(width: 50, height: 50)
+                                        .padding(.leading, 29)
+                                }
+                                
+                                Spacer()
+                                
+                                // ปุ่มขวา
+                                if currentIndex < wasteCategories.count - 1 { // ใช้ currentIndex < count - 1 เพื่อให้ครอบคลุมถังขยะทั้งหมด
+                                    Button(action: {
+                                        withAnimation(.easeInOut) {
+                                            currentIndex += 1
+                                        }
+                                    }) {
+                                        Image(systemName: "chevron.right")
+                                            .font(.system(size: 30))
+                                            .foregroundColor(.white)
+                                    }
+                                    .frame(width: 50, height: 50)
+                                    .background(Color.mainColor)
+                                    .clipShape(Circle())
+                                    .padding(.trailing, 29)
+                                    // *** ลบ .padding(.top, ...) เพื่อจัดให้อยู่กึ่งกลางแนวตั้ง ***
+                                } else {
+                                    Color.clear
+                                        .frame(width: 50, height: 50)
+                                        .padding(.trailing, 29)
+                                }
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        
+                        VStack(alignment: .leading, spacing: 0) {
+                            HStack(spacing: 0) {
+                                Text(current.name + " ")
+                                    .font(.noto(20, weight: .bold))
+                                    .minimumScaleFactor(0.8)
+                                    .foregroundColor(.black)
+                                Text(current.colorName)
+                                    .font(.noto(20, weight: .bold))
+                                    .minimumScaleFactor(0.8)
+                                    .foregroundColor(current.color)
+                            }
+                            .padding(.bottom, 8)
+                            
+                            Text(current.description)
+                                .font(.noto(16))
+                                .foregroundColor(.black)
+                                .multilineTextAlignment(.leading)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(.bottom, 20)
+                            
+                            Text("ตัวอย่างขยะ:")
+                                .font(.noto(18, weight: .bold))
+                                .foregroundColor(.black)
+                                .padding(.bottom, 20)
+                            
+                            WasteExamplesGrid(wasteExamples: current.examples)
+                            
+                            Color.clear.frame(height: 30)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 35)
+                        .padding(.top, 28)
+                        .background(
+                            Color.knowledgeBackground
+                                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                                .ignoresSafeArea(edges: .bottom)
+                        )
                     }
-                    .padding(.bottom, 8)
-                    
-                    Text("สำหรับขยะที่ย่อยสลายได้เองตามธรรมชาติ")
-                        .font(.noto(20))
-                        .foregroundColor(.black)
-                        .padding(.bottom, 20)
-                    
-                    Text("ตัวอย่างขยะ:")
-                        .font(.noto(20, weight: .bold))
-                        .foregroundColor(.black)
-                        .padding(.bottom, 42)
-                    
-                    // Grid of waste examples
-                    WasteExamplesGrid()
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 44)
-                .padding(.top, 37)
-                .padding(.bottom, 113)
-                .background(
-                    Color.knowledgeBackground
-                        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                        .ignoresSafeArea(edges: .bottom)
-                )
-                
-                Spacer()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }
 
+// ---------------------------------------------------------------- //
+
 struct WasteExamplesGrid: View {
-    let wasteExamples = [
-        WasteExample(image: "transparent-photoroom--3--2", label: "เศษอาหาร"),
-        WasteExample(image: "egg-photoroom-2", label: "เปลือกไข่"),
-        WasteExample(image: "fruit-photoroom-1", label: "เปลือกผลไม้"),
-        WasteExample(image: "leaf-photoroom-2", label: "ใบไม้"),
-        WasteExample(image: "veget3-photoroom-2", label: "เศษผัก"),
-        WasteExample(image: "mai-photoroom-2", label: "กิ่งไม้")
-    ]
+    let wasteExamples: [WasteExample]
     
     let columns = [
-        GridItem(.flexible(), spacing: 18),
+        GridItem(.flexible(), spacing: 8),
         GridItem(.flexible(), spacing: 18)
     ]
     
@@ -120,6 +214,7 @@ struct WasteExamplesGrid: View {
     }
 }
 
+
 struct WasteCard: View {
     let example: WasteExample
     
@@ -128,20 +223,21 @@ struct WasteCard: View {
             Image(example.image)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 62, height: 63)
-                .frame(width: 80)
-            
+                .frame(width: 60, height: 60)
+                .frame(width: 70)
+                
             Text(example.label)
-                .font(.noto(16, weight: .medium))
+                .font(.noto(14, weight: .medium))
                 .foregroundColor(.black)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.trailing, 8)
         }
-        .frame(height: 85)
+        .frame(height: 80)
         .background(Color.wasteCard)
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }
+
 
 #Preview {
     KnowledgeView()
