@@ -15,7 +15,45 @@ struct LoginView: View {
     
     @State private var showRegister = false
     
+    @State private var isEmailError: Bool = false
+    @State private var isPasswordError: Bool = false
+    @State private var loginErrorMessage: String = ""
+    
     @AppStorage("isLoggedIn") var isLoggedIn = false
+    
+    func validateAndLogin() {
+        loginErrorMessage = ""
+        
+        isEmailError = username.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        isPasswordError = password.isEmpty
+        
+        if !isEmailError && !isPasswordError {
+
+            let validUsername = "user@example.com"
+            let validPassword = "12345678"
+            
+            if username == validUsername && password == validPassword {
+                // Login สำเร็จ
+                isLoggedIn = true
+                print("Login Successful")
+                // ล้างสถานะข้อผิดพลาดทั้งหมดเมื่อสำเร็จ
+                isEmailError = false
+                isPasswordError = false
+            } else {
+                // Login ล้มเหลว - แสดงข้อความอีเมลหรือรหัสผ่านไม่ถูกต้อง
+                loginErrorMessage = "อีเมลหรือรหัสผ่านไม่ถูกต้อง"
+                print("Login Failed: Incorrect credentials")
+                
+                // **ส่วนที่เพิ่ม/แก้ไข:**
+                // ตั้งค่า isEmailError และ isPasswordError เป็น true เพื่อให้กรอบสีแดงขึ้นพร้อมกัน
+                isEmailError = true
+                isPasswordError = true
+            }
+            
+        } else {
+            print("Validation Failed: Empty fields")
+        }
+    }
     
     var body: some View {
         
@@ -26,18 +64,42 @@ struct LoginView: View {
                 
                 Text("LOGO")
                     .font(.system(size: 24))
-                
-                VStack(spacing: 26){//เปิด Vstack2
-                    
+                                        
                     VStack(alignment: .leading, spacing: 5) { //เปิด Vstack3
-                        Text("ชื่อผู้ใช้")
+                        Text("อีเมล")
                             .font(.noto(20, weight: .bold))
                         
-                        TextField("กรุณากรอกชื่อผู้ใช้", text: $username)
-                            .padding()
-                            .frame(width: 345, height: 49)
-                            .background(Color.textFieldColor)
-                            .cornerRadius(20)
+                        ZStack(alignment: .leading) {
+                            if username.isEmpty {
+                                Text("กรอกอีเมล")
+                                    .foregroundColor(Color.placeholderColor)
+                            }
+                            
+                            TextField("", text: $username)
+                        }
+                        .padding()
+                        .frame(width: 345, height: 49)
+                        .background(Color.textFieldColor)
+                        .cornerRadius(20)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(isEmailError || !loginErrorMessage.isEmpty ? Color.errorColor : Color.clear, lineWidth: 2)
+                        )
+                        
+                        if !loginErrorMessage.isEmpty {
+                            Text(loginErrorMessage) // แสดง "อีเมลหรือรหัสผ่านไม่ถูกต้อง"
+                                .font(.noto(15, weight: .medium))
+                                .foregroundColor(.errorColor)
+                                .padding(.leading,7)
+                        } else {
+                            Text("กรุณากรอกอีเมล")
+                                .font(.noto(15, weight: .medium))
+                                .foregroundColor(.errorColor)
+                            // แสดงข้อความ "กรุณากรอกอีเมล" เมื่อช่องว่างเท่านั้น
+                                .opacity(isEmailError ? 1 : 0)
+                                .padding(.leading,7)
+                        }
+                        
                     }//ปิด Vstack3
                     .padding(.top, 50)
                     
@@ -45,39 +107,63 @@ struct LoginView: View {
                         Text("รหัสผ่าน")
                             .font(.noto(20, weight: .bold))
                         
-                        HStack {//เปิด Hstack1
-                            if isPasswordVisible {
-                                TextField("กรุณากรอกรหัสผ่าน", text: $password)
-                            } else {
-                                SecureField("กรุณากรอกรหัสผ่าน", text: $password)
+                        ZStack(alignment: .leading) {
+                            if password.isEmpty {
+                                Text("กรอกรหัสผ่าน")
+                                    .foregroundColor(Color.placeholderColor)
                             }
                             
-                            Button {
-                                isPasswordVisible.toggle()
-                            } label: {
-                                Image(systemName: isPasswordVisible ? "eye.fill" : "eye.slash.fill")
-                                    .foregroundColor(.black)
+                            HStack {//เปิด Hstack1
+                                if isPasswordVisible {
+                                    TextField("", text: $password)
+                                } else {
+                                    SecureField("", text: $password)
+                                }
+                                
+                                Button {
+                                    isPasswordVisible.toggle()
+                                } label: {
+                                    Image(systemName: isPasswordVisible ? "eye.fill" : "eye.slash.fill")
+                                        .foregroundColor(.black)
+                                }
                             }
                         }//ปิด Hstack1
                         .padding()
                         .frame(width: 345, height: 49)
                         .background(Color.textFieldColor)
                         .cornerRadius(20)
-                        
-                        Button(action: {
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(isPasswordError || !loginErrorMessage.isEmpty ? Color.errorColor : Color.clear, lineWidth: 2)
+                        )
+                        HStack{
+                            if !loginErrorMessage.isEmpty {
+                                Text(loginErrorMessage)
+                                    .font(.noto(15, weight: .medium))
+                                    .foregroundColor(.errorColor)
+                                    .padding(.leading,7)
+                            } else {
+                                Text("กรุณากรอกรหัสผ่าน")
+                                    .font(.noto(15, weight: .medium))
+                                    .foregroundColor(.errorColor)
+                                    .opacity(isPasswordError ? 1 : 0)
+                                    .padding(.leading,7)
+                            }
+                            Spacer()
+                            
+                            Button(action: {
                                 // forgot password action
-                        }) {
-                            Text("ลืมรหัสผ่าน?")
-                                .font(.noto(15, weight: .medium))
-                                .foregroundColor(.mainColor)
+                            }) {
+                                Text("ลืมรหัสผ่าน?")
+                                    .font(.noto(15, weight: .medium))
+                                    .foregroundColor(.mainColor)
+                            }
                         }
-                        .frame(width: 345, alignment: .trailing)
+                        .frame(width: 345)
                     }//ปิด Vstack4
-                }//ปิด Vstack2
                 
                 Button(action: {
-                    //                    print("Login tapped")
-                    isLoggedIn = true
+                    validateAndLogin()
                 }) {
                     Text("เข้าสู่ระบบ")
                         .font(.noto(20, weight: .bold))
