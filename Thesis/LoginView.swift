@@ -153,6 +153,7 @@ struct LoginView: View {
                             
                             Button(action: {
                                 // forgot password action
+//                                NavigationLink(destination: EmailForgotPassword())
                             }) {
                                 Text("ลืมรหัสผ่าน?")
                                     .font(.noto(15, weight: .medium))
@@ -179,10 +180,7 @@ struct LoginView: View {
                         .font(.noto(15,weight: .medium))
                         .foregroundColor(.black)
                         
-                    Button(action: {
-//                        print("Register")
-                        showRegister = true
-                    }){
+                    NavigationLink(destination: RegisterView()){
                         Text("ลงทะเบียน")
                             .font(.noto(15,weight: .bold))
                             .foregroundColor(.mainColor)
