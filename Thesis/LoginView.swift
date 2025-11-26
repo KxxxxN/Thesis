@@ -12,9 +12,7 @@ struct LoginView: View {
     @State private var password: String = ""
     
     @State private var isPasswordVisible: Bool = false
-    
-    @State private var showRegister = false
-    
+        
     @State private var isEmailError: Bool = false
     @State private var isPasswordError: Bool = false
     @State private var loginErrorMessage: String = ""
@@ -250,9 +248,6 @@ struct LoginView: View {
             } //ปิด Vstack1
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.backgroundColor)
-            .navigationDestination(isPresented: $showRegister) {
-                RegisterView()
-            }
         }
     }
 }
