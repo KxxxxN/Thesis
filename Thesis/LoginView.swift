@@ -161,16 +161,12 @@ struct LoginView: View {
                         .frame(width: 345)
                     }//ปิด Vstack4
                 
-                Button(action: {
-                    validateAndLogin()
-                }) {
-                    Text("เข้าสู่ระบบ")
-                        .font(.noto(20, weight: .bold))
-                        .foregroundColor(.white)
-                        .frame(width: 155, height: 49)
-                        .background(Color.mainColor)
-                        .cornerRadius(20)
-                }
+                PrimaryButton(
+                    title: "เข้าสู่ระบบ",
+                    action: validateAndLogin,
+                    width: 155,  
+                    height: 49
+                )
                 .padding(.top, 21)
 
                 HStack(spacing: 8){
@@ -203,46 +199,15 @@ struct LoginView: View {
                 .padding(.top, 64.5)
                 
                 VStack(spacing: 16){
-                    Button(action: {
-                        print("Google")
-                    }){HStack(spacing: 15) {
-                        Image("GoogleIcon")
-                            .resizable()
-                            .frame(width: 30, height: 30)
-                        
-                        Text("ดำเนินการต่อด้วย Google")
-                            .font(.noto(18, weight: .medium))
-                            .foregroundColor(.mainColor)
-                    }
-                    .padding(.leading, 54)
-                    .frame(width: 345, height: 49, alignment: .leading)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(Color.mainColor, lineWidth: 2)
-                    )
+                    SocialLoginButton(iconName: "GoogleIcon", title: "ดำเนินการต่อด้วย Google") {
+                        print("Google Login Action")
                     }
                     .padding(.top, 21)
                     
-                    Button(action: {
-                        print("X")
-                    }){HStack(spacing: 15) {
-                        Image("XIcon")
-                            .resizable()
-                            .frame(width: 30, height: 30)
-                        
-                        Text("ดำเนินการต่อด้วย X (Twitter)")
-                            .font(.noto(18, weight: .medium))
-                            .foregroundColor(.mainColor)
-                    }
-                    .padding(.leading, 54)
-                    .frame(width: 345, height: 49, alignment: .leading)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(Color.mainColor, lineWidth: 2)
-                    )
+                    SocialLoginButton(iconName: "XIcon", title: "ดำเนินการต่อด้วย X (Twitter)") {
+                        print("X Login Action")
                     }
                 }
-                
                 Spacer()
                 
             } //ปิด Vstack1

@@ -177,3 +177,51 @@ struct InputField: View {
         }
     }
 }
+
+// MARK: - Button Component
+
+//PrimaryButton
+struct PrimaryButton: View {
+    let title: String
+    let action: () -> Void
+    let width: CGFloat
+    let height: CGFloat
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.noto(20, weight: .bold))
+                .foregroundColor(.white)
+                .frame(width: width, height: height)
+                .background(Color.mainColor)
+                .cornerRadius(20)
+        }
+    }
+}
+
+//SocialLoginButton
+struct SocialLoginButton: View {
+    let iconName: String
+    let title: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 15) {
+                Image(iconName)
+                    .resizable()
+                    .frame(width: 30, height: 30)
+                
+                Text(title)
+                    .font(.noto(18, weight: .medium)) // ใช้ Font ที่คุณกำหนด
+                    .foregroundColor(.mainColor)
+            }
+            .padding(.leading, 54) // จัดตำแหน่งให้เป็นไปตาม Layout เดิม
+            .frame(width: 345, height: 49, alignment: .leading)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.mainColor, lineWidth: 2)
+            )
+        }
+    }
+}
