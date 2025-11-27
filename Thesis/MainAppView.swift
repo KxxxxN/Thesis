@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainAppView: View {
     @State private var currentCarouselIndex = 0
+    @Binding var hideTabBar: Bool
     
     let historyItems = [
         HistoryItem(title: "ขวดพลาสติก", date: "13/9/2025", points: "+3", pointsLabel: "คะแนน")
@@ -59,16 +60,17 @@ struct MainAppView: View {
                 .padding(.bottom, 36)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(maxWidth: .infinity, minHeight: 205, alignment: .leading)
+            .frame(height: 205)
+            .frame(maxWidth: .infinity)
             .padding(.leading, 28)
             .background(Color.mainColor)
             .clipShape(RoundedCorner(radius: 20, corners: [.bottomLeft, .bottomRight]))
             
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 20) {
-                    HistorySection(items: historyItems)
-                    RewardExchangeSection()
-                    FrequentWasteSection(items: recyclableItems)
+                    HistorySection(hideTabBar: $hideTabBar,items: historyItems)
+                    RewardExchangeSection(hideTabBar: $hideTabBar)
+                    FrequentWasteSection(hideTabBar: $hideTabBar, items: recyclableItems)
                     WasteSeparationGuideSection(currentIndex: $currentCarouselIndex)
                 }
                 .padding()
@@ -81,8 +83,10 @@ struct MainAppView: View {
     }
 }
 
-struct SectionHeader: View {
+
+struct SectionHeader<Destination: View>: View {
     let title: String
+    let destinationView: Destination
     
     var body: some View {
         HStack {
@@ -92,7 +96,7 @@ struct SectionHeader: View {
             
             Spacer()
             
-            Button(action: {}) {
+            NavigationLink(destination: destinationView.navigationBarBackButtonHidden(true)) {
                 HStack(spacing: 4) {
                     Text("ดูทั้งหมด")
                         .font(.noto(14, weight: .medium))
@@ -108,16 +112,20 @@ struct SectionHeader: View {
 }
 
 struct FrequentWasteSection: View {
+    
+    @Binding var hideTabBar: Bool
     let items: [RecyclableItem]
     
     var body: some View {
         VStack(spacing: 12) {
-            SectionHeader(title: "ขยะที่แยกบ่อย")
+            SectionHeader(title: "วิธีการแยกขยะ", destinationView: FrequentWasteView())
             
             HStack(spacing: 8) {
                 ForEach(items) { item in
-                    RecyclableItemCard(item: item)
-                        
+                    NavigationLink(destination: WasteTypeView(hideTabBar: $hideTabBar)) {
+                        RecyclableItemCard(item: item)
+                            .foregroundColor(.primary)
+                    }
                 }
             }
         }
@@ -161,7 +169,7 @@ struct WasteSeparationGuideSection: View {
     
     var body: some View {
         VStack(spacing: 12) {
-            SectionHeader(title: "วิธีการแยกขยะ")
+            SectionHeader(title: "วิธีการแยกขยะ", destinationView: WasteSeparationGuideView())
             
             VStack(spacing: 12) {
                 ZStack {
@@ -210,6 +218,4 @@ struct RoundedCorner: Shape {
     }
 }
 
-#Preview {
-    MainAppView()
-}
+

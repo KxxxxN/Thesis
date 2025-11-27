@@ -7,12 +7,15 @@
 import SwiftUI
 
 struct HistorySection: View {
+    
+    @Binding var hideTabBar: Bool
+
     let items: [HistoryItem]
     
     var body: some View {
         VStack(spacing: 12) {
-            SectionHeader(title: "ประวัติคะแนน")
-            
+            SectionHeader(title: "ประวัติคะแนน", destinationView: ScoreHistoryView(hideTabBar: $hideTabBar))
+
             ForEach(items) { item in
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
