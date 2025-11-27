@@ -10,228 +10,246 @@ import SwiftUI
 struct RegisterView: View {
     @Environment(\.dismiss) private var dismiss
     
-    @State private var firstName: String = ""
-    @State private var lastName: String = ""
-    @State private var email: String = ""
-    @State private var phone: String = ""
-    @State private var password: String = ""
-    @State private var confirmPassword: String = ""
-    
-    @State private var isPasswordVisible: Bool = false
-    @State private var isConfirmPasswordVisible: Bool = false
-    @State private var isPrivacyAccepted: Bool = false
-    @State private var showPrivacyPopup: Bool = false
+    // ใช้ @StateObject เพื่อจัดการ ViewModel ที่เก็บ State และ Logic
+    @StateObject private var viewModel = RegisterViewModel()
     
     var body: some View {
         NavigationStack {
             ZStack {
                 VStack{ //เปิด Vstack1
+                    // Header (ย้าย logic ออกไปไม่ได้)
                     ZStack {
                         Text("ลงทะเบียน")
                             .font(.noto(25, weight: .bold))
-                        
+                            
                         HStack {
                             Button {
+                                //                                viewModel.showSuccessPopup = false;
                                 dismiss()
                             } label: {
                                 Image(systemName: "chevron.left")
                                     .foregroundColor(.black)
                                     .font(.system(size: 24, weight: .bold))
                             }
-                            .padding(.leading, 18)
-                            
+                            .padding(.leading, 25)
+    
                             Spacer()
                         }
                     }
                     .padding(.bottom)
-                    
+                        
                     // MARK: Form Fields
-//                    VStack(spacing: 26) {
-//                        
-//                        InputField(title: "ชื่อผู้ใช้", placeholder: "กรุณากรอกชื่อผู้ใช้", text: $firstName)
-//                        
-//                        InputField(title: "นามสกุล", placeholder: "กรุณากรอกนามสกุล", text: $lastName)
-//                        
-//                        InputField(title: "อีเมล", placeholder: "กรุณากรอกอีเมล", text: $email)
-//                        
-//                        InputField(title: "เบอร์โทร", placeholder: "กรุณากรอกเบอร์โทร", text: $phone)
-//                        
-//                        PasswordField(title: "รหัสผ่าน", placeholder: "กรอกรหัสผ่าน", text: $password)
-//                        
-//                        PasswordField(title: "ยืนยันรหัสผ่าน",
-//                                      placeholder: "กรุณายืนยันรหัสผ่าน",
-//                                      text: $confirmPassword)
-//                    }
-                    
-                    VStack(spacing: 26){ //เปิด Vstack2
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text("ชื่อ")
-                                .font(.noto(20, weight: .bold))
-                            
-                            TextField("กรุณากรอกชื่อ", text: $firstName)
-                                .padding()
-                                .frame(width: 345, height: 49)
-                                .background(Color.textFieldColor)
-                                .cornerRadius(20)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text("นามสกุล")
-                                .font(.noto(20, weight: .bold))
-                            
-                            TextField("กรุณากรอกนามสกุล", text: $lastName)
-                                .padding()
-                                .frame(width: 345, height: 49)
-                                .background(Color.textFieldColor)
-                                .cornerRadius(20)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text("อีเมล")
-                                .font(.noto(20, weight: .bold))
-                            
-                            TextField("กรุณากรอกอีเมล", text: $email)
-                                .padding()
-                                .frame(width: 345, height: 49)
-                                .background(Color.textFieldColor)
-                                .cornerRadius(20)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text("เบอร์โทร")
-                                .font(.noto(20, weight: .bold))
-                            
-                            TextField("กรุณากรอกเบอร์โทร", text: $phone)
-                                .padding()
-                                .frame(width: 345, height: 49)
-                                .background(Color.textFieldColor)
-                                .cornerRadius(20)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text("รหัสผ่าน")
-                                .font(.noto(20, weight: .bold))
-                            
-                            HStack { //เปิด Hstack1
-                                if isPasswordVisible {
-                                    TextField("กรุณากรอกรหัสผ่าน", text: $password)
-                                } else {
-                                    SecureField("กรุณากรอกรหัสผ่าน", text: $password)
-                                }
+                    ScrollView(.vertical, showsIndicators: false) {
+                        VStack{ //เปิด Vstack2
                                 
-                                Button {
-                                    isPasswordVisible.toggle()
-                                } label: {
-                                    Image(systemName: isPasswordVisible ? "eye.fill" : "eye.slash.fill")
-                                        .foregroundColor(.black)
-                                }
-                            } //ปิด Hstack1
-                            .padding()
-                            .frame(width: 345, height: 49)
-                            .background(Color.textFieldColor)
-                            .cornerRadius(20)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text("ยืนยันรหัสผ่าน")
-                                .font(.noto(20, weight: .bold))
-                            
-                            HStack { //เปิด Hstack1
-                                if isPasswordVisible {
-                                    TextField("กรุณายืนยันรหัสผ่าน", text: $confirmPassword)
-                                } else {
-                                    SecureField("กรุณายืนยันรหัสผ่าน", text: $confirmPassword)
-                                }
+                            // First Name
+                            InputField(
+                                title: "ชื่อ",
+                                placeholder: "กรอกชื่อภาษาไทย",
+                                text: $viewModel.firstName,
+                                isValid: $viewModel.isFirstNameValid,
+                                errorMessage: viewModel.firstName.isEmpty ? "จำเป็นต้องระบุ" : "กรุณากรอกชื่อให้ถูกต้อง",
                                 
-                                Button {
-                                    isConfirmPasswordVisible.toggle()
-                                } label: {
-                                    Image(systemName: isConfirmPasswordVisible ? "eye.fill" : "eye.slash.fill")
-                                        .foregroundColor(.black)
+                            )
+                            // ใช้ onChange รูปแบบใหม่
+                            .onChange(of: viewModel.firstName) {
+                                if !viewModel.firstName.isEmpty {
+                                    viewModel.isFirstNameValid = viewModel.isNameValid(name: viewModel.firstName)
                                 }
-                            } //ปิด Hstack1
-                            .padding()
-                            .frame(width: 345, height: 49)
-                            .background(Color.textFieldColor)
-                            .cornerRadius(20)
-                        }
-                    }//ปิด Vstack2
-                    
-                    // MARK: Privacy Accept
-                    HStack {
-                        Button { isPrivacyAccepted.toggle() } label: {
-                            Image(systemName: isPrivacyAccepted ? "checkmark.square.fill" : "square")
-                                .foregroundColor(isPrivacyAccepted ? .mainColor : .gray)
-                                .font(.system(size: 20))
-                        }
-                        HStack(spacing:0){
-                            Text("ฉันได้อ่านและยอมรับ")
-                                .font(.noto(15, weight: .medium))
+                            }
+                                
+                            // Last Name
+                            InputField(
+                                title: "นามสกุล",
+                                placeholder: "กรอกนามสกุลภาษาไทย",
+                                text: $viewModel.lastName,
+                                isValid: $viewModel.isLastNameValid,
+                                // ปรับ errorMessage ให้เข้ากับ ViewModel
+                                errorMessage: viewModel.lastName.isEmpty ? "จำเป็นต้องระบุ" : "กรุณากรอกนามสกุลให้ถูกต้อง",
+                            )
+                            .onChange(of: viewModel.lastName) {
+                                if !viewModel.lastName.isEmpty {
+                                    viewModel.isLastNameValid = viewModel.isNameValid(name: viewModel.lastName)
+                                }
+                            }
+                                
+                            // Email
+                            InputField(
+                                title: "อีเมล",
+                                placeholder: "กรอกอีเมล",
+                                text: $viewModel.email,
+                                isValid: $viewModel.isEmailValid,
+                                // ปรับ errorMessage ให้เข้ากับ ViewModel
+                                errorMessage: viewModel.email.isEmpty ? "จำเป็นต้องระบุ" : "รูปแบบอีเมลไม่ถูกต้อง",
+                            )
+                            .onChange(of: viewModel.email) {
+                                // Live validation
+                                if !viewModel.email.isEmpty {
+                                    viewModel.isEmailValid = viewModel.isValidEmail(email: viewModel.email)
+                                }
+                            }
+                                
+                            // Phone
+                            InputField(
+                                title: "เบอร์โทร",
+                                placeholder: "0XX-XXX-XXXX",
+                                text: $viewModel.phone,
+                                isValid: $viewModel.isPhoneValid,
+                                // ปรับ errorMessage ให้เข้ากับ ViewModel
+                                errorMessage: viewModel.phone.isEmpty ? "จำเป็นต้องระบุ" : "รูปแบบเบอร์โทรไม่ถูกต้อง",
+                            )
+                            .onChange(of: viewModel.phone) {
+                                // Live validation
+                                if !viewModel.phone.isEmpty {
+                                    viewModel.isPhoneValid = viewModel.isValidPhone(phone: viewModel.phone)
+                                }
+                            }
+                                
+                            // Password
+                            InputField(
+                                title: "รหัสผ่าน",
+                                placeholder: "อย่างน้อย 8 ตัวอักษร",
+                                text: $viewModel.password,
+                                isValid: $viewModel.isPasswordValid,
+                                errorMessage: viewModel.password.isEmpty ? "จำเป็นต้องระบุ" : "รูปแบบรหัสผ่านไม่ถูกต้อง",
+                                isSecure: true,
+                                isPasswordToggle: $viewModel.isPasswordVisible
+                            )
+                            .onChange(of: viewModel.password) {
+                                
+                                let password = viewModel.password
+                                
+                                let confirmPassword = viewModel.confirmPassword
+                                
+                                if !password.isEmpty {
+                                    
+                                    let regexPassed = viewModel.isPasswordValid(password: password)
+                                    let matchConfirmed = (password == confirmPassword)
+                                    
+                                    // **1. แก้ไข Logic รวม:** // isPasswordValid = (Regex ผ่าน) AND (ช่อง Confirm ว่าง หรือ ตรงกัน)
+                                    viewModel.isPasswordValid = regexPassed && (confirmPassword.isEmpty || matchConfirmed)
+                                    
+                                    // **2. อัปเดตสถานะของ Confirm Password ด้วย**
+
+                                    if !confirmPassword.isEmpty {
+
+                                        viewModel.isConfirmPasswordValid = matchConfirmed
+                                        
+                                    }
+                                } else {
+                                        // **3. จัดการช่องว่าง:** ถ้าว่าง ให้ถือว่า Valid ชั่วคราว
+                                        viewModel.isPasswordValid = true
+                                        
+                                    }
+                                
+                            }
+                                
+                            // Password Validation Checklist
+                            if !viewModel.isPasswordValid(password: viewModel.password) {
+                                PasswordValidationChecklist(viewModel: viewModel)
+                                    .padding(.top, -7)
+                                    .padding(.bottom, 5)
+                            }
+                                
+                            // Confirm Password
+                            InputField(
+                                title: "ยืนยันรหัสผ่าน",
+                                placeholder: "กรอกรหัสผ่านอีกครั้ง",
+                                text: $viewModel.confirmPassword,
+                                isValid: $viewModel.isConfirmPasswordValid,
+                                errorMessage: viewModel.confirmPassword.isEmpty ? "จำเป็นต้องระบุ" : "รหัสผ่านไม่ตรงกัน",
+                                isSecure: true,
+                                isPasswordToggle: $viewModel.isConfirmPasswordVisible
+                            )
+                            .onChange(of: viewModel.confirmPassword) {
+                                // Live validation:
+                                if !viewModel.confirmPassword.isEmpty {
+                                    // isConfirmPasswordValid จะเป็น false ถ้าไม่ตรงกัน
+                                    viewModel.isConfirmPasswordValid = (viewModel.password == viewModel.confirmPassword)
+                                }
+                            }
+                        }//ปิด Vstack2
+                        .padding(.horizontal, 40)
                             
-                            Button(action: {
-                                showPrivacyPopup = true
-                            }){
-                                Text("นโยบายความเป็นส่วนตัว*") .font(.noto(15,weight: .semibold)) .foregroundColor(Color.dangerColor) .underline(color: .dangerColor)
+                        // MARK: Privacy Accept
+                        VStack {
+                            HStack {
+                                Button { viewModel.isPrivacyAccepted.toggle() } label: {
+                                    Image(systemName: viewModel.isPrivacyAccepted ? "checkmark.square.fill" : "square")
+                                        .foregroundColor(viewModel.isPrivacyAccepted ? .mainColor : .mainColor)
+                                        .font(.system(size: 20))
+                                }
+                                HStack(spacing:0){
+                                    Text("ฉันได้อ่านและยอมรับ")
+                                        .font(.noto(15, weight: .medium))
+                                        
+                                    Button(action: { viewModel.showPrivacyPopup = true }){
+                                        Text("นโยบายความเป็นส่วนตัว*")
+                                            .font(.noto(15,weight: .semibold))
+                                            .foregroundColor(Color.dangerColor)
+                                            .underline(color: .dangerColor)
+                                    }
+                                }
+                                Spacer()
+                            }
+                            .frame(width: 345, alignment: .leading)
+                                
+                            if !viewModel.isPrivacyAccepted && viewModel.isFormSubmitted {
+                                Text("จำเป็นต้องยอมรับนโยบายความเป็นส่วนตัว")
+                                    .font(.noto(15, weight: .medium))
+                                    .foregroundColor(Color.errorColor)
+                                    .frame(width: 345, alignment: .leading)
                             }
                         }
+                        .padding(.top,16)
+                            
+                        Button(action: {
+                            // ย้าย logic ไปที่ ViewModel และใช้ผลลัพธ์ในการแสดง Popup
+                            viewModel.isFormSubmitted = true
+                            if viewModel.validateForm() {
+                                print("สร้างบัญชีสำเร็จ")
+                                viewModel.showSuccessPopup = true
+                                
+                                Task {
+                                    try await Task.sleep(nanoseconds: 2_000_000_000)
+                                        
+                                    // ตรวจสอบว่า Popup ยังเปิดอยู่หรือไม่ก่อนทำการปิด
+                                    if viewModel.showSuccessPopup {
+                                        viewModel.showSuccessPopup = false
+                                        dismiss()
+                                    }
+                                }
+                            } else {
+                                print("มีช่องที่ต้องกรอก")
+                            }
+                        }) {
+                            Text("สร้างบัญชี")
+                                .font(.noto(20, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(width: 155, height: 49)
+                                .background(Color.mainColor)
+                                .cornerRadius(20)
+                        }
+                        .padding(.top, 13)
+                        .padding(.bottom, 20)
+                        Spacer()
                     }
-                    .frame(width: 345, alignment: .leading)
-                    .padding(.top, 15)
-                    
-                    Button(action: {
-                        print("สร้างบัญชี")
-//                        isLoggedIn = true
-                    }) {
-                        Text("สร้างบัญชี")
-                            .font(.noto(20, weight: .bold))
-                            .foregroundColor(.white)
-                            .frame(width: 155, height: 49)
-                            .background(Color.mainColor)
-                            .cornerRadius(20)
-                    }
-                    .padding(.top, 55)
-                    Spacer()
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.backgroundColor)
-                .blur(radius: showPrivacyPopup ? 6 : 0)
+                .blur(radius: viewModel.showPrivacyPopup || viewModel.showSuccessPopup ? 6 : 0)
+                .onTapGesture {
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }
                 
                 // MARK: Privacy Popup
-                if showPrivacyPopup {
-                    Color.black.opacity(0.4)
-                        .ignoresSafeArea()
-                    
-                    VStack {
-                        HStack {
-                            Spacer()
-                            Button(action: { showPrivacyPopup = false }) {
-                                Image(systemName: "xmark")
-                                    .foregroundColor(.black)
-                                    .padding(.top, 10)
-                                    .padding(.horizontal, 10)
-                                    .background(Color.white.opacity(0.7))
-                                    .clipShape(Circle())
-                            }
-                        }
-                                        
-                        ScrollView {
-                            Text("""
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                            """)
-                            .font(.noto(16))
-                            .padding()
-                        }
-                        .frame(height: 500)
-                        .background(Color.white.opacity(0.9))
-                        .cornerRadius(15)
-                    }
-                    .padding()
-                    .frame(width: 386)
-                    .background(Color.white)
-                    .cornerRadius(15)
-                    .shadow(radius: 10)
-                    .transition(.scale)
-                    .animation(.spring(), value: showPrivacyPopup)
+                if viewModel.showPrivacyPopup {
+                    PrivacyPopupView(showPrivacyPopup: $viewModel.showPrivacyPopup)
+                }
+                
+                // MARK: Success Popup
+                if viewModel.showSuccessPopup {
+                    SuccessPopupView()
                 }
             }
         }
