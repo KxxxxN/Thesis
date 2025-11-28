@@ -2,11 +2,9 @@
 //  RegisterViewModel.swift
 //  Thesis
 //
-//  Created by Kansinee Klinkhachon on 27/11/2568 BE.
+//  Created by Kansinee Klinkhachon on 28/11/2568 BE.
 //
 
-
-// RegisterViewModel.swift
 
 import Foundation
 import Combine
@@ -32,7 +30,6 @@ class RegisterViewModel: ObservableObject {
     @Published var isPhoneValid: Bool = true
     @Published var isPasswordValid: Bool = true
     @Published var isConfirmPasswordValid: Bool = true
-    
     
     // MARK: - Phone
     func isValidPhone(phone: String) -> Bool {

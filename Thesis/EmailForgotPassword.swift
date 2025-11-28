@@ -5,21 +5,37 @@
 //  Created by Kansinee Klinkhachon on 28/11/2568 BE.
 //
 
-
-//
-//  EmailForgotPassword.swift
-//  Thesis
-//
-//  Created by Kansinee Klinkhachon on 9/11/2568 BE.
-//
-
 import SwiftUI
 
 struct EmailForgotPassword: View {
     @Environment(\.dismiss) private var dismiss
     
-    @State private var email: String = ""
+    @StateObject private var viewModel = ForgotPasswordViewModel()
     
+    @State private var navigateToOTP: Bool = false
+    
+    private var isAnyError: Bool {
+        return !viewModel.isEmailValid
+    }
+
+        // Logic ในการเลือกข้อความผิดพลาดที่ควรแสดง และจองพื้นที่
+    private var currentErrorMessage: String {
+        // 1. Server Error (Highest Priority)
+        if let serverError = viewModel.serverErrorMessage, !serverError.isEmpty {
+            return serverError
+        }
+        // 2. Client Error: Empty
+        if viewModel.email.isEmpty {
+            return "กรุณากรอกอีเมลที่ลงทะเบียนไว้"
+        }
+        // 3. Client Error: Format
+        if !viewModel.isValidEmail(email: viewModel.email) {
+            return "รูปแบบอีเมลไม่ถูกต้อง"
+        }
+        // 4. จองพื้นที่: ใช้ข้อความที่ยาวที่สุด และจะถูกซ่อนด้วย .opacity(0)
+        return "อีเมลนี้ยังไม่ได้ลงทะเบียน"
+    }
+
     var body: some View {
         NavigationStack {
             VStack{ //เปิด Vstack1
@@ -41,35 +57,44 @@ struct EmailForgotPassword: View {
                 }//ปิด Zstack1
                 .padding(.bottom)
                 
-                VStack(alignment: .leading, spacing: 0) { //เปิด Vstack2
-                    Text("อีเมล")
-                        .font(.noto(20, weight: .bold))
-                    
-                    TextField("กรุณากรอกอีเมล", text: $email)
-                        .padding()
-                        .frame(width: 345, height: 49)
-                        .background(Color.textFieldColor)
-                        .cornerRadius(20)
-                } //ปิด Vstack2
-                
-//                Button(action: {
-//                    showPrivacyPopup = true
-//                }){
-                NavigationLink(destination: OTPConfirmView()) {
-                    Text("ส่งรหัส OTP")
-                        .font(.noto(20, weight: .bold))
-                        .foregroundColor(.white)
-                        .frame(width: 155, height: 49)
-                        .background(Color.mainColor)
-                        .cornerRadius(20)
+                EmailInputField(
+                    title: "ที่อยู่อีเมล",
+                    placeholder: "กรอกอีเมล",
+                    text: $viewModel.email,
+                    isValid: $viewModel.isEmailValid,
+                    displayErrorMessage: currentErrorMessage, // ส่งข้อความที่คำนวณแล้ว
+                    isErrorActive: isAnyError // ส่งสถานะการแสดงผล
+                                )
+                .onChange(of: viewModel.email) {
+                    viewModel.serverErrorMessage = nil
+                    if !viewModel.email.isEmpty {
+                        viewModel.isEmailValid = viewModel.isValidEmail(email: viewModel.email)
+                    } else {
+                        viewModel.isEmailValid = false
+                    }
                 }
-                .padding(.top, 55)
+                PrimaryButton(
+                    title: "ส่งรหัส OTP",
+                    action: {
+                        viewModel.handleSendOTP { success in
+                            if success {
+                                navigateToOTP = true
+                            }
+                        }
+                    },
+                    width: 155,
+                    height: 49
+                )
+                .padding(.top)
                 
                 Spacer()
                 
             }//ปิด Vstack1
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.backgroundColor)
+            .navigationDestination(isPresented: $navigateToOTP) {
+                OTPConfirmView()
+            }
         }
         .navigationBarBackButtonHidden(true)
         .navigationTitle("")

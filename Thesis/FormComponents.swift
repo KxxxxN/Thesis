@@ -225,3 +225,53 @@ struct SocialLoginButton: View {
         }
     }
 }
+
+struct EmailInputField: View {
+    let title: String
+    let placeholder: String
+    
+    @Binding var text: String
+    @Binding var isValid: Bool
+    
+    // พารามิเตอร์สำหรับข้อความแสดง Error ที่คำนวณไว้แล้ว
+    let displayErrorMessage: String
+    // พารามิเตอร์สำหรับสถานะการแสดงผล (เพื่อควบคุม opacity)
+    let isErrorActive: Bool
+    
+    var body: some View {
+        // VStack ที่รวม Title, Field Box, และ Error Message
+        VStack(alignment: .leading, spacing: 3) {
+            
+            RequiredTitle(title: title)
+                 
+            // MARK: - Field Box
+            HStack {
+                ZStack(alignment: .leading) {
+                    PlaceholderView(text: text, placeholder: placeholder)
+                    
+                    TextField("", text: $text)
+                        .font(.noto(18, weight: .medium)) // สมมติว่า Font มีอยู่
+                }
+            }
+            .padding()
+            .frame(width: 345, height: 49)
+            .background(Color.textFieldColor)
+            .cornerRadius(20)
+            .modifier(ValidationBorder(isValid: isValid)) // ใช้ ValidationBorder
+                 
+            // MARK: - Error Message (จองพื้นที่คงที่)
+            HStack {
+                Text(displayErrorMessage)
+                    .font(.noto(15, weight: .medium))
+                    .foregroundColor(Color.errorColor)
+                    // ควบคุมการแสดงผล: แสดงเมื่อมี Error เท่านั้น
+                    .opacity(isErrorActive ? 1 : 0)
+                    .padding(.leading, 7)
+                
+                Spacer()
+            }
+            // กำหนดความสูงคงที่ 20 หน่วย + Padding ด้านบน 5 หน่วย
+            .frame(width: 345, alignment: .topLeading)
+        }
+    }
+}

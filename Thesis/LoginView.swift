@@ -93,7 +93,7 @@ struct LoginView: View {
                             Text("กรุณากรอกอีเมล")
                                 .font(.noto(15, weight: .medium))
                                 .foregroundColor(.errorColor)
-                            // แสดงข้อความ "กรุณากรอกอีเมล" เมื่อช่องว่างเท่านั้น
+    
                                 .opacity(isEmailError ? 1 : 0)
                                 .padding(.leading,7)
                         }
