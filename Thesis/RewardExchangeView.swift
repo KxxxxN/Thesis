@@ -63,7 +63,6 @@ struct RewardExchangeView: View {
             .frame(height: 123)
             .clipShape(RoundedCorner(radius: 20, corners: [.bottomLeft, .bottomRight]))
             
-            // MARK: Scroll Content
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
                     

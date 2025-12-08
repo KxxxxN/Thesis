@@ -178,7 +178,7 @@ struct WasteItemCard: View {
         }
         .padding(.horizontal, 16)
         .frame(height: 110)
-        .background(cardColor)
+        .background(Color.thirdColor)
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }

@@ -49,7 +49,6 @@ struct DetailView: View {
                     }
                     .padding(.horizontal, 18)
                 }
-                .padding(.top, 5)
                 .padding(.bottom,27)
                 
                 ScrollView {
@@ -99,9 +98,9 @@ struct DetailView: View {
                             }
                         }
                         .padding(.horizontal, 58)
-                        .padding(.top, 23)
+                        .padding(.top, 20)
                         
-                        VStack(alignment: .leading, spacing: 24) {
+                        VStack(alignment: .leading, spacing: -10) {
                             Text("วิธีการแยกขยะ")
                                 .font(.noto(20, weight: .bold))
                                 .foregroundColor(.black)
@@ -112,12 +111,11 @@ struct DetailView: View {
                                     if index > 0 {
                                         Image(systemName: "arrow.right")
                                             .foregroundColor(.black)
-                                            .font(.system(size: 15))
+                                            .font(.system(size: 20))
                                             .padding(.horizontal, 8)
-                                            .padding(.top, 40)
                                     }
                                     
-                                    VStack(spacing: 20) {
+                                    VStack(spacing: 0) {
                                         ZStack {
                                             Color.clear
                                                 .frame(width: 90, height: 90)
@@ -142,29 +140,30 @@ struct DetailView: View {
                             }
                         }
                         .padding(.horizontal, 37)
-                        .padding(.top, 29)
+                        .padding(.top, 20)
                         
                         VStack(alignment: .leading, spacing: 9) {
                             Text("การรีไซเคิล")
                                 .font(.noto(20, weight: .bold))
                                 .foregroundColor(.black)
                             
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: -5) {
                                 ForEach(recyclingMethods, id: \.self) { method in
-                                    Text("• \(method)")
+                                    Text("•   \(method)")
                                         .font(.noto(18, weight: .medium))
                                         .foregroundColor(.black)
                                 }
                             }
                         }
                         .padding(.horizontal, 37)
-                        .padding(.top, 34)
+                        .padding(.top, 20)
                         .padding(.bottom, 40)
                         
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(Color.knowledgeBackground)
                     .cornerRadius(20, corners: [.topLeft, .topRight])
+                    .edgesIgnoringSafeArea(.bottom)  // ⭐ ให้ยาวจนสุดขอบล่าง
                 }
             }
         }

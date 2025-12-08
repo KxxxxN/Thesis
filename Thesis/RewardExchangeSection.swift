@@ -1,3 +1,9 @@
+//
+//  RewardExchangeSection.swift
+//  Thesis
+//
+//  Created by Kansinee Klinkhachon on 27/11/2568 BE.
+//
 import SwiftUI
 
 struct RewardExchangeSection: View {
@@ -7,22 +13,15 @@ struct RewardExchangeSection: View {
     
     var body: some View {
         VStack(spacing: 12) {
-            // NavigationLink ลับ
-            NavigationLink(
-                destination: RewardExchangeView(hideTabBar: $hideTabBar).navigationBarBackButtonHidden(true),
-                isActive: $navigateToExchangeView
-            ) {
-                EmptyView()
-            }
-            .hidden() // 🔹 ซ่อนและไม่เกิดช่องว่าง
             
-            // SectionHeader
             SectionHeader(
                 title: "แลกคะแนน",
                 destinationView: RewardExchangeView(hideTabBar: $hideTabBar)
             )
+            .onTapGesture {
+                navigateToExchangeView = true
+            }
             
-            // HStack คะแนน
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -56,6 +55,11 @@ struct RewardExchangeSection: View {
             .onTapGesture {
                 navigateToExchangeView = true
             }
+        }
+        // 🔹 Navigation using iOS 16+ approach
+        .navigationDestination(isPresented: $navigateToExchangeView) {
+            RewardExchangeView(hideTabBar: $hideTabBar)
+                .navigationBarBackButtonHidden(true)
         }
     }
 }

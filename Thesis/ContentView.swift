@@ -20,7 +20,7 @@ struct ContentView: View {
                 ZStack{
                     if self.index == 0 { MainAppView(hideTabBar: $hideTabBar) }
                     else if self.index == 1 { Color.red }
-                    else if self.index == 2 { KnowledgeView() }
+                    else if self.index == 2 { KnowledgeView(hideTabBar: $hideTabBar) }
                     else { AccountView() }
                 }
                 
