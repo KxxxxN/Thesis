@@ -6,23 +6,11 @@
 //
 
 
-//
-//  ChangePasswordView.swift
-//  Thesis
-//
-//  Created by Kansinee Klinkhachon on 9/11/2568 BE.
-//
-
 import SwiftUI
 
 struct ChangePasswordView: View {
     @Environment(\.dismiss) private var dismiss
-    
-    @State private var password: String = ""
-    @State private var confirmPassword: String = ""
-    
-    @State private var isPasswordVisible: Bool = false
-    @State private var isConfirmPasswordVisible: Bool = false
+    @StateObject private var viewModel = ChangePasswordViewModel()
     
     var body: some View {
         NavigationStack {
@@ -45,59 +33,57 @@ struct ChangePasswordView: View {
                 }//ปิด Zstack1
                 .padding(.bottom)
                 
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("รหัสผ่าน")
-                        .font(.noto(20, weight: .bold))
-                    
-                    HStack { //เปิด Hstack1
-                        if isPasswordVisible {
-                            TextField("กรุณากรอกรหัสผ่าน", text: $password)
-                        } else {
-                            SecureField("กรุณากรอกรหัสผ่าน", text: $password)
-                        }
-                        
-                        Button {
-                            isPasswordVisible.toggle()
-                        } label: {
-                            Image(systemName: isPasswordVisible ? "eye.fill" : "eye.slash.fill")
-                                .foregroundColor(.black)
-                        }
-                    } //ปิด Hstack1
-                    .padding()
-                    .frame(width: 345, height: 49)
-                    .background(Color.textFieldColor)
-                    .cornerRadius(20)
+                // --- 1. ช่องรหัสผ่านใหม่ ---
+                ChangePasswordField(
+                    title: "รหัสผ่าน",
+                    placeholder: "กรุณากรอกรหัสผ่าน",
+                    text: $viewModel.password,
+                    isValid: $viewModel.isPasswordValid,
+                    errorMessage: viewModel.password.isEmpty ?
+                    "กรุณากรอกรหัสผ่าน" : "รูปแบบรหัสผ่านไม่ถูกต้อง",
+                    isSecure: true,
+                    isPasswordToggle: $viewModel.isConfirmPasswordVisible
+                )
+                .onChange(of: viewModel.password) {
+                    if !viewModel.password.isEmpty {
+                        viewModel.isPasswordValid = viewModel.isPasswordValid(password:viewModel.password)
+                    }
                 }
                 
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("ยืนยันรหัสผ่าน")
-                        .font(.noto(20, weight: .bold))
-                    
-                    HStack { //เปิด Hstack1
-                        if isPasswordVisible {
-                            TextField("กรุณายืนยันรหัสผ่าน", text: $confirmPassword)
-                        } else {
-                            SecureField("กรุณายืนยันรหัสผ่าน", text: $confirmPassword)
-                        }
-                        
-                        Button {
-                            isConfirmPasswordVisible.toggle()
-                        } label: {
-                            Image(systemName: isConfirmPasswordVisible ? "eye.fill" : "eye.slash.fill")
-                                .foregroundColor(.black)
-                        }
-                    } //ปิด Hstack1
-                    .padding()
-                    .frame(width: 345, height: 49)
-                    .background(Color.textFieldColor)
-                    .cornerRadius(20)
+                if !viewModel.isPasswordValid(password: viewModel.password) {
+                    PasswordValidatCheckChangePassword(viewModel: viewModel)
+                        .padding(.top, -7)
+                        .padding(.bottom, 5)
                 }
-                .padding(.top, 26)
+                    
+                ChangePasswordField(
+                    title: "ยืนยันรหัสผ่าน",
+                    placeholder: "กรุณายืนยันรหัสผ่าน",
+                    text: $viewModel.confirmPassword,
+                    isValid: $viewModel.isConfirmPasswordValid,
+                    errorMessage: viewModel.confirmPassword.isEmpty ? "กรุณากรอกรหัสผ่านอีกครั้ง" : "รหัสผ่านไม่ตรงกัน",
+                    isSecure: true,
+                    isPasswordToggle: $viewModel.isConfirmPasswordVisible
+                )
+                .onChange(of: viewModel.confirmPassword) {
+                    if !viewModel.confirmPassword.isEmpty {
+                        viewModel.isConfirmPasswordValid = (viewModel.password == viewModel.confirmPassword)
+                    } else {
+                        // หากช่องยืนยันว่างเปล่า ให้ถือว่าไม่ถูกต้อง
+                        viewModel.isConfirmPasswordValid = false
+                    }
+                }
+                // 💡 สิ่งที่ต้องเพิ่ม: ตรวจสอบเมื่อมีการเปลี่ยนแปลงในช่องรหัสผ่าน (Password)
+                .onChange(of: viewModel.password) {
+                    // บังคับให้ตรวจสอบความถูกต้องใหม่ หากช่องยืนยันรหัสผ่านถูกกรอกแล้ว
+                    if !viewModel.confirmPassword.isEmpty {
+                        viewModel.isConfirmPasswordValid = (viewModel.password == viewModel.confirmPassword)
+                    }
+                }
                 
-//                Button(action: {
-//                    showPrivacyPopup = true
-//                }){
-                NavigationLink(destination: LoginView()) {
+                Button(action: {
+                    viewModel.changePassword()
+                }) {
                     Text("ยืนยัน")
                         .font(.noto(20, weight: .bold))
                         .foregroundColor(.white)
@@ -112,6 +98,9 @@ struct ChangePasswordView: View {
             }//ปิด Vstack1
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.backgroundColor)
+            .navigationDestination(isPresented: $viewModel.navigateToLogin) {
+                LoginView()
+            }
         }
         .navigationBarBackButtonHidden(true)
         .navigationTitle("")

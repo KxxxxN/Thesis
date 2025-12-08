@@ -22,7 +22,7 @@ class RegisterViewModel: ObservableObject {
     @Published var isPrivacyAccepted: Bool = false
     @Published var showPrivacyPopup: Bool = false
     @Published var showSuccessPopup: Bool = false
-    @Published var isFormSubmitted: Bool = false
+    @Published var isRegisterSubmitted: Bool = false
     
     @Published var isFirstNameValid: Bool = true
     @Published var isLastNameValid: Bool = true
@@ -97,7 +97,7 @@ class RegisterViewModel: ObservableObject {
     // MARK: - Main Validation Logic
     // เพิ่ม @discardableResult เพื่อให้ Xcode ไม่เตือนว่าผลลัพธ์ไม่ได้ถูกใช้ หากมีการเรียกใช้ฟังก์ชันนี้เพื่ออัปเดตสถานะเท่านั้น
     @discardableResult
-    func validateForm() -> Bool {
+    func validateFormRegister() -> Bool {
         // ตรวจสอบว่าช่องว่างหรือไม่
         isFirstNameValid = !firstName.isEmpty
         isLastNameValid = !lastName.isEmpty

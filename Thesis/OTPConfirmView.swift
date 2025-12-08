@@ -2,14 +2,6 @@
 //  OTPConfirmView.swift
 //  Thesis
 //
-//  Created by Kansinee Klinkhachon on 28/11/2568 BE.
-//
-
-
-//
-//  OTPConfirmView.swift
-//  Thesis
-//
 //  Created by Kansinee Klinkhachon on 9/11/2568 BE.
 //
 
@@ -17,14 +9,18 @@ import SwiftUI
 
 struct OTPConfirmView: View {
     @Environment(\.dismiss) private var dismiss
+    // ใช้ @StateObject เพื่อสร้างและจัดการ ViewModel
+    @StateObject private var viewModel = OTPConfirmViewModel()
     
-    @State private var otpFields: [String] = Array(repeating: "", count: 6)
+    // ย้าย FocusState มาที่ View หลักเพื่อส่งไปที่ Component
     @FocusState private var focusedField: Int?
-
+    
+    @AppStorage("navigateToChangePW") var appStorageNavigateToChangePW = false
+    
     var body: some View {
         NavigationStack {
             VStack {
-                // Header
+                // Header (เดิม)
                 ZStack {
                     Text("ยืนยันรหัส OTP")
                         .font(.noto(25, weight: .bold))
@@ -39,55 +35,43 @@ struct OTPConfirmView: View {
                         Spacer()
                     }
                 }
-                .padding(.bottom, 70)
+                .padding(.bottom, 65)
 
                 Text("ใส่รหัสที่ส่งไปยังอีเมลของคุณ")
                     .font(.noto(20, weight: .semibold))
                     .padding(.bottom, 18)
 
-                // OTP 6 ช่อง
-                HStack(spacing: 7) {
-                    ForEach(0..<6, id: \.self) { index in
-                        TextField("", text: $otpFields[index])
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.center)
-                            .frame(width: 60, height: 75)
-                            .background(Color.textFieldColor)
-                            .cornerRadius(20)
-                            .font(.noto(30, weight: .medium))
-                            .focused($focusedField, equals: index)
-                            .onChange(of: otpFields[index]) { oldValue, newValue in
-                                
-                                let filtered = newValue.filter { $0.isNumber }
+                // ** Component ช่อง OTP **
+                OTPInputView(viewModel: viewModel, focusedField: $focusedField)
+                    .padding(.bottom, 15)
 
-                                if filtered.count > 1 {
-                                    handlePaste(filtered)
-                                    return
-                                }
-
-                                if filtered.isEmpty {
-                                    otpFields[index] = ""
-                                    if index > 0 { focusedField = index - 1 }
-                                    return
-                                }
-
-                                otpFields[index] = String(filtered.prefix(1))
-
-                                if index < 5 {
-                                    focusedField = index + 1
-                                } else {
-                                    focusedField = nil
-                                }
-                            }
-                    }
-                }
-                .padding(.bottom, 45)
+                // ** ส่วนแสดงผล Error **
+                Text(viewModel.errorMessage)
+                    .font(.noto(15, weight: .medium))
+                    .foregroundColor(Color.errorColor)
+                    .frame(height: 15)
+                    .padding(.bottom,0)
+                    .opacity(viewModel.shouldShowError ? 1 : 0)
                 
+                HStack(spacing: 5){
+                    Text("รหัสอ้างอิง :")
+                        .font(.noto(15, weight: .medium))
+                        .foregroundColor(Color.placeholderColor)
+                    
+                    let refCode = "A9F4K2"
+                    Text(refCode)
+                        .font(.noto(15, weight: .medium))
+                        .foregroundColor(Color.placeholderColor)
+                    
+                }
+//                .padding(.top,0)
+                .padding(.bottom,18)
+                    
                 // ปุ่มยืนยัน
-//                Button(action: {
-//                    showPrivacyPopup = true
-//                }){
-                NavigationLink(destination: ChangePasswordView()){
+                Button(action: {
+                    focusedField = nil // ซ่อนคีย์บอร์ด
+                    viewModel.verifyOTP()
+                }) {
                     Text("ยืนยัน")
                         .font(.noto(20, weight: .bold))
                         .foregroundColor(.white)
@@ -103,6 +87,7 @@ struct OTPConfirmView: View {
                         
                     Button(action: {
                         print("New OTP")
+                        // TODO: Implement Resend OTP logic in ViewModel
                     }) {
                         Text("ส่งรหัสใหม่")
                             .font(.noto(15,weight: .bold))
@@ -116,26 +101,22 @@ struct OTPConfirmView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.backgroundColor)
-            .onAppear { focusedField = 0 } // เริ่มที่ช่องแรก
+            .onAppear { focusedField = 0 }
+            
+            // ผูกสถานะการนำทางจาก ViewModel กับ AppStorage/Navigation
+            .onChange(of: viewModel.navigateToChangePW) { oldValue, newValue in
+                if newValue {
+                    appStorageNavigateToChangePW = true
+                }
+            }
+            .navigationDestination(isPresented: $appStorageNavigateToChangePW) {
+                // สมมติว่า ChangePasswordView() มีอยู่จริง
+                // ถ้ามีการใช้ NavigationStack/Path ที่ซับซ้อนกว่านี้อาจต้องใช้ NavigationLink หรือ Path Array
+                ChangePasswordView()
+            }
         }
         .navigationBarBackButtonHidden(true)
         .navigationTitle("")
-    }
-
-    // ฟังก์ชันกระจายตัวเลขเมื่อมีการวาง (paste)
-    private func handlePaste(_ value: String) {
-        let digits = value.filter { $0.isNumber }
-        let limited = String(digits.prefix(6)) // จำกัดสูงสุด 6 ตัว
-
-        for i in 0..<6 {
-            if i < limited.count {
-                otpFields[i] = String(limited[limited.index(limited.startIndex, offsetBy: i)])
-            } else {
-                otpFields[i] = ""
-            }
-        }
-
-        focusedField = limited.count < 6 ? limited.count : nil
     }
 }
 

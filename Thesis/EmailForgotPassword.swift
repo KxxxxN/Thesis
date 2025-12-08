@@ -12,30 +12,6 @@ struct EmailForgotPassword: View {
     
     @StateObject private var viewModel = ForgotPasswordViewModel()
     
-    @State private var navigateToOTP: Bool = false
-    
-    private var isAnyError: Bool {
-        return !viewModel.isEmailValid
-    }
-
-        // Logic ในการเลือกข้อความผิดพลาดที่ควรแสดง และจองพื้นที่
-    private var currentErrorMessage: String {
-        // 1. Server Error (Highest Priority)
-        if let serverError = viewModel.serverErrorMessage, !serverError.isEmpty {
-            return serverError
-        }
-        // 2. Client Error: Empty
-        if viewModel.email.isEmpty {
-            return "กรุณากรอกอีเมลที่ลงทะเบียนไว้"
-        }
-        // 3. Client Error: Format
-        if !viewModel.isValidEmail(email: viewModel.email) {
-            return "รูปแบบอีเมลไม่ถูกต้อง"
-        }
-        // 4. จองพื้นที่: ใช้ข้อความที่ยาวที่สุด และจะถูกซ่อนด้วย .opacity(0)
-        return "อีเมลนี้ยังไม่ได้ลงทะเบียน"
-    }
-
     var body: some View {
         NavigationStack {
             VStack{ //เปิด Vstack1
@@ -57,30 +33,30 @@ struct EmailForgotPassword: View {
                 }//ปิด Zstack1
                 .padding(.bottom)
                 
-                EmailInputField(
+                LoginInputField(
                     title: "ที่อยู่อีเมล",
                     placeholder: "กรอกอีเมล",
-                    text: $viewModel.email,
-                    isValid: $viewModel.isEmailValid,
-                    displayErrorMessage: currentErrorMessage, // ส่งข้อความที่คำนวณแล้ว
-                    isErrorActive: isAnyError // ส่งสถานะการแสดงผล
-                                )
-                .onChange(of: viewModel.email) {
-                    viewModel.serverErrorMessage = nil
-                    if !viewModel.email.isEmpty {
-                        viewModel.isEmailValid = viewModel.isValidEmail(email: viewModel.email)
+                    text: $viewModel.emailForgotPassword,
+                    isValid: .constant(viewModel.emailErrorForgot == nil),
+                    errorMessage: viewModel.emailErrorForgot ?? ""
+                )
+                .onChange(of: viewModel.emailForgotPassword) {
+                    // Live validation
+                    let currentEmail = viewModel.emailForgotPassword.trimmingCharacters(in: .whitespacesAndNewlines)
+                    
+                    // 1. ตรวจสอบว่าช่องไม่ว่างเปล่า
+                    if !currentEmail.isEmpty {
+                        viewModel.emailErrorForgot = nil
                     } else {
-                        viewModel.isEmailValid = false
+                        viewModel.emailErrorForgot = "กรุณากรอกอีเมลที่ลงทะเบียนไว้"
                     }
                 }
+                
+                
                 PrimaryButton(
                     title: "ส่งรหัส OTP",
                     action: {
-                        viewModel.handleSendOTP { success in
-                            if success {
-                                navigateToOTP = true
-                            }
-                        }
+                        viewModel.forgotPassword()
                     },
                     width: 155,
                     height: 49
@@ -92,7 +68,7 @@ struct EmailForgotPassword: View {
             }//ปิด Vstack1
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.backgroundColor)
-            .navigationDestination(isPresented: $navigateToOTP) {
+            .navigationDestination(isPresented: $viewModel.navigateToOTP) {
                 OTPConfirmView()
             }
         }
