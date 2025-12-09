@@ -10,7 +10,6 @@ import SwiftUI
 struct RegisterView: View {
     @Environment(\.dismiss) private var dismiss
     
-    // ใช้ @StateObject เพื่อจัดการ ViewModel ที่เก็บ State และ Logic
     @StateObject private var viewModel = RegisterViewModel()
     
     var body: some View {
@@ -172,11 +171,10 @@ struct RegisterView: View {
                                     Button(action: { viewModel.showPrivacyPopup = true }){
                                         Text("นโยบายความเป็นส่วนตัว*")
                                             .font(.noto(15,weight: .semibold))
-                                            .foregroundColor(Color.dangerColor)
-                                            .underline(color: .dangerColor)
+                                            .foregroundColor(Color.errorColor)
+                                            .underline(color: .errorColor)
                                     }
                                 }
-                                Spacer()
                             }
                             .frame(width: 345, alignment: .leading)
                                 
