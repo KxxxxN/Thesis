@@ -10,7 +10,6 @@ import SwiftUI
 struct RegisterView: View {
     @Environment(\.dismiss) private var dismiss
     
-    // ใช้ @StateObject เพื่อจัดการ ViewModel ที่เก็บ State และ Logic
     @StateObject private var viewModel = RegisterViewModel()
     
     var body: some View {
@@ -40,10 +39,10 @@ struct RegisterView: View {
                         
                     // MARK: Form Fields
                     ScrollView(.vertical, showsIndicators: false) {
-                        VStack{ //เปิด Vstack2
-                                
+                        VStack(spacing: -3){ //เปิด Vstack2
+                            
                             // First Name
-                            InputField(
+                            RegisterInputField(
                                 title: "ชื่อ",
                                 placeholder: "กรอกชื่อภาษาไทย",
                                 text: $viewModel.firstName,
@@ -57,9 +56,9 @@ struct RegisterView: View {
                                     viewModel.isFirstNameValid = viewModel.isNameValid(name: viewModel.firstName)
                                 }
                             }
-                                
+                            
                             // Last Name
-                            InputField(
+                            RegisterInputField(
                                 title: "นามสกุล",
                                 placeholder: "กรอกนามสกุลภาษาไทย",
                                 text: $viewModel.lastName,
@@ -72,9 +71,9 @@ struct RegisterView: View {
                                     viewModel.isLastNameValid = viewModel.isNameValid(name: viewModel.lastName)
                                 }
                             }
-                                
+                            
                             // Email
-                            InputField(
+                            RegisterInputField(
                                 title: "อีเมล",
                                 placeholder: "กรอกอีเมล",
                                 text: $viewModel.email,
@@ -88,9 +87,9 @@ struct RegisterView: View {
                                     viewModel.isEmailValid = viewModel.isValidEmail(email: viewModel.email)
                                 }
                             }
-                                
+                            
                             // Phone
-                            InputField(
+                            RegisterInputField(
                                 title: "เบอร์โทร",
                                 placeholder: "0XX-XXX-XXXX",
                                 text: $viewModel.phone,
@@ -104,9 +103,9 @@ struct RegisterView: View {
                                     viewModel.isPhoneValid = viewModel.isValidPhone(phone: viewModel.phone)
                                 }
                             }
-                                
+                            
                             // Password
-                            InputField(
+                            RegisterInputField(
                                 title: "รหัสผ่าน",
                                 placeholder: "อย่างน้อย 8 ตัวอักษร",
                                 text: $viewModel.password,
@@ -116,43 +115,20 @@ struct RegisterView: View {
                                 isPasswordToggle: $viewModel.isPasswordVisible
                             )
                             .onChange(of: viewModel.password) {
-                                
-                                let password = viewModel.password
-                                
-                                let confirmPassword = viewModel.confirmPassword
-                                
-                                if !password.isEmpty {
-                                    
-                                    let regexPassed = viewModel.isPasswordValid(password: password)
-                                    let matchConfirmed = (password == confirmPassword)
-                                    
-                                    // **1. แก้ไข Logic รวม:** // isPasswordValid = (Regex ผ่าน) AND (ช่อง Confirm ว่าง หรือ ตรงกัน)
-                                    viewModel.isPasswordValid = regexPassed && (confirmPassword.isEmpty || matchConfirmed)
-                                    
-                                    // **2. อัปเดตสถานะของ Confirm Password ด้วย**
-
-                                    if !confirmPassword.isEmpty {
-
-                                        viewModel.isConfirmPasswordValid = matchConfirmed
-                                        
-                                    }
-                                } else {
-                                        // **3. จัดการช่องว่าง:** ถ้าว่าง ให้ถือว่า Valid ชั่วคราว
-                                        viewModel.isPasswordValid = true
-                                        
-                                    }
-                                
+                                if !viewModel.password.isEmpty {
+                                    viewModel.isPasswordValid = viewModel.isPasswordValid(password:viewModel.password)
+                                }
                             }
-                                
+                            
                             // Password Validation Checklist
                             if !viewModel.isPasswordValid(password: viewModel.password) {
-                                PasswordValidationChecklist(viewModel: viewModel)
-                                    .padding(.top, -7)
+                                PasswordValidatCheckRegister(viewModel: viewModel)
+                                    .padding(.top, 0)
                                     .padding(.bottom, 5)
                             }
-                                
+                            
                             // Confirm Password
-                            InputField(
+                            RegisterInputField(
                                 title: "ยืนยันรหัสผ่าน",
                                 placeholder: "กรอกรหัสผ่านอีกครั้ง",
                                 text: $viewModel.confirmPassword,
@@ -161,10 +137,19 @@ struct RegisterView: View {
                                 isSecure: true,
                                 isPasswordToggle: $viewModel.isConfirmPasswordVisible
                             )
+                            // ตรวจสอบเมื่อมีการเปลี่ยนแปลงในช่องยืนยันรหัสผ่าน
                             .onChange(of: viewModel.confirmPassword) {
-                                // Live validation:
                                 if !viewModel.confirmPassword.isEmpty {
-                                    // isConfirmPasswordValid จะเป็น false ถ้าไม่ตรงกัน
+                                    viewModel.isConfirmPasswordValid = (viewModel.password == viewModel.confirmPassword)
+                                } else {
+                                    // หากช่องยืนยันว่างเปล่า ให้ถือว่าไม่ถูกต้อง
+                                    viewModel.isConfirmPasswordValid = false
+                                }
+                            }
+                            // 💡 สิ่งที่ต้องเพิ่ม: ตรวจสอบเมื่อมีการเปลี่ยนแปลงในช่องรหัสผ่าน (Password)
+                            .onChange(of: viewModel.password) {
+                                // บังคับให้ตรวจสอบความถูกต้องใหม่ หากช่องยืนยันรหัสผ่านถูกกรอกแล้ว
+                                if !viewModel.confirmPassword.isEmpty {
                                     viewModel.isConfirmPasswordValid = (viewModel.password == viewModel.confirmPassword)
                                 }
                             }
@@ -186,34 +171,31 @@ struct RegisterView: View {
                                     Button(action: { viewModel.showPrivacyPopup = true }){
                                         Text("นโยบายความเป็นส่วนตัว*")
                                             .font(.noto(15,weight: .semibold))
-                                            .foregroundColor(Color.dangerColor)
-                                            .underline(color: .dangerColor)
+                                            .foregroundColor(Color.errorColor)
+                                            .underline(color: .errorColor)
                                     }
                                 }
-                                Spacer()
                             }
                             .frame(width: 345, alignment: .leading)
                                 
-                            if !viewModel.isPrivacyAccepted && viewModel.isFormSubmitted {
+                            VStack(alignment: .leading, spacing: 0) {
                                 Text("จำเป็นต้องยอมรับนโยบายความเป็นส่วนตัว")
                                     .font(.noto(15, weight: .medium))
                                     .foregroundColor(Color.errorColor)
+                                    .opacity((!viewModel.isPrivacyAccepted && viewModel.isRegisterSubmitted) ? 1 : 0)
                                     .frame(width: 345, alignment: .leading)
                             }
                         }
-                        .padding(.top,16)
                             
                         Button(action: {
-                            // ย้าย logic ไปที่ ViewModel และใช้ผลลัพธ์ในการแสดง Popup
-                            viewModel.isFormSubmitted = true
-                            if viewModel.validateForm() {
+                            viewModel.isRegisterSubmitted = true
+                            if viewModel.validateFormRegister() {
                                 print("สร้างบัญชีสำเร็จ")
                                 viewModel.showSuccessPopup = true
                                 
                                 Task {
                                     try await Task.sleep(nanoseconds: 2_000_000_000)
                                         
-                                    // ตรวจสอบว่า Popup ยังเปิดอยู่หรือไม่ก่อนทำการปิด
                                     if viewModel.showSuccessPopup {
                                         viewModel.showSuccessPopup = false
                                         dismiss()
@@ -230,14 +212,12 @@ struct RegisterView: View {
                                 .background(Color.mainColor)
                                 .cornerRadius(20)
                         }
-                        .padding(.top, 13)
                         .padding(.bottom, 20)
                         Spacer()
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.backgroundColor)
-                .blur(radius: viewModel.showPrivacyPopup || viewModel.showSuccessPopup ? 6 : 0)
                 .onTapGesture {
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 }
