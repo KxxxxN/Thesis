@@ -9,27 +9,41 @@ import SwiftUI
 
 struct ContentView: View {
     
+    @Binding var hideTabBar: Bool 
     @State var index = 0
     
     var body: some View {
         
-        VStack(spacing: 0){
-            
-            ZStack{
-                if self.index == 0 { MainAppView() }
-                else if self.index == 1 { Color.red }
-                else if self.index == 2 { KnowledgeView() }
-                else { AccountView() }
+        NavigationStack {
+            VStack(spacing: 0){
+                
+                ZStack{
+                    if self.index == 0 { MainAppView(hideTabBar: $hideTabBar) }
+                    else if self.index == 1 { Color.red }
+                    else if self.index == 2 { KnowledgeView(hideTabBar: $hideTabBar) }
+                    else { AccountView() }
+                }
+                
+                // 🔥 ต้องมีเงื่อนไขการซ่อน Tab Bar ใน ContentView นี้ด้วย
+                if !hideTabBar {
+                   MainTabView(index: self.$index)
+                }
             }
-            
-            MainTabView(index: self.$index)
-            
+            .edgesIgnoringSafeArea(.top)
+            .edgesIgnoringSafeArea(.bottom)
+            .navigationBarHidden(true)
         }
-        .edgesIgnoringSafeArea(.top)
-        .edgesIgnoringSafeArea(.bottom)
     }
 }
 
 #Preview {
-    ContentView()
+    struct ContentViewPreviewContainer: View {
+        @State private var hideTabBarState = false
+        
+        var body: some View {
+            ContentView(hideTabBar: $hideTabBarState)
+        }
+    }
+    
+    return ContentViewPreviewContainer()
 }
