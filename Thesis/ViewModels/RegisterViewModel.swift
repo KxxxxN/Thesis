@@ -2,11 +2,9 @@
 //  RegisterViewModel.swift
 //  Thesis
 //
-//  Created by Kansinee Klinkhachon on 27/11/2568 BE.
+//  Created by Kansinee Klinkhachon on 28/11/2568 BE.
 //
 
-
-// RegisterViewModel.swift
 
 import Foundation
 import Combine
@@ -24,7 +22,7 @@ class RegisterViewModel: ObservableObject {
     @Published var isPrivacyAccepted: Bool = false
     @Published var showPrivacyPopup: Bool = false
     @Published var showSuccessPopup: Bool = false
-    @Published var isFormSubmitted: Bool = false
+    @Published var isRegisterSubmitted: Bool = false
     
     @Published var isFirstNameValid: Bool = true
     @Published var isLastNameValid: Bool = true
@@ -32,7 +30,6 @@ class RegisterViewModel: ObservableObject {
     @Published var isPhoneValid: Bool = true
     @Published var isPasswordValid: Bool = true
     @Published var isConfirmPasswordValid: Bool = true
-    
     
     // MARK: - Phone
     func isValidPhone(phone: String) -> Bool {
@@ -100,7 +97,7 @@ class RegisterViewModel: ObservableObject {
     // MARK: - Main Validation Logic
     // เพิ่ม @discardableResult เพื่อให้ Xcode ไม่เตือนว่าผลลัพธ์ไม่ได้ถูกใช้ หากมีการเรียกใช้ฟังก์ชันนี้เพื่ออัปเดตสถานะเท่านั้น
     @discardableResult
-    func validateForm() -> Bool {
+    func validateFormRegister() -> Bool {
         // ตรวจสอบว่าช่องว่างหรือไม่
         isFirstNameValid = !firstName.isEmpty
         isLastNameValid = !lastName.isEmpty
