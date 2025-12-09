@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct WasteItem: Identifiable {
+struct WasteItem: Identifiable, Hashable {
     let id = UUID()
     let imageName: String
     let title: String
@@ -17,6 +17,8 @@ struct WasteItem: Identifiable {
 struct FrequentWasteView: View {
 
     @Environment(\.dismiss) var dismiss
+
+    @State private var selectedWaste: WasteItem? = nil    
 
     let wasteItems = [
         WasteItem(imageName: "Bottle", title: "ขวดพลาสติก", count: "33 ครั้ง"),
@@ -36,7 +38,9 @@ struct FrequentWasteView: View {
     ]
 
     var sortedWasteItems: [WasteItem] {
-        wasteItems.sorted { extractNumber($0.count) > extractNumber($1.count) }
+        wasteItems.sorted {
+            extractNumber($0.count) > extractNumber($1.count)
+        }
     }
 
     func extractNumber(_ text: String) -> Int {
@@ -117,6 +121,7 @@ struct FrequentWasteView: View {
         }
     }
 
+    // MARK: - BODY
     var body: some View {
         ZStack {
             Color.backgroundColor.ignoresSafeArea()
@@ -131,8 +136,11 @@ struct FrequentWasteView: View {
                         GridItem(.flexible(), spacing: 16)
                     ], spacing: 16) {
 
-                        ForEach(paginatedItems) { item in
+                        ForEach(paginatedItems, id: \.self) { item in
                             WasteCardView(item: item)
+                                .onTapGesture {
+                                    selectedWaste = item    // ⭐ ไปหน้า WasteTypeView
+                                }
                         }
                     }
                     .padding(.horizontal, 18)
@@ -140,15 +148,19 @@ struct FrequentWasteView: View {
                 }
 
                 paginationSection
-                
             }
             .edgesIgnoringSafeArea(.top)
+        }
+        // ⭐ Navigation ไป WasteTypeView
+        .navigationDestination(item: $selectedWaste) { item in
+            WasteTypeView(hideTabBar: .constant(true))
+                .navigationBarBackButtonHidden(true)
         }
     }
 }
 
 
-// MARK: - Card View
+// MARK: - CARD
 struct WasteCardView: View {
     let item: WasteItem
 
@@ -159,7 +171,6 @@ struct WasteCardView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(height: 100)
-                    .foregroundColor(Color.thirdColor)
             }
             .frame(maxWidth: .infinity)
             .frame(height: 140)

@@ -189,9 +189,12 @@ struct KnowledgeView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                                 .ignoresSafeArea(edges: .bottom)
                         )
+                        
                     }
+                    
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .edgesIgnoringSafeArea(.top)
             }
             .navigationBarTitleDisplayMode(.inline)
         }

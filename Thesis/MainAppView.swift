@@ -71,7 +71,7 @@ struct MainAppView: View {
                     HistorySection(hideTabBar: $hideTabBar,items: historyItems)
                     RewardExchangeSection(hideTabBar: $hideTabBar)
                     FrequentWasteSection(hideTabBar: $hideTabBar, items: recyclableItems)
-                    WasteSeparationGuideSection(currentIndex: $currentCarouselIndex)
+                    WasteSeparationGuideSection(currentIndex: $currentCarouselIndex, hideTabBar: $hideTabBar)
                 }
                 .padding()
             }
@@ -165,11 +165,13 @@ struct RecyclableItemCard: View {
 
 struct WasteSeparationGuideSection: View {
     @Binding var currentIndex: Int
+    @Binding var hideTabBar: Bool
+
     let totalPages = 3
     
     var body: some View {
         VStack(spacing: 12) {
-            SectionHeader(title: "วิธีการแยกขยะ", destinationView: WasteSeparationGuideView())
+            SectionHeader(title: "วิธีการแยกขยะ", destinationView: KnowledgeView(hideTabBar: $hideTabBar))
             
             VStack(spacing: 12) {
                 ZStack {
