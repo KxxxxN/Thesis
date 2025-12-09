@@ -36,7 +36,7 @@ struct ChangePasswordView: View {
                 // --- 1. ช่องรหัสผ่านใหม่ ---
                 ChangePasswordField(
                     title: "รหัสผ่าน",
-                    placeholder: "กรุณากรอกรหัสผ่าน",
+                    placeholder: "อย่างน้อย 8 ตัวอักษร",
                     text: $viewModel.password,
                     isValid: $viewModel.isPasswordValid,
                     errorMessage: viewModel.password.isEmpty ?
@@ -58,7 +58,7 @@ struct ChangePasswordView: View {
                     
                 ChangePasswordField(
                     title: "ยืนยันรหัสผ่าน",
-                    placeholder: "กรุณายืนยันรหัสผ่าน",
+                    placeholder: "กรอกรหัสผ่านอีกครั้ง",
                     text: $viewModel.confirmPassword,
                     isValid: $viewModel.isConfirmPasswordValid,
                     errorMessage: viewModel.confirmPassword.isEmpty ? "กรุณากรอกรหัสผ่านอีกครั้ง" : "รหัสผ่านไม่ตรงกัน",
