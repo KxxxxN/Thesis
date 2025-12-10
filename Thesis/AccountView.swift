@@ -63,9 +63,7 @@ struct AccountView: View {
                         .padding(.horizontal,20)
                     
                     VStack(spacing: 0) {
-                        Button(action: {
-                            print("Translate")
-                        }) {
+                        NavigationLink(destination: TranslateView()) {
                             HStack(spacing: 15) {
                                 Image("IconTranslate")
                                     .resizable()
