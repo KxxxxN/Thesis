@@ -9,10 +9,12 @@ import SwiftUI
 
 struct RootView: View {
     @AppStorage("isLoggedIn") var isLoggedIn = false
+    
+    @State private var shouldHideTabBar = false
 
     var body: some View {
         if isLoggedIn {
-            ContentView()
+            ContentView(hideTabBar: $shouldHideTabBar)
         } else {
             LoginView()
         }

@@ -61,7 +61,7 @@ struct MainTabView: View {
                 }
 
                 Text(label)
-                    .font(.custom("Inter UI", size: 15))
+                    .font(.noto(15, weight: .regular))   
                     .foregroundColor(.white)
                     .padding(.bottom, 13)
             }

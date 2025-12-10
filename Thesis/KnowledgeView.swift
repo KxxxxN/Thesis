@@ -25,6 +25,7 @@ struct WasteCategory {
 
 struct KnowledgeView: View {
     @State private var currentIndex = 0
+    @Binding var hideTabBar: Bool
     
     let wasteCategories: [WasteCategory] = [
         WasteCategory(
@@ -87,7 +88,7 @@ struct KnowledgeView: View {
                             .font(.noto(25, weight: .bold))
                             .minimumScaleFactor(0.7)
                             .foregroundColor(.black)
-                            .padding(.top, 10)
+                            .padding(.top, 65)
                             .padding(.bottom, 10)
                         
                         let current = wasteCategories[currentIndex]
@@ -176,8 +177,8 @@ struct KnowledgeView: View {
                                 .foregroundColor(.black)
                                 .padding(.bottom, 10)
                             
-                            WasteExamplesGrid(wasteExamples: current.examples)
-                            
+                            WasteExamplesGrid(hideTabBar: $hideTabBar, wasteExamples: current.examples)
+
                             Color.clear.frame(height: 40)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -199,6 +200,7 @@ struct KnowledgeView: View {
 
 
 struct WasteExamplesGrid: View {
+    @Binding var hideTabBar: Bool
     let wasteExamples: [WasteExample]
     
     let columns = [
@@ -209,11 +211,16 @@ struct WasteExamplesGrid: View {
     var body: some View {
         LazyVGrid(columns: columns, spacing: 10) {
             ForEach(wasteExamples) { example in
-                WasteCard(example: example)
+                NavigationLink {
+                    DetailWasteTypeView(hideTabBar: $hideTabBar)
+                } label: {
+                    WasteCard(example: example)
+                }
             }
         }
     }
 }
+
 
 
 struct WasteCard: View {
@@ -240,7 +247,3 @@ struct WasteCard: View {
     }
 }
 
-
-#Preview {
-    KnowledgeView()
-}
