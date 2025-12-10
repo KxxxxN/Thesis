@@ -1,29 +1,21 @@
 //
-//  TranslateView.swift
+//  ContactUsView.swift
 //  Thesis
 //
-//  Created by Kansinee Klinkhachon on 10/12/2568 BE.
+//  Created by Kansinee Klinkhachon on 11/12/2568 BE.
 //
 
 import SwiftUI
 
-struct TranslateView: View {
+struct ContactUsView: View {
     @Environment(\.dismiss) private var dismiss
-    
-    @State private var selectedLanguageCode: String = "TH"
-    
-    let languages = [
-        (code: "TH", name: "ภาษาไทย", image: "Thai"),
-        (code: "EN", name: "English", image: "English")
-    ]
     
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 
-                // Header
                 ZStack {
-                    Text("เปลี่ยนภาษา")
+                    Text("ติดต่อเรา")
                         .font(.noto(25, weight: .bold))
                     
                     HStack {
@@ -35,22 +27,24 @@ struct TranslateView: View {
                                 .font(.system(size: 24, weight: .bold))
                         }
                         .padding(.leading, 25)
-                        
                         Spacer()
                     }
                 }
                 
-                // Language Selection List
+                // Menu List
                 VStack(spacing: 0) {
-                    ForEach(languages, id: \.code) { lang in
-                        LanguageSelectionRow(
-                            code: lang.code,
-                            name: lang.name,
-                            imageName: lang.image,
-                            selectedCode: selectedLanguageCode //
-                        ) { newCode in
-                            selectedLanguageCode = newCode
-                        }
+                    ContactRow(
+                        title: "ช่องทางที่ 1",
+                        imageName: "ContactUs"
+                    ) {
+                        print("ติดต่อ 1")
+                    }
+                    
+                    ContactRow(
+                        title: "ช่องทางที่ 2",
+                        imageName: "ContactUs"
+                    ) {
+                        print("ติดต่อ 2")
                     }
                 }
                 .padding(.top, 40)
@@ -65,5 +59,5 @@ struct TranslateView: View {
 }
 
 #Preview {
-    TranslateView()
+    ContactUsView()
 }
