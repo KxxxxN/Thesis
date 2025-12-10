@@ -16,14 +16,13 @@ struct RegisterView: View {
         NavigationStack {
             ZStack {
                 VStack{ //เปิด Vstack1
-                    // Header (ย้าย logic ออกไปไม่ได้)
                     ZStack {
                         Text("ลงทะเบียน")
                             .font(.noto(25, weight: .bold))
                             
                         HStack {
                             Button {
-                                //                                viewModel.showSuccessPopup = false;
+                                //                 viewModel.showSuccessPopup = false;
                                 dismiss()
                             } label: {
                                 Image(systemName: "chevron.left")
