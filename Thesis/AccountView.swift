@@ -119,9 +119,7 @@ struct AccountView: View {
                     
                     VStack(spacing: 0) {
                         
-                        Button(action: {
-                            print("Heip Center")
-                        }) {
+                        NavigationLink(destination: HelpCenterView()) {
                             HStack(spacing: 15) {
                                 Image("IconHelp")
                                     .resizable()

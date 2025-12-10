@@ -58,6 +58,7 @@ struct TranslateView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color.backgroundColor)
+        .navigationBarBackButtonHidden(true)
     }
 }
 
