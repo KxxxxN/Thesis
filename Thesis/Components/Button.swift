@@ -27,3 +27,22 @@ struct PrimaryButton: View {
         }
     }
 }
+
+struct SecondButton: View {
+    let title: String
+    let action: () -> Void
+    let width: CGFloat
+    let height: CGFloat
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.noto(20, weight: .bold))
+                .foregroundColor(.mainColor)
+                .frame(width: width, height: height)
+                .background(Color.white)
+                .border(Color.mainColor, width: 2)
+                .cornerRadius(20)
+        }
+    }
+}
