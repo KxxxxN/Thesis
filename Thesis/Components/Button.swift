@@ -28,6 +28,7 @@ struct PrimaryButton: View {
     }
 }
 
+//SecondButton
 struct SecondButton: View {
     let title: String
     let action: () -> Void
@@ -40,9 +41,30 @@ struct SecondButton: View {
                 .font(.noto(20, weight: .bold))
                 .foregroundColor(.mainColor)
                 .frame(width: width, height: height)
-                .background(Color.white)
-                .border(Color.mainColor, width: 2)
-                .cornerRadius(20)
+                .background(Color.backgroundColor)
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.mainColor, lineWidth: 2)
+                )
+//                .border(Color.mainColor, width: 2)
+//                .cornerRadius(20)
         }
+    }
+}
+
+//BackButton
+struct BackButton: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        Button {
+            dismiss()
+        } label: {
+            Image(systemName: "chevron.left")
+                .foregroundColor(.black)
+                .font(.system(size: 24, weight: .bold))
+        }
+        .padding(.leading, 25)
     }
 }

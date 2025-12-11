@@ -34,7 +34,8 @@ struct AccountView: View {
                         AccountMenuRow(
                             title: "แก้ไขโปรไฟล์",
                             imageName: "IconUser",
-                            action: { print("Profile") }
+                            destination:
+                                ProfileView()
                         )
                     }
                     

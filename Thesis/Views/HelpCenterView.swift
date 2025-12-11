@@ -19,14 +19,7 @@ struct HelpCenterView: View {
                         .font(.noto(25, weight: .bold))
                     
                     HStack {
-                        Button {
-                            dismiss()
-                        } label: {
-                            Image(systemName: "chevron.left")
-                                .foregroundColor(.black)
-                                .font(.system(size: 24, weight: .bold))
-                        }
-                        .padding(.leading, 25)
+                        BackButton()
                         Spacer()
                     }
                 }
