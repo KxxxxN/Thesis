@@ -64,12 +64,11 @@ struct OTPConfirmView: View {
                         .foregroundColor(Color.placeholderColor)
                     
                 }
-//                .padding(.top,0)
                 .padding(.bottom,18)
                     
                 // ปุ่มยืนยัน
                 Button(action: {
-                    focusedField = nil // ซ่อนคีย์บอร์ด
+                    focusedField = nil
                     viewModel.verifyOTP()
                 }) {
                     Text("ยืนยัน")
@@ -116,7 +115,6 @@ struct OTPConfirmView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
-        .navigationTitle("")
     }
 }
 

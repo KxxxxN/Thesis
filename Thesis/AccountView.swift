@@ -13,217 +13,109 @@ struct AccountView: View {
     @AppStorage("isLoggedIn") var isLoggedIn = false
     
     var body: some View {
-        VStack(spacing: 0) {
-            Spacer()
-            
-            Text("บัญชีผู้ใช้")
-                .font(.noto(25, weight: .bold))
-                .padding(.bottom, 28)
-
-            VStack(spacing: 22) {
-                //ข้อมูลผู้ใช้
-                VStack(alignment: .leading, spacing: 7) {
-                    
-                    Text("ข้อมูลผู้ใช้")
-                        .font(.noto(16, weight: .bold))
-                        .foregroundColor(Color.black)
-                        .padding(.horizontal,20)
-                    
-                    Button(action: {
-                        print("Profile")
-                    }) {
-                        HStack(spacing: 15) {
-                            Image("IconUser")
-                                .resizable()
-                                .frame(width: 40, height: 40)
-                                .padding(.leading, 35)
-                            
-                            Text("แก้ไขโปรไฟล์")
-                                .font(.noto(20, weight: .medium))
-                                .foregroundColor(Color.black)
-                            
-                            Spacer()
-                            
-                            Image(systemName: "chevron.right")
-                                .foregroundColor(.black)
-                                .font(.system(size: 24, weight: .bold))
-                        }
-                        .padding(.trailing)
-                        .frame(height: 70)
-                        .background(Color.accountSecColor)
-                    }
-                }
+        NavigationStack {
+            VStack(spacing: 0) {
+                Spacer()
                 
-                //ตั้งค่า
-                VStack(alignment: .leading, spacing: 7) {
-                    
-                    Text("ตั้งค่า")
-                        .font(.noto(16, weight: .bold))
-                        .foregroundColor(Color.black)
-                        .padding(.horizontal,20)
-                    
-                    VStack(spacing: 0) {
-                        Button(action: {
-                            print("Translate")
-                        }) {
-                            HStack(spacing: 15) {
-                                Image("IconTranslate")
-                                    .resizable()
-                                    .frame(width: 40, height: 40)
-                                    .padding(.leading, 35)
-                                
-                                Text("เปลี่ยนภาษา")
-                                    .font(.noto(20, weight: .medium))
-                                    .foregroundColor(Color.black)
-                                
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .foregroundColor(.black)
-                                    .font(.system(size: 24, weight: .bold))
-                            }
-                            .padding(.trailing)
-                            .frame(height: 70)
-                            .background(Color.accountSecColor)
-                        }
-                        
-                        Button(action: {
-                            print("Notification")
-                        }) {
-                            HStack(spacing: 15) {
-                                Image("IconNotification")
-                                    .resizable()
-                                    .frame(width: 40, height: 40)
-                                    .padding(.leading, 35)
-                                
-                                Text("การแจ้งเตือน")
-                                    .font(.noto(20, weight: .medium))
-                                    .foregroundColor(Color.black)
-                                
-                                Spacer()
-                                Toggle("", isOn: $isNotificationOn)
-                                    .labelsHidden()
-                                    .tint(.mainColor)
-                            }
-                            .padding(.trailing)
-                            .frame(height: 70)
-                            .background(Color.accountSecColor)
-                        }
-                    }
-                }
-
-                //ทั่วไป
-                VStack(alignment: .leading, spacing: 7) {
-                    
-                    Text("ทั่วไป")
-                        .font(.noto(16, weight: .bold))
-                        .foregroundColor(Color.black)
-                        .padding(.horizontal,20)
-                    
-                    VStack(spacing: 0) {
-                        
-                        Button(action: {
-                            print("Heip Center")
-                        }) {
-                            HStack(spacing: 15) {
-                                Image("IconHelp")
-                                    .resizable()
-                                    .frame(width: 40, height: 40)
-                                    .padding(.leading, 35)
-                                
-                                Text("ช่วยเหลือ")
-                                    .font(.noto(20, weight: .medium))
-                                    .foregroundColor(Color.black)
-                                
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .foregroundColor(.black)
-                                    .font(.system(size: 24, weight: .bold))
-                            }
-                            .padding(.trailing)
-                            .frame(height: 70)
-                            .background(Color.accountSecColor)
-                        }
-                        
-                        Button(action: {
-                            print("Contact")
-                        }) {
-                            HStack(spacing: 15) {
-                                Image("IconSupport")
-                                    .resizable()
-                                    .frame(width: 40, height: 40)
-                                    .padding(.leading, 35)
-                                
-                                Text("ติดต่อเรา")
-                                    .font(.noto(20, weight: .medium))
-                                    .foregroundColor(Color.black)
-                                
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .foregroundColor(.black)
-                                    .font(.system(size: 24, weight: .bold))
-                            }
-                            .padding(.trailing)
-                            .frame(height: 70)
-                            .background(Color.accountSecColor)
-                        }
-                    }
-                }
+                Text("บัญชีผู้ใช้")
+                    .font(.noto(25, weight: .bold))
+                    .padding(.bottom, 28)
                 
-                //ทั่วไป
-                VStack(alignment: .leading, spacing: 7) {
+                VStack(spacing: 22) {
                     
-                    Text("บัญชี")
-                        .font(.noto(16, weight: .bold))
-                        .foregroundColor(Color.clear)
-                        .padding(.horizontal,20)
-                    
-                    VStack(spacing: 0) {
-                        Button(action: {
-                            isLoggedIn = false
-                        }) {
-                            HStack(spacing: 15) {
-                                Image("IconLogout")
-                                    .resizable()
-                                    .frame(width: 40, height: 40)
-                                    .padding(.leading, 35)
-                                
-                                Text("ออกจากระบบ")
-                                    .font(.noto(20, weight: .medium))
-                                    .foregroundColor(Color.black)
-                                
-                                Spacer()
-                            }
-                            .padding(.trailing)
-                            .frame(height: 70)
-                            .background(Color.accountSecColor)
-                        }
+                    // --- กลุ่ม: ข้อมูลผู้ใช้ ---
+                    VStack(alignment: .leading, spacing: 7) {
+                        Text("ข้อมูลผู้ใช้")
+                            .font(.noto(16, weight: .bold))
+                            .foregroundColor(Color.black)
+                            .padding(.horizontal, 20)
                         
-                        Button(action: {
-                            print("Delete Account")
-                        }) {
-                            HStack(spacing: 15) {
-                                Image("IconDelete")
-                                    .resizable()
-                                    .frame(width: 40, height: 40)
-                                    .padding(.leading, 35)
-                                
-                                Text("ลบบัญชี")
-                                    .font(.noto(20, weight: .medium))
-                                    .foregroundColor(Color.black)
-                                
-                                Spacer()
-                            }
-                            .padding(.trailing)
-                            .frame(height: 70)
-                            .background(Color.accountSecColor)
+                        //Profile
+                        AccountMenuRow(
+                            title: "แก้ไขโปรไฟล์",
+                            imageName: "IconUser",
+                            action: { print("Profile") }
+                        )
+                    }
+                    
+                    // --- กลุ่ม: ตั้งค่า ---
+                    VStack(alignment: .leading, spacing: 7) {
+                        Text("ตั้งค่า")
+                            .font(.noto(16, weight: .bold))
+                            .foregroundColor(Color.black)
+                            .padding(.horizontal, 20)
+                        
+                        VStack(spacing: 0) {
+                            //Translate
+                            AccountMenuRow(
+                                title: "เปลี่ยนภาษา",
+                                imageName: "IconTranslate",
+                                destination: TranslateView()
+                            )
+                            
+                            //Notification
+                            AccountToggleRow(
+                                title: "การแจ้งเตือน",
+                                imageName: "IconNotification",
+                                isOn: $isNotificationOn
+                            )
+                        }
+                    }
+                    
+                    // --- กลุ่ม: ทั่วไป ---
+                    VStack(alignment: .leading, spacing: 7) {
+                        Text("ทั่วไป")
+                            .font(.noto(16, weight: .bold))
+                            .foregroundColor(Color.black)
+                            .padding(.horizontal, 20)
+                        
+                        VStack(spacing: 0) {
+                            // Help Center
+                            AccountMenuRow(
+                                title: "ช่วยเหลือ",
+                                imageName: "IconHelp",
+                                destination: HelpCenterView()
+                            )
+                            
+                            // Contact
+                            AccountMenuRow(
+                                title: "ติดต่อเรา",
+                                imageName: "IconSupport",
+                                destination: ContactUsView()
+                            )
+                        }
+                    }
+                    
+                    // --- กลุ่ม: บัญชี ---
+                    VStack(alignment: .leading, spacing: 7) {
+                        Text("บัญชี")
+                            .font(.noto(16, weight: .bold))
+                            .foregroundColor(Color.clear)
+                            .padding(.horizontal, 20)
+                        
+                        VStack(spacing: 0) {
+                            // ออกจากระบบ (Button)
+                            AccountMenuRow(
+                                title: "ออกจากระบบ",
+                                imageName: "IconLogout",
+                                action: { isLoggedIn = false; print("Logout") }
+                            )
+                            
+                            // ลบบัญชี (Button)
+                            AccountMenuRow(
+                                title: "ลบบัญชี",
+                                imageName: "IconDelete",
+                                action: { print("Delete Account") }
+                            )
                         }
                     }
                 }
+                Spacer()
             }
-            Spacer()
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .background(Color.backgroundColor)
+            .navigationBarHidden(true)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background(Color.backgroundColor)
     }
 }
 

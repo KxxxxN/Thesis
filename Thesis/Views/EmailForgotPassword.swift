@@ -73,7 +73,6 @@ struct EmailForgotPassword: View {
             }
         }
         .navigationBarBackButtonHidden(true)
-        .navigationTitle("")
     }
 }
 
