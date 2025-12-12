@@ -9,7 +9,6 @@
 import SwiftUI
 
 struct ChangePasswordView: View {
-    @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = ChangePasswordViewModel()
     
     var body: some View {
@@ -19,14 +18,7 @@ struct ChangePasswordView: View {
                     Text("เปลี่ยนรหัสผ่านใหม่")
                         .font(.noto(25, weight: .bold))
                     HStack { //เปิด Hstack1
-                        Button {
-                            dismiss()
-                        } label: {
-                            Image(systemName: "chevron.left")
-                                .foregroundColor(.black)
-                                .font(.system(size: 24, weight: .bold))
-                        }
-                        .padding(.leading, 18)
+                        BackButton()
                         
                         Spacer()
                     }//ปิด Hstack1
@@ -81,16 +73,25 @@ struct ChangePasswordView: View {
                     }
                 }
                 
-                Button(action: {
-                    viewModel.changePassword()
-                }) {
-                    Text("ยืนยัน")
-                        .font(.noto(20, weight: .bold))
-                        .foregroundColor(.white)
-                        .frame(width: 155, height: 49)
-                        .background(Color.mainColor)
-                        .cornerRadius(20)
-                }
+//                Button(action: {
+//                    viewModel.changePassword()
+//                }) {
+//                    Text("ยืนยัน")
+//                        .font(.noto(20, weight: .bold))
+//                        .foregroundColor(.white)
+//                        .frame(width: 155, height: 49)
+//                        .background(Color.mainColor)
+//                        .cornerRadius(20)
+//                }
+                
+                PrimaryButton(
+                    title: "ยืนยัน", // Text ที่ต้องการแสดงบนปุ่ม
+                    action: { // โค้ดการทำงานเมื่อกดปุ่ม
+                        viewModel.changePassword()
+                    },
+                    width: 155, // ความกว้างของปุ่ม
+                    height: 49 // ความสูงของปุ่ม
+                )
                 .padding(.top, 55)
                 
                 Spacer()
