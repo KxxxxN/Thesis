@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct EmailForgotPassword: View {
-    @Environment(\.dismiss) private var dismiss
     
     @StateObject private var viewModel = ForgotPasswordViewModel()
     
@@ -19,14 +18,7 @@ struct EmailForgotPassword: View {
                     Text("ลืมรหัสผ่าน")
                         .font(.noto(25, weight: .bold))
                     HStack { //เปิด Hstack1
-                        Button {
-                            dismiss()
-                        } label: {
-                            Image(systemName: "chevron.left")
-                                .foregroundColor(.black)
-                                .font(.system(size: 24, weight: .bold))
-                        }
-                        .padding(.leading, 18)
+                        BackButton()
                         
                         Spacer()
                     }//ปิด Hstack1
@@ -73,7 +65,6 @@ struct EmailForgotPassword: View {
             }
         }
         .navigationBarBackButtonHidden(true)
-        .navigationTitle("")
     }
 }
 

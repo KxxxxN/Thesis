@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "profile.png",
+      "filename" : "Bookguide.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "profile 1.png",
+      "filename" : "Bookguide 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "profile 2.png",
+      "filename" : "Bookguide 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

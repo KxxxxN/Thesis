@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct OTPConfirmView: View {
-    @Environment(\.dismiss) private var dismiss
     // ใช้ @StateObject เพื่อสร้างและจัดการ ViewModel
     @StateObject private var viewModel = OTPConfirmViewModel()
     
@@ -26,12 +25,8 @@ struct OTPConfirmView: View {
                         .font(.noto(25, weight: .bold))
 
                     HStack {
-                        Button(action: { dismiss() }) {
-                            Image(systemName: "chevron.left")
-                                .foregroundColor(.black)
-                                .font(.system(size: 24, weight: .bold))
-                        }
-                        .padding(.leading, 18)
+                        BackButton()
+                        
                         Spacer()
                     }
                 }
@@ -64,21 +59,30 @@ struct OTPConfirmView: View {
                         .foregroundColor(Color.placeholderColor)
                     
                 }
-//                .padding(.top,0)
                 .padding(.bottom,18)
                     
                 // ปุ่มยืนยัน
-                Button(action: {
-                    focusedField = nil // ซ่อนคีย์บอร์ด
-                    viewModel.verifyOTP()
-                }) {
-                    Text("ยืนยัน")
-                        .font(.noto(20, weight: .bold))
-                        .foregroundColor(.white)
-                        .frame(width: 155, height: 49)
-                        .background(Color.mainColor)
-                        .cornerRadius(20)
-                }
+//                Button(action: {
+//                    focusedField = nil
+//                    viewModel.verifyOTP()
+//                }) {
+//                    Text("ยืนยัน")
+//                        .font(.noto(20, weight: .bold))
+//                        .foregroundColor(.white)
+//                        .frame(width: 155, height: 49)
+//                        .background(Color.mainColor)
+//                        .cornerRadius(20)
+//                }
+                
+                PrimaryButton(
+                    title: "ยืนยัน",
+                    action: {
+                        focusedField = nil
+                        viewModel.verifyOTP()
+                    },
+                    width: 155, // ความกว้างของปุ่ม
+                    height: 49 // ความสูงของปุ่ม
+                )
                 
                 HStack(spacing: 8){
                     Text("ยังไม่ได้รับรหัส?")
@@ -116,7 +120,6 @@ struct OTPConfirmView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
-        .navigationTitle("")
     }
 }
 
