@@ -47,8 +47,6 @@ struct SecondButton: View {
                     RoundedRectangle(cornerRadius: 20)
                         .stroke(Color.mainColor, lineWidth: 2)
                 )
-//                .border(Color.mainColor, width: 2)
-//                .cornerRadius(20)
         }
     }
 }

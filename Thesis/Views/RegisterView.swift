@@ -21,16 +21,7 @@ struct RegisterView: View {
                             .font(.noto(25, weight: .bold))
                             
                         HStack {
-                            Button {
-                                //                 viewModel.showSuccessPopup = false;
-                                dismiss()
-                            } label: {
-                                Image(systemName: "chevron.left")
-                                    .foregroundColor(.black)
-                                    .font(.system(size: 24, weight: .bold))
-                            }
-                            .padding(.leading, 25)
-    
+                            BackButton()
                             Spacer()
                         }
                     }
@@ -185,32 +176,30 @@ struct RegisterView: View {
                                     .frame(width: 345, alignment: .leading)
                             }
                         }
-                            
-                        Button(action: {
-                            viewModel.isRegisterSubmitted = true
-                            if viewModel.validateFormRegister() {
-                                print("สร้างบัญชีสำเร็จ")
-                                viewModel.showSuccessPopup = true
-                                
-                                Task {
-                                    try await Task.sleep(nanoseconds: 2_000_000_000)
-                                        
-                                    if viewModel.showSuccessPopup {
-                                        viewModel.showSuccessPopup = false
-                                        dismiss()
+                
+                        PrimaryButton(
+                            title: "สร้างบัญชี",
+                            action: {
+                                viewModel.isRegisterSubmitted = true
+                                if viewModel.validateFormRegister() {
+                                    print("สร้างบัญชีสำเร็จ")
+                                    viewModel.showSuccessPopup = true
+
+                                    Task {
+                                        try await Task.sleep(nanoseconds: 2_000_000_000)
+
+                                        if viewModel.showSuccessPopup {
+                                            viewModel.showSuccessPopup = false
+                                            dismiss()
+                                        }
                                     }
+                                } else {
+                                    print("มีช่องที่ต้องกรอก")
                                 }
-                            } else {
-                                print("มีช่องที่ต้องกรอก")
-                            }
-                        }) {
-                            Text("สร้างบัญชี")
-                                .font(.noto(20, weight: .bold))
-                                .foregroundColor(.white)
-                                .frame(width: 155, height: 49)
-                                .background(Color.mainColor)
-                                .cornerRadius(20)
-                        }
+                            },
+                            width: 155,
+                            height: 49
+                        )
                         .padding(.bottom, 20)
                         Spacer()
                     }
