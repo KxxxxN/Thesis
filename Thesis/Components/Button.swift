@@ -61,7 +61,22 @@ struct BackButton: View {
         } label: {
             Image(systemName: "chevron.left")
                 .foregroundColor(.black)
-                .font(.system(size: 24, weight: .bold))
+                .font(.system(size: 25))
+        }
+        .padding(.leading, 25)
+    }
+}
+
+struct BackButtonWhite: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        Button {
+            dismiss()
+        } label: {
+            Image(systemName: "chevron.left")
+                .foregroundColor(.white)
+                .font(.system(size: 25))
         }
         .padding(.leading, 25)
     }

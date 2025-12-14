@@ -89,32 +89,26 @@ struct WasteTypeView: View {
     var headerView: some View {
         ZStack {
             Color.mainColor
-            HStack {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.white)
-                        .font(.system(size: 20))
-                }
-                
-                Spacer()
 
+            ZStack {
                 Text("ขยะแต่ละประเภท")
                     .font(.noto(25, weight: .bold))
                     .foregroundColor(.white)
 
-                Spacer()
-                
-                Image(systemName: "chevron.left")
-                    .foregroundColor(.clear)
-                    .font(.system(size: 20))
+                HStack {
+                    BackButtonWhite()
+
+                    Spacer()
+                }
             }
-            .padding(.horizontal, 18)
-            .padding(.bottom, 28)
             .padding(.top, 69)
+            .padding(.bottom, 28)
+            .padding(.horizontal, 18)
         }
         .frame(height: 123)
         .cornerRadius(20, corners: [.bottomLeft, .bottomRight])
     }
+
 
     var paginationSection: some View {
         HStack(spacing: 19) {

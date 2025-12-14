@@ -28,12 +28,7 @@ struct ScoreHistoryView: View {
                         .foregroundColor(.white)
 
                     HStack {
-                        Button(action: { dismiss() }) {
-                            Image(systemName: "chevron.left")
-                                .foregroundColor(.white)
-                                .font(.system(size: 20))
-                        }
-                        .padding(.leading, 18)
+                        BackButtonWhite()
 
                         Spacer()
                     }

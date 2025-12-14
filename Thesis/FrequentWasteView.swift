@@ -60,36 +60,27 @@ struct FrequentWasteView: View {
         Int(ceil(Double(sortedWasteItems.count) / Double(itemsPerPage)))
     }
 
-    // MARK: - Header
     var headerView: some View {
         ZStack {
             Color.mainColor
-            HStack {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.white)
-                        .font(.system(size: 20))
-                }
 
-                Spacer()
-
+            ZStack {
                 Text("ขยะที่แยกทั้งหมด")
                     .font(.noto(25, weight: .bold))
                     .foregroundColor(.white)
 
-                Spacer()
-
-                Image(systemName: "chevron.left")
-                    .foregroundColor(.clear)
-                    .font(.system(size: 20))
+                HStack {
+                    BackButtonWhite()
+                    Spacer()
+                }
             }
-            .padding(.horizontal, 18)
-            .padding(.bottom, 28)
             .padding(.top, 69)
+            .padding(.bottom, 28)
         }
         .frame(height: 123)
         .cornerRadius(20, corners: [.bottomLeft, .bottomRight])
     }
+
 
     var paginationSection: some View {
         HStack(spacing: 19) {
@@ -121,7 +112,6 @@ struct FrequentWasteView: View {
         }
     }
 
-    // MARK: - BODY
     var body: some View {
         ZStack {
             Color.backgroundColor.ignoresSafeArea()
@@ -131,15 +121,17 @@ struct FrequentWasteView: View {
                 headerView
 
                 ScrollView {
-                    LazyVGrid(columns: [
-                        GridItem(.flexible(), spacing: 16),
-                        GridItem(.flexible(), spacing: 16)
-                    ], spacing: 16) {
-
+                    LazyVGrid(
+                        columns: [
+                            GridItem(.flexible(), spacing: 16),
+                            GridItem(.flexible(), spacing: 16)
+                        ],
+                        spacing: 16
+                    ) {
                         ForEach(paginatedItems, id: \.self) { item in
                             WasteCardView(item: item)
                                 .onTapGesture {
-                                    selectedWaste = item    // ⭐ ไปหน้า WasteTypeView
+                                    selectedWaste = item
                                 }
                         }
                     }
@@ -151,12 +143,12 @@ struct FrequentWasteView: View {
             }
             .edgesIgnoringSafeArea(.top)
         }
-        // ⭐ Navigation ไป WasteTypeView
-        .navigationDestination(item: $selectedWaste) { item in
+        .navigationDestination(item: $selectedWaste) { _ in
             WasteTypeView(hideTabBar: .constant(true))
                 .navigationBarBackButtonHidden(true)
         }
     }
+
 }
 
 
