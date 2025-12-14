@@ -37,17 +37,9 @@ struct DetailView: View {
                         .foregroundColor(.black)
                     
                     HStack {
-                        Button(action: {
-                            hideTabBar = false
-                            dismiss()
-                        }) {
-                            Image(systemName: "chevron.left")
-                                .foregroundColor(.black)
-                                .font(.system(size: 20))
-                        }
+                        BackButton()
                         Spacer()
                     }
-                    .padding(.horizontal, 18)
                 }
                 .padding(.bottom,27)
                 
