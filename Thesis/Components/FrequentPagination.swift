@@ -1,3 +1,11 @@
+//
+//  FrequentPagination.swift
+//  Thesis
+//
+//  Created by Penpitcha Sureepitak on 14/12/2568 BE.
+//
+
+import SwiftUI
 
 struct FrequentPagination: View {
 

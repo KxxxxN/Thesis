@@ -1,3 +1,12 @@
+//
+//  KnowledgeWasteCard.swift
+//  Thesis
+//
+//  Created by Penpitcha Sureepitak on 14/12/2568 BE.
+//
+
+import SwiftUI
+
 struct KnowledgeWasteCard: View {
     let example: WasteExample
     

@@ -1,3 +1,12 @@
+//
+//  FrequentWasteCard.swift
+//  Thesis
+//
+//  Created by Penpitcha Sureepitak on 14/12/2568 BE.
+//
+
+import SwiftUI
+
 struct FrequentWasteCard: View {
     let item: WasteItem
 

@@ -26,6 +26,8 @@ extension Color {
     static let generalWasteColor = Color(red: 0x1A/255, green: 0x75/255, blue: 0xBB/255)
     static let recycleWasteColor = Color(red: 0xE9/255, green: 0xAF/255, blue: 0x43/255)
     static let redeemColor = Color(red: 0xD7/255, green: 0x69/255, blue: 0x69/255)
+    static let cameraBackground = Color(red: 0xEB/255, green: 0xEB/255, blue: 0xEB/255)
+
 }
 
 extension Font {
