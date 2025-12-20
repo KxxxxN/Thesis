@@ -1,3 +1,10 @@
+//
+//  CameraPreview.swift
+//  Thesis
+//
+//  Created by Penpitcha Sureepitak on 21/12/2568 BE.
+//
+
 import SwiftUI
 import PhotosUI
 import AVFoundation
