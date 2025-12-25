@@ -37,12 +37,7 @@ struct RewardExchangeView: View {
                 Color.mainColor
                 
                 HStack {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 20))
-                            .foregroundColor(.white)
-                            .frame(width: 24, height: 24)
-                    }
+                    XBackButtonWhite()
 
                     Spacer()
 
@@ -55,7 +50,6 @@ struct RewardExchangeView: View {
                     Color.clear
                         .frame(width: 24, height: 24)
                 }
-                .padding(.horizontal, 22)
                 .padding(.top, 69)
                 .padding(.bottom, 20)
             }

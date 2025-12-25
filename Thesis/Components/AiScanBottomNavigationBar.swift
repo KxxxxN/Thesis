@@ -8,12 +8,11 @@
 import SwiftUI
 
 struct AiScanBottomNavigationBar: View {
-
     @Binding var selectedTab: Int
+    var onSelect: (Int) -> Void
 
     var body: some View {
         ZStack {
-
             Capsule()
                 .fill(Color.secondColor)
                 .frame(width: 344, height: 50)
@@ -22,24 +21,21 @@ struct AiScanBottomNavigationBar: View {
                 .fill(Color.mainColor)
                 .frame(width: 110, height: 42)
                 .offset(x: CGFloat(selectedTab - 1) * 110)
-                .animation(.easeInOut(duration: 0.25), value: selectedTab)
+                .animation(.easeInOut(duration: 0.3), value: selectedTab)
 
             HStack(spacing: 7) {
-                navigationItem(icon: "Barcode", label: "บาร์โค้ด", index: 0)
-                navigationItem(icon: "Tabler_ai", label: "สแกน", index: 1)
-                navigationItem(icon: "Search", label: "ค้นหา", index: 2)
+                tabButton(icon: "Barcode", label: "บาร์โค้ด", index: 0)
+                tabButton(icon: "Tabler_ai", label: "สแกน", index: 1)
+                tabButton(icon: "Search", label: "ค้นหา", index: 2)
             }
         }
         .frame(width: 344, height: 50)
     }
 
-    // MARK: - Item
-    private func navigationItem(icon: String, label: String, index: Int) -> some View {
-
-        let xOffset: CGFloat = index == 0 ? 6 : (index == 2 ? -6 : 0)
-
-        return Button {
+    private func tabButton(icon: String, label: String, index: Int) -> some View {
+        Button {
             selectedTab = index
+            onSelect(index)
         } label: {
             HStack(spacing: 6) {
                 Image(icon)
@@ -51,12 +47,13 @@ struct AiScanBottomNavigationBar: View {
                     )
 
                 Text(label)
-                    .font(.noto(15, weight: .medium))
+                    .font(.noto(15, weight: .regular))
             }
             .foregroundColor(.white)
             .frame(width: 110, height: 42)
-            .offset(x: xOffset)
         }
     }
 }
+
+
 

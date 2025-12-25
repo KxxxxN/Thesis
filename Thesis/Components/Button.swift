@@ -81,3 +81,35 @@ struct BackButtonWhite: View {
         .padding(.leading, 25)
     }
 }
+
+struct XBackButtonWhite: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        Button {
+            dismiss()
+        } label: {
+            Image(systemName: "xmark")
+                .font(.system(size: 20))
+                .foregroundColor(.white)
+                .frame(width: 24, height: 24)
+        }
+        .padding(.leading, 25)
+    }
+}
+
+struct XBackButtonBlack: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        Button {
+            dismiss()
+        } label: {
+            Image(systemName: "xmark")
+                .font(.system(size: 20))
+                .foregroundColor(.black)
+                .frame(width: 24, height: 24)
+        }
+        .padding(.leading, 25)
+    }
+}

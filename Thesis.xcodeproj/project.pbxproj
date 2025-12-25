@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		48673FF22EFDB5CA00A054B9 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 48673FF12EFDB5CA00A054B9 /* Inter-Bold.ttf */; };
+		48673FF42EFDB5D800A054B9 /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 48673FF32EFDB5D800A054B9 /* Inter-Medium.ttf */; };
+		48673FF62EFDB5E500A054B9 /* Inter-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 48673FF52EFDB5E500A054B9 /* Inter-Light.ttf */; };
+		48673FFC2EFDB5FD00A054B9 /* Inter-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 48673FF92EFDB5FD00A054B9 /* Inter-Thin.ttf */; };
+		48673FFE2EFDB64D00A054B9 /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 48673FFD2EFDB64D00A054B9 /* Inter-Regular.ttf */; };
 		BB50BD592EB8966E00A20141 /* NotoSansThai-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BB50BD582EB8966E00A20141 /* NotoSansThai-Thin.ttf */; };
 		BB50BD5E2EB8968400A20141 /* NotoSansThai-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BB50BD5A2EB8968400A20141 /* NotoSansThai-Light.ttf */; };
 		BB50BD5F2EB8968400A20141 /* NotoSansThai-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BB50BD5B2EB8968400A20141 /* NotoSansThai-Medium.ttf */; };
@@ -16,6 +21,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		48673FF12EFDB5CA00A054B9 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Bold.ttf"; sourceTree = "<group>"; };
+		48673FF32EFDB5D800A054B9 /* Inter-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.ttf"; sourceTree = "<group>"; };
+		48673FF52EFDB5E500A054B9 /* Inter-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Light.ttf"; sourceTree = "<group>"; };
+		48673FF92EFDB5FD00A054B9 /* Inter-Thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Thin.ttf"; sourceTree = "<group>"; };
+		48673FFD2EFDB64D00A054B9 /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Regular.ttf"; sourceTree = "<group>"; };
 		BB50BD582EB8966E00A20141 /* NotoSansThai-Thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansThai-Thin.ttf"; sourceTree = "<group>"; };
 		BB50BD5A2EB8968400A20141 /* NotoSansThai-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansThai-Light.ttf"; sourceTree = "<group>"; };
 		BB50BD5B2EB8968400A20141 /* NotoSansThai-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansThai-Medium.ttf"; sourceTree = "<group>"; };
@@ -66,6 +76,11 @@
 				BB50BD5C2EB8968400A20141 /* NotoSansThai-Regular.ttf */,
 				BB50BD5D2EB8968400A20141 /* NotoSansThai-SemiBold.ttf */,
 				BB50BD622EB8968E00A20141 /* NotoSansThai-Bold.ttf */,
+				48673FF92EFDB5FD00A054B9 /* Inter-Thin.ttf */,
+				48673FF52EFDB5E500A054B9 /* Inter-Light.ttf */,
+				48673FF32EFDB5D800A054B9 /* Inter-Medium.ttf */,
+				48673FFD2EFDB64D00A054B9 /* Inter-Regular.ttf */,
+				48673FF12EFDB5CA00A054B9 /* Inter-Bold.ttf */,
 			);
 			path = Fonts;
 			sourceTree = "<group>";
@@ -156,8 +171,13 @@
 				BB50BD5E2EB8968400A20141 /* NotoSansThai-Light.ttf in Resources */,
 				BB50BD5F2EB8968400A20141 /* NotoSansThai-Medium.ttf in Resources */,
 				BB50BD632EB8968E00A20141 /* NotoSansThai-Bold.ttf in Resources */,
+				48673FF22EFDB5CA00A054B9 /* Inter-Bold.ttf in Resources */,
 				BB50BD602EB8968400A20141 /* NotoSansThai-Regular.ttf in Resources */,
+				48673FFC2EFDB5FD00A054B9 /* Inter-Thin.ttf in Resources */,
+				48673FFE2EFDB64D00A054B9 /* Inter-Regular.ttf in Resources */,
 				BB50BD612EB8968400A20141 /* NotoSansThai-SemiBold.ttf in Resources */,
+				48673FF62EFDB5E500A054B9 /* Inter-Light.ttf in Resources */,
+				48673FF42EFDB5D800A054B9 /* Inter-Medium.ttf in Resources */,
 				BB50BD592EB8966E00A20141 /* NotoSansThai-Thin.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
