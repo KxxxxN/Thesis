@@ -34,13 +34,16 @@ class LoginViewModel: ObservableObject {
         var allFieldsValid = true
         
         // 2. ตรวจสอบอีเมล
-        if email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        if ValidationHelper.isEmpty(email) {
             emailError = "กรุณากรอกอีเมล" // กำหนดข้อความเฉพาะ
+            allFieldsValid = false
+        } else if !ValidationHelper.isValidEmail(email) {
+            emailError = "รูปแบบอีเมลไม่ถูกต้อง"
             allFieldsValid = false
         }
         
         // 3. ตรวจสอบรหัสผ่าน
-        if password.isEmpty {
+        if ValidationHelper.isEmpty(password) {
             passwordError = "กรุณากรอกรหัสผ่าน" // กำหนดข้อความเฉพาะ
             allFieldsValid = false
         }

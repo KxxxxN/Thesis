@@ -20,6 +20,26 @@ struct ProfileView: View {
     
     @State private var navigateToConfirmPassword: Bool = false
     
+    @State private var isNameInvalid: Bool = false
+    @State private var isLastNameInvalid: Bool = false
+    @State private var isPhoneInvalid: Bool = false
+        
+    // เก็บค่าสำรองไว้ใช้กรณี "ยกเลิก"
+    @State private var originalName: String = ""
+    @State private var originalLastName: String = ""
+    @State private var originalPhone: String = ""
+    
+    private func resetData() {
+        name = originalName
+        lastName = originalLastName
+        phoneNumber = originalPhone
+        
+        // ล้างสถานะ Error ด้วย
+        isNameInvalid = false
+        isLastNameInvalid = false
+        isPhoneInvalid = false
+    }
+    
     init(
         initialName: String = "สุนิสา",
         initialLastName: String = "จินดาวัฒนา",
@@ -53,17 +73,28 @@ struct ProfileView: View {
                         .foregroundColor(Color.black)
                     
                     HStack {
-                        BackButton()
+                        Button(action: {
+                            resetData() // คืนค่าก่อนย้อนกลับ
+                            // ใส่ Logic ย้อนกลับของคุณที่นี่ เช่น dismiss()
+                        }) {
+                            BackButton()
+                        }
                         
                         Spacer()
-                                                
+                        
                         Button(action: {
+                            // เก็บค่าปัจจุบันไว้เป็นค่าสำรองก่อนเริ่มแก้ไข
+                            if !isEditing {
+                                originalName = name
+                                originalLastName = lastName
+                                originalPhone = phoneNumber
+                            }
                             isEditing.toggle()
                         }) {
                             Text(isEditing ? "" : "แก้ไข")
                                 .font(.noto(16, weight: .medium))
                                 .foregroundColor(isEditing ? Color.clear : Color.mainColor)
-                                .padding(.horizontal,31)
+                                .padding(.horizontal, 31)
                         }
                     }
                 }
@@ -75,240 +106,102 @@ struct ProfileView: View {
                     .padding(.top,35)
                     .padding(.bottom,11)
                 
-                VStack(alignment: .leading, spacing: 10){
+                VStack(alignment: .leading, spacing: 0){
                     
                     // --- ชื่อ ---
-                    VStack(alignment: .leading, spacing: 4){
-                        Title(title: "ชื่อ")
-                        
-                        HStack {
-                            if isEditing {
-
-                                TextField("ป้อนชื่อของคุณ", text: $name)
-                                    .font(.noto(20, weight: .medium))
-                                    .foregroundColor(Color.black)
-
-                            } else {
-                                // โหมดดู: ใช้ Text ธรรมดา ผู้ใช้คลิกไม่ได้
-                                Text(displayValue(for: name))
-                                    .font(.noto(20, weight: .medium))
-                                    .foregroundColor(Color.black)
-                            }
-                            
-                            Spacer()
-                            
-                            if isEditing {
-                                Button(action: {
-                                    print("แก้ไขชื่อ")
-                                }) {
-                                    Image(systemName: "pencil")
-                                        .foregroundColor(Color.mainColor)
-                                        .frame(width: 16, height: 18)
-                                }
-                            }
+                    ProfileInputField(
+                        title: "ชื่อ",
+                        placeholder: "ป้อนชื่อของคุณ",
+                        text: $name,
+                        isEditing: $isEditing,
+                        isInvalid: $isNameInvalid,
+                        errorMessage: "รูปแบบชื่อไม่ถูกต้อง",
+                        onEditingChanged: {
+                            isNameInvalid = !ValidationHelper.isNameValid(name: name)
                         }
-                        .padding(.horizontal)
-                        .frame(width: 345, height: 49)
-                        .background(Color.textFieldColor)
-                        .cornerRadius(20)
-                    }
+                    )
                     
                     // --- นามสกุล ---
-                    VStack(alignment: .leading, spacing: 4){
-                        Title(title: "นามสกุล")
-                        
-                        HStack {
-                            if isEditing {
-                                // โหมดแก้ไข: ใช้ TextField
-                                TextField("ป้อนชื่อของคุณ", text: $lastName)
-                                    .font(.noto(20, weight: .medium))
-                                    .foregroundColor(Color.black)
-
-                            } else {
-                                // โหมดดู: ใช้ Text ธรรมดา ผู้ใช้คลิกไม่ได้
-                                Text(displayValue(for: lastName))
-                                    .font(.noto(20, weight: .medium))
-                                    .foregroundColor(Color.black)
-                            }
-                            
-                            Spacer()
-                            
-                            if isEditing {
-                                Button(action: {
-                                    print("แก้ไขนามสกุล")
-                                }) {
-                                    Image(systemName: "pencil")
-                                        .foregroundColor(Color.mainColor)
-                                        .frame(width: 16, height: 18)
-                                }
-                            }
+                    ProfileInputField(
+                        title: "นามสกุล",
+                        placeholder: "ป้อนนามสกุลของคุณ",
+                        text: $lastName,
+                        isEditing: $isEditing,
+                        isInvalid: $isLastNameInvalid,
+                        errorMessage: "รูปแบบนามสกุลไม่ถูกต้อง",
+                        onEditingChanged: {
+                            isLastNameInvalid = !ValidationHelper.isNameValid(name: lastName)
                         }
-                        .padding(.horizontal)
-                        .frame(width: 345, height: 49)
-                        .background(Color.textFieldColor)
-                        .cornerRadius(20)
-                    }
+                    )
                     
                     // --- อีเมล ---
-                    VStack(alignment: .leading, spacing: 4){
-                        Title(title: "อีเมล")
-                                                
-                        Group {
-                            if isEditing {
-                                // MARK: - โหมดแก้ไข (ใช้ NavigationLink)
-                                NavigationLink(destination: ConfirmPasswordView()) {
-                                    HStack {
-                                        Text(displayValue(for: email)) // แสดงค่า
-                                            .font(.noto(20, weight: .medium))
-                                            .foregroundColor(Color.black)
-                                        
-                                        Spacer()
-                                        
-                                        Image(systemName: "pencil") // ไอคอนดินสอ
-                                            .foregroundColor(Color.mainColor)
-                                            .frame(width: 16, height: 18)
-                                    }
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                
-                            } else {
-                                // MARK: - โหมดดู (ไม่ใช่ Button)
-                                HStack {
-                                    Text(displayValue(for: email))
-                                        .font(.noto(20, weight: .medium))
-                                        .foregroundColor(Color.black)
-                                    
-                                    Spacer()
-                                    
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                        }
-                        .padding(.horizontal)
-                        .frame(width: 345, height: 49)
-                        .background(Color.textFieldColor)
-                        .cornerRadius(20)
-                    }
+                    ProfileEmailField(
+                        title: "อีเมล",
+                        email: email,
+                        isEditing: $isEditing
+                    )
                     
                     // --- เบอร์โทร ---
-                    VStack(alignment: .leading, spacing: 4){
-                        Title(title: "เบอร์โทร")
-                                                
-                        Group {
-                            if isEditing {
-                                // MARK: - โหมดแก้ไข (ใช้ NavigationLink)
-                                NavigationLink(destination: ConfirmPasswordView()) {
-                                    HStack {
-                                        Text(displayValue(for: phoneNumber)) // แสดงค่า
-                                            .font(.noto(20, weight: .medium))
-                                            .foregroundColor(Color.black)
-                                        
-                                        Spacer()
-                                        
-                                        Image(systemName: "pencil") // ไอคอนดินสอ
-                                            .foregroundColor(Color.mainColor)
-                                            .frame(width: 16, height: 18)
-                                    }
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                
-                            } else {
-                                // MARK: - โหมดดู (ไม่ใช่ Button)
-                                HStack {
-                                    Text(displayValue(for: phoneNumber))
-                                        .font(.noto(20, weight: .medium))
-                                        .foregroundColor(Color.black)
-                                    
-                                    Spacer()
-                                    
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            }
+                    ProfileInputField(
+                        title: "เบอร์โทร",
+                        placeholder: "0XX-XXX-XXXX",
+                        text: $phoneNumber,
+                        isEditing: $isEditing,
+                        isInvalid: $isPhoneInvalid,
+                        errorMessage: "รูปแบบเบอร์โทรไม่ถูกต้อง",
+                        keyboardType: .numberPad,
+                        onEditingChanged: {
+                            isPhoneInvalid = !ValidationHelper.isValidPhone(phoneNumber)
                         }
-                        .padding(.horizontal)
-                        .frame(width: 345, height: 49)
-                        .background(Color.textFieldColor)
-                        .cornerRadius(20)
-                    }
+                    )
                     
                     // --- รหัสผ่าน ---
-                    VStack(alignment: .leading, spacing: 4){
-                        Title(title: "รหัสผ่าน")
-                                                
-                        Group {
-                            let passwordDisplay: String = isPasswordVisible ? password : displayValue(for: "hasValue", isSecure: true)
-                            if isEditing {
-                                // MARK: - โหมดแก้ไข (ใช้ NavigationLink)
-                                NavigationLink(destination: ConfirmEmailView()) {
-                                    HStack {
-                                        Text(passwordDisplay) // แสดงค่า
-                                            .font(.noto(20, weight: .medium))
-                                            .foregroundColor(Color.black)
-                                        
-                                        Spacer()
-                                        
-                                        Image(systemName: "pencil") // ไอคอนดินสอ
-                                            .foregroundColor(Color.mainColor)
-                                            .frame(width: 16, height: 18)
-                                    }
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                
-                            } else {
-                                // MARK: - โหมดดู (ไม่ใช่ Button)
-                                HStack {
-                                    Text(passwordDisplay)
-                                        .font(.noto(20, weight: .medium))
-                                        .foregroundColor(Color.black)
-                                    
-                                    Spacer()
-                                    
-                                    Button(action: {
-                                        isPasswordVisible.toggle()
-                                    }) {
-                                        Image(systemName: isPasswordVisible ? "eye.fill" : "eye.slash.fill")
-                                            .foregroundColor(Color.mainColor)
-                                    }
-
-                                    
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                        }
-                        .padding(.horizontal)
-                        .frame(width: 345, height: 49)
-                        .background(Color.textFieldColor)
-                        .cornerRadius(20)
-                    }
                     
+                    ProfilePasswordField(
+                        title: "รหัสผ่าน",
+                        password: password,
+                        isEditing: $isEditing,
+                        isPasswordVisible: $isPasswordVisible
+                    )
                 }
+                
                 Spacer()
+                
                 if isEditing{
                     HStack(alignment: .bottom,spacing: 35){
                         SecondButton(
                             title: "ยกเลิก",
                             action: {
-                                print("ยกเลิก")
-//                                withAnimation {
-                                    isEditing.toggle()
-                                // TODO: Logic สำหรับยกเลิกการแก้ไข (เช่น รีเซ็ตค่า)
-//                                }
+                                resetData() // คืนค่าเก่ากลับมา
+                                isEditing = false
                             },
                             width: 155,
                             height: 49
                         )
+                        
                         PrimaryButton(
                             title: "บันทึก",
-                            action:{
-//                                withAnimation {
-                                    isEditing.toggle()
-                                    print("บันทึก")
-                                // TODO: Logic สำหรับบันทึกข้อมูล
-//                                }
+                            action: {
+                                // ถ้าผ่าน Validation ทั้งหมด
+                                if !isNameInvalid && !isLastNameInvalid && !isPhoneInvalid &&
+                                    !name.isEmpty && !lastName.isEmpty && !phoneNumber.isEmpty {
+                                    
+                                    // อัปเดตค่าสำรองให้เป็นค่าใหม่ที่บันทึก
+                                    originalName = name
+                                    originalLastName = lastName
+                                    originalPhone = phoneNumber
+                                    
+                                    isEditing = false
+                                    print("บันทึกสำเร็จ")
+                                }
                             },
                             width: 155,
                             height: 49
                         )
+                        .disabled(isNameInvalid || isLastNameInvalid || isPhoneInvalid ||
+                                  name.isEmpty || lastName.isEmpty || phoneNumber.isEmpty)
+                        .opacity((isNameInvalid || isLastNameInvalid || isPhoneInvalid ||
+                                  name.isEmpty || lastName.isEmpty || phoneNumber.isEmpty) ? 0.5 : 1)
                     }
                     .padding(.bottom,20)
                 }
@@ -316,6 +209,12 @@ struct ProfileView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(Color.backgroundColor)
             .navigationBarBackButtonHidden(true)
+        }
+        .onAppear {
+            // ตั้งค่าข้อมูลสำรองครั้งแรกเมื่อหน้าจอแสดงผล
+            originalName = name
+            originalLastName = lastName
+            originalPhone = phoneNumber
         }
     }
 }

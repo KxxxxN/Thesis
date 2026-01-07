@@ -38,12 +38,12 @@ struct ChangePasswordView: View {
                 )
                 .onChange(of: viewModel.password) {
                     if !viewModel.password.isEmpty {
-                        viewModel.isPasswordValid = viewModel.isPasswordValid(password:viewModel.password)
+                        viewModel.isPasswordValid = ValidationHelper.isPasswordValid(viewModel.password)
                     }
                 }
                 
-                if !viewModel.isPasswordValid(password: viewModel.password) {
-                    PasswordValidatCheckChangePassword(viewModel: viewModel)
+                if !ValidationHelper.isPasswordValid(viewModel.password) {
+                    PasswordValidationCheckView(password: viewModel.password)
                         .padding(.top, -7)
                         .padding(.bottom, 5)
                 }

@@ -43,7 +43,7 @@ struct RegisterView: View {
                             // ใช้ onChange รูปแบบใหม่
                             .onChange(of: viewModel.firstName) {
                                 if !viewModel.firstName.isEmpty {
-                                    viewModel.isFirstNameValid = viewModel.isNameValid(name: viewModel.firstName)
+                                    viewModel.isFirstNameValid = ValidationHelper.isNameValid(name: viewModel.firstName)
                                 }
                             }
                             
@@ -58,7 +58,7 @@ struct RegisterView: View {
                             )
                             .onChange(of: viewModel.lastName) {
                                 if !viewModel.lastName.isEmpty {
-                                    viewModel.isLastNameValid = viewModel.isNameValid(name: viewModel.lastName)
+                                    viewModel.isLastNameValid = ValidationHelper.isNameValid(name: viewModel.lastName)
                                 }
                             }
                             
@@ -74,7 +74,7 @@ struct RegisterView: View {
                             .onChange(of: viewModel.email) {
                                 // Live validation
                                 if !viewModel.email.isEmpty {
-                                    viewModel.isEmailValid = viewModel.isValidEmail(email: viewModel.email)
+                                    viewModel.isEmailValid = ValidationHelper.isValidEmail(viewModel.email)
                                 }
                             }
                             
@@ -90,7 +90,7 @@ struct RegisterView: View {
                             .onChange(of: viewModel.phone) {
                                 // Live validation
                                 if !viewModel.phone.isEmpty {
-                                    viewModel.isPhoneValid = viewModel.isValidPhone(phone: viewModel.phone)
+                                    viewModel.isPhoneValid = ValidationHelper.isValidPhone(viewModel.phone)
                                 }
                             }
                             
@@ -106,13 +106,13 @@ struct RegisterView: View {
                             )
                             .onChange(of: viewModel.password) {
                                 if !viewModel.password.isEmpty {
-                                    viewModel.isPasswordValid = viewModel.isPasswordValid(password:viewModel.password)
+                                    viewModel.isPasswordValid = ValidationHelper.isPasswordValid(viewModel.password)
                                 }
                             }
                             
                             // Password Validation Checklist
-                            if !viewModel.isPasswordValid(password: viewModel.password) {
-                                PasswordValidatCheckRegister(viewModel: viewModel)
+                            if !ValidationHelper.isPasswordValid(viewModel.password) {
+                                PasswordValidationCheckView(password: viewModel.password)
                                     .padding(.top, 0)
                                     .padding(.bottom, 5)
                             }
@@ -132,7 +132,6 @@ struct RegisterView: View {
                                 if !viewModel.confirmPassword.isEmpty {
                                     viewModel.isConfirmPasswordValid = (viewModel.password == viewModel.confirmPassword)
                                 } else {
-                                    // หากช่องยืนยันว่างเปล่า ให้ถือว่าไม่ถูกต้อง
                                     viewModel.isConfirmPasswordValid = false
                                 }
                             }

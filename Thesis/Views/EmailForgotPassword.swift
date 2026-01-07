@@ -33,14 +33,12 @@ struct EmailForgotPassword: View {
                     errorMessage: viewModel.emailErrorForgot ?? ""
                 )
                 .onChange(of: viewModel.emailForgotPassword) {
-                    // Live validation
-                    let currentEmail = viewModel.emailForgotPassword.trimmingCharacters(in: .whitespacesAndNewlines)
-                    
-                    // 1. ตรวจสอบว่าช่องไม่ว่างเปล่า
-                    if !currentEmail.isEmpty {
-                        viewModel.emailErrorForgot = nil
-                    } else {
+                    // ใช้ ValidationHelper ตรวจสอบตามเงื่อนไข
+                    if ValidationHelper.isEmpty(viewModel.emailForgotPassword) {
                         viewModel.emailErrorForgot = "กรุณากรอกอีเมลที่ลงทะเบียนไว้"
+                    } else {
+                        // ถ้าถูกต้อง ให้ล้างข้อความ Error
+                        viewModel.emailErrorForgot = nil
                     }
                 }
                 

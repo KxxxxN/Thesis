@@ -12,88 +12,48 @@ import SwiftUI
 class ChangePasswordViewModel: ObservableObject {
     @Published var password: String = ""
     @Published var confirmPassword: String = ""
-    
+        
     @Published var isPasswordVisible: Bool = false
     @Published var isConfirmPasswordVisible: Bool = false
     @Published var isChangePasswordSubmitted: Bool = false
-    
+        
     @Published var isPasswordValid: Bool = true
     @Published var isConfirmPasswordValid: Bool = true
-    @Published var passwordsMatch: Bool = true
-    
+        
     @Published var navigateToLogin: Bool = false
-    @AppStorage("navigateToLogin") var navigateTologin = false
-    // Computed Property: ตรวจสอบว่ารหัสผ่านใหม่ผ่านเงื่อนไข Checklist ทั้งหมดหรือไม่
+    @AppStorage("isLoggedIn") var isLoggedIn = false
+    
+    // MARK: - Password Checklist Helpers (เรียกใช้จาก Helper)
+    var passwordHasLength: Bool { ValidationHelper.hasMinimumLength(password) }
+    var passwordHasUpper: Bool { ValidationHelper.hasUppercase(password) }
+    var passwordHasLower: Bool { ValidationHelper.hasLowercase(password) }
+    var passwordHasDigit: Bool { ValidationHelper.hasDigit(password) }
+    var passwordHasSpecial: Bool { ValidationHelper.hasSpecialCharacter(password) }
     
     var isFormValid: Bool {
-        // ต้องผ่านเงื่อนไขรูปแบบ AND ต้องตรงกัน
-        return isPasswordValid(password: password) && (password == confirmPassword) && !password.isEmpty
-    }
-            
-    // MARK: - Validation Functions (Logic สำหรับ Checklist 5 ข้อ)
-    func isPasswordValid(password: String) -> Bool {
-        let regex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%&*_-]).{8,}$"
-        
-        let passwordPredicate = NSPredicate(format: "SELF MATCHES %@", regex)
-        return passwordPredicate.evaluate(with: password)
-    }
-    
-    func hasMinimumLength(_ password: String) -> Bool {
-        return password.count >= 8
-    }
-
-    func hasUppercase(_ password: String) -> Bool {
-        let regex = ".*[A-Z]+.*"
-        return NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: password)
-    }
-
-    func hasLowercase(_ password: String) -> Bool {
-        let regex = ".*[a-z]+.*"
-        return NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: password)
-    }
-
-    func hasDigit(_ password: String) -> Bool {
-        let regex = ".*[0-9]+.*"
-        return NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: password)
-    }
-
-    func hasSpecialCharacter(_ password: String) -> Bool {
-        // อักขระพิเศษ: !@#$%&*_-
-        let regex = ".*[!@#$%&*_-]+.*"
-        return NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: password)
+        return ValidationHelper.isPasswordValid(password) && (password == confirmPassword) && !password.isEmpty
     }
     
     // MARK: - Action & Confirmation Validation
     func validateFormChangePassword() -> Bool {
+        isChangePasswordSubmitted = true
         
-        // 1. ตรวจสอบว่าช่องว่างเปล่าหรือไม่ (Required check)
-        isPasswordValid = !password.isEmpty
-        isConfirmPasswordValid = !confirmPassword.isEmpty
+        // 1. ตรวจสอบรูปแบบรหัสผ่าน
+        isPasswordValid = !ValidationHelper.isEmpty(password) && ValidationHelper.isPasswordValid(password)
         
-        // 2. ตรวจสอบรูปแบบ (Format Validation)
-        if !password.isEmpty {
-            let isFormatValid = isPasswordValid(password: password)
-            self.isPasswordValid = isFormatValid // ตั้งค่าตามผลการตรวจสอบรูปแบบ
+        // 2. ตรวจสอบการตรงกัน
+        if ValidationHelper.isEmpty(confirmPassword) {
+            isConfirmPasswordValid = false
+        } else {
+            isConfirmPasswordValid = (password == confirmPassword)
         }
         
-        // 3. ตรวจสอบการตรงกัน (Matching Validation)
-        var isMatch = false
-        if !password.isEmpty && !confirmPassword.isEmpty {
-            isMatch = (password == confirmPassword)
-            // ตั้งค่า isConfirmPasswordValid ตามผลการ Match และต้องผ่านรูปแบบ
-            self.isConfirmPasswordValid = isMatch && self.isPasswordValid
-        }
-        
-        // 4. ผลลัพธ์รวม: ต้องผ่านรูปแบบ, ต้องไม่ว่างเปล่า, และต้องตรงกัน
-        let finalResult = self.isPasswordValid && self.isConfirmPasswordValid && isMatch && !password.isEmpty
-        
-        return finalResult
+        return isPasswordValid && isConfirmPasswordValid
     }
     
     func changePassword() {
         // 1. เรียกตรวจสอบฟอร์มก่อนดำเนินการ
         if validateFormChangePassword() {
-            // MARK: - 💡 Logic การเปลี่ยนรหัสผ่านสำเร็จ
             
             // 2. ส่งข้อมูลรหัสผ่านไปยัง Backend (หรือ Logic การเปลี่ยนรหัสผ่านจริง)
             print("Password successfully changed.")
@@ -111,7 +71,6 @@ class ChangePasswordViewModel: ObservableObject {
             isConfirmPasswordValid = true
             
         } else {
-            // หากฟอร์มไม่ถูกต้อง: อาจมีการแสดงข้อความแจ้งเตือนเพิ่มเติมที่นี่
             print("Form validation failed. Please check the fields.")
         }
     }
