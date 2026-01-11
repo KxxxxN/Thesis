@@ -14,6 +14,7 @@ struct ProfileInputField: View {
     @Binding var text: String
     @Binding var isEditing: Bool
     @Binding var isInvalid: Bool
+    @Binding var isSubmitted: Bool
     var errorMessage: String
     var keyboardType: UIKeyboardType = .default
     var onEditingChanged: () -> Void = {}
@@ -60,17 +61,16 @@ struct ProfileInputField: View {
             .background(Color.textFieldColor)
             .cornerRadius(20)
             // ใช้ความสามารถของ ValidationBorder
-            .modifier(ValidationBorder(isValid: isEditing ? (!text.isEmpty && !isInvalid) : true))
+            .modifier(ValidationBorder(isValid: isEditing ? !(isSubmitted && isInvalid) : true))
             
             // 3. ส่วนแสดงข้อความ Error (โครงสร้างเดียวกับ Login/Register)
             Group {
                 // จองพื้นที่ 20 ไว้เสมอไม่ว่าจะโหมดไหน Layout จะได้ไม่ขยับ
-                Text(isEditing && (text.isEmpty || isInvalid) ?
-                     (text.isEmpty ? "กรุณากรอก\(title)" : errorMessage) : "")
+                Text(isEditing && isSubmitted && isInvalid ? errorMessage : "")
                     .font(.noto(15, weight: .medium))
                     .foregroundColor(Color.errorColor)
-                    .padding(.top,3)
-                    .opacity(isEditing && (text.isEmpty || isInvalid) ? 1 : 0)
+                    .padding(.top, -1)
+                    .opacity(isEditing && isSubmitted && isInvalid ? 1 : 0)
             }
             .frame(height: 20, alignment: .top)
             .clipped()
@@ -152,7 +152,7 @@ struct ProfilePasswordField: View {
                 } else {
                     // โหมดดู: มีปุ่มเปิด/ปิดตา
                     HStack {
-                        Text(isPasswordVisible ? password : String(repeating: "•", count: 8)) // โชว์จุดคงที่เพื่อความปลอดภัย
+                        Text(isPasswordVisible ? password : String(repeating: "•", count: password.count)) // โชว์จุดคงที่เพื่อความปลอดภัย
                             .font(.noto(20, weight: .medium))
                             .foregroundColor(.black)
                         Spacer()

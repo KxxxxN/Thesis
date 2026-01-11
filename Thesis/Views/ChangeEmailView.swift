@@ -1,44 +1,41 @@
 //
-//  ConfirmEmailView.swift
+//  ChangeEmailView.swift
 //  Thesis
 //
-//  Created by Kansinee Klinkhachon on 12/12/2568 BE.
+//  Created by Kansinee Klinkhachon on 8/1/2569 BE.
 //
 
 import SwiftUI
 
-struct ConfirmEmailView: View {
-    @StateObject private var viewModel = ConfirmEmailViewModel()
-    @Environment(\.dismiss) var dismiss
+struct ChangeEmailView: View {
+    @StateObject private var viewModel = ChangeEmailViewModel()
     
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // MARK: - Header
                 ZStack {
-                    Text("ยืนยันแก้ไขรหัสผ่าน")
+                    Text("ยืนยันแก้ไขอีเมล")
                         .font(.noto(25, weight: .bold))
                         .foregroundColor(.black)
                     HStack {
-                        BackButton()
+                            BackButton()
+                        
                         Spacer()
                     }
                 }
                 .padding(.bottom, 30)
                 
-
-                // MARK: - Email Input Field
-                // ใช้ LoginInputField เพื่อให้มีพื้นที่จอง Error 20px ตามมาตรฐานแอปคุณ
+                // MARK: - Input Field
                 LoginInputField(
                     title: "ที่อยู่อีเมล",
-                    placeholder: "กรอกอีเมล",
-                    text: $viewModel.email,
+                    placeholder: "กรอกอีเมลที่ต้องการแก้ไข",
+                    text: $viewModel.newEmail,
                     isValid: .constant(!viewModel.isSubmitted || viewModel.emailError == nil),
                     errorMessage: viewModel.isSubmitted ? (viewModel.emailError ?? "") : ""
                 )
                 .keyboardType(.emailAddress)
                 .autocapitalization(.none)
-                .onChange(of: viewModel.email) { _, _ in
+                .onChange(of: viewModel.newEmail) { _, _ in
                     viewModel.clearError()
                 }
                 
@@ -46,7 +43,7 @@ struct ConfirmEmailView: View {
                 PrimaryButton(
                     title: "ส่งรหัส OTP",
                     action: {
-                        viewModel.verifyEmailBeforeChange()
+                        viewModel.validateEmail()
                     },
                     width: 155,
                     height: 49
@@ -57,11 +54,8 @@ struct ConfirmEmailView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.backgroundColor)
-            .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("PopToProfile"))) { _ in
-                dismiss()
-            }
             .navigationDestination(isPresented: $viewModel.navigateToOTP) {
-                OTPConfirmView(source: .confirmEmail)
+                OTPConfirmView(source: .changeEmail)
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -69,5 +63,5 @@ struct ConfirmEmailView: View {
 }
 
 #Preview {
-    ConfirmEmailView()
+    ChangeEmailView()
 }

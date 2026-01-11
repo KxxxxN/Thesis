@@ -13,51 +13,45 @@ import Combine
 class ForgotPasswordViewModel: ObservableObject {
     
     @Published var emailForgotPassword: String = ""
-    
     @Published var emailErrorForgot: String? = nil
-    
     @Published var forgotErrorMessage: String? = nil // ใช้สำหรับ Error ที่มาจาก Server/API
+    
+    @Published var isForgotSubmitted: Bool = false
+    
     @AppStorage("navigateToOTP") var navigateToOTP = false
     
     // MARK: - Validation
     
+    func clearError() {
+        emailErrorForgot = nil
+    }
+    
     @discardableResult
     func validateFormForgot() -> Bool {
-        // 1. ล้างข้อความผิดพลาดเดิมก่อนตรวจสอบ
         emailErrorForgot = nil
         
-        var allFieldsValid = true
-        
-        // 2. ตรวจสอบอีเมล
         if emailForgotPassword.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             emailErrorForgot = "กรุณากรอกอีเมลที่ลงทะเบียนไว้"
-            allFieldsValid = false
+            return false
+        } else if !ValidationHelper.isValidEmail(emailForgotPassword) {
+            emailErrorForgot = "รูปแบบอีเมลไม่ถูกต้อง"
+            return false
         }
-        
-        return allFieldsValid
+        return true
     }
     
     func forgotPassword() {
-        forgotErrorMessage = nil
+        self.isForgotSubmitted = true
         
-        let isValidForm = validateFormForgot()
-        
-        if !isValidForm {
-            print("Validation Failed: Empty fields")
-            return
-        }
-        
-        let emailForgot = "user@example.com"
-        
-        if emailForgotPassword == emailForgot {
-            navigateToOTP = true
-            print("Email Forgot Password")
-        } else {
-            forgotErrorMessage = "อีเมลนี้ยังไม่ได้ลงทะเบียน"
-            emailErrorForgot = forgotErrorMessage
+        if validateFormForgot() {
+            // จำลองการตรวจสอบกับ Database
+            let emailForgot = "user@gmail.com"
             
-            print("forgotPassword Failed")
+            if emailForgotPassword == emailForgot {
+                navigateToOTP = true
+            } else {
+                emailErrorForgot = "อีเมลนี้ยังไม่ได้ลงทะเบียน"
+            }
         }
-        
     }
 }

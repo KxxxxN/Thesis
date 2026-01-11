@@ -13,7 +13,7 @@ struct EmailForgotPassword: View {
     
     var body: some View {
         NavigationStack {
-            VStack{ //เปิด Vstack1
+            VStack(spacing: 0){ //เปิด Vstack1
                 ZStack { //เปิด Zstack1
                     Text("ลืมรหัสผ่าน")
                         .font(.noto(25, weight: .bold))
@@ -23,23 +23,19 @@ struct EmailForgotPassword: View {
                         Spacer()
                     }//ปิด Hstack1
                 }//ปิด Zstack1
-                .padding(.bottom)
+                .padding(.bottom, 30)
                 
                 LoginInputField(
                     title: "ที่อยู่อีเมล",
                     placeholder: "กรอกอีเมล",
                     text: $viewModel.emailForgotPassword,
-                    isValid: .constant(viewModel.emailErrorForgot == nil),
-                    errorMessage: viewModel.emailErrorForgot ?? ""
+                    isValid: .constant(!viewModel.isForgotSubmitted || viewModel.emailErrorForgot == nil),
+                    errorMessage: viewModel.isForgotSubmitted ? (viewModel.emailErrorForgot ?? "") : ""
                 )
-                .onChange(of: viewModel.emailForgotPassword) {
-                    // ใช้ ValidationHelper ตรวจสอบตามเงื่อนไข
-                    if ValidationHelper.isEmpty(viewModel.emailForgotPassword) {
-                        viewModel.emailErrorForgot = "กรุณากรอกอีเมลที่ลงทะเบียนไว้"
-                    } else {
-                        // ถ้าถูกต้อง ให้ล้างข้อความ Error
-                        viewModel.emailErrorForgot = nil
-                    }
+                .keyboardType(.emailAddress)
+                .autocapitalization(.none)
+                .onChange(of: viewModel.emailForgotPassword) { _, _ in
+                    viewModel.clearError()
                 }
                 
                 
@@ -51,7 +47,7 @@ struct EmailForgotPassword: View {
                     width: 155,
                     height: 49
                 )
-                .padding(.top)
+                .padding(.top, 40)
                 
                 Spacer()
                 
@@ -59,7 +55,7 @@ struct EmailForgotPassword: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.backgroundColor)
             .navigationDestination(isPresented: $viewModel.navigateToOTP) {
-                OTPConfirmView()
+                OTPConfirmView(source: .forgotPassword)
             }
         }
         .navigationBarBackButtonHidden(true)

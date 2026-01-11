@@ -19,6 +19,9 @@ class ChangePasswordViewModel: ObservableObject {
         
     @Published var isPasswordValid: Bool = true
     @Published var isConfirmPasswordValid: Bool = true
+    
+    @Published var showSuccessPopup: Bool = false
+    @Published var showErrorPopup: Bool = false
         
     @Published var navigateToLogin: Bool = false
     @AppStorage("isLoggedIn") var isLoggedIn = false
@@ -32,6 +35,19 @@ class ChangePasswordViewModel: ObservableObject {
     
     var isFormValid: Bool {
         return ValidationHelper.isPasswordValid(password) && (password == confirmPassword) && !password.isEmpty
+    }
+    
+    func clearError(for field: String) {
+        // เมื่อเริ่มพิมพ์ใหม่ ให้สถานะ Submit เป็น false เพื่อให้ระบบคำนวณ Error ใหม่
+        // หรือจะเลือกคงค่าไว้แล้วเปลี่ยนแค่ Valid ของช่องนั้นๆ ก็ได้
+        if field == "password" {
+            isPasswordValid = true
+        } else if field == "confirmPassword" {
+            isConfirmPasswordValid = true
+        }
+        
+        // หากต้องการให้พฤติกรรมเหมือน RegisterView ที่กรอบแดงหายทันทีที่พิมพ์
+        // อาจจะต้องใช้ตัวแปรควบคุมแยก หรือเช็คผ่าน isChangePasswordSubmitted
     }
     
     // MARK: - Action & Confirmation Validation
@@ -52,26 +68,19 @@ class ChangePasswordViewModel: ObservableObject {
     }
     
     func changePassword() {
-        // 1. เรียกตรวจสอบฟอร์มก่อนดำเนินการ
         if validateFormChangePassword() {
-            
-            // 2. ส่งข้อมูลรหัสผ่านไปยัง Backend (หรือ Logic การเปลี่ยนรหัสผ่านจริง)
             print("Password successfully changed.")
-            
-            // 3. ตั้งค่าการนำทางไปยังหน้า Login
-            // นี่คือตัวแปร @AppStorage ที่จะใช้ในการนำทางใน View หลัก
-            self.navigateToLogin = true
-            
-            // 4. อาจจะต้องการรีเซ็ต Field ต่างๆ หลังสำเร็จ
+            withAnimation {
+                self.showSuccessPopup = true
+            }
+            // รีเซ็ตค่าหลังจากสำเร็จ
             password = ""
             confirmPassword = ""
-            isPasswordVisible = false
-            isConfirmPasswordVisible = false
-            isPasswordValid = true
-            isConfirmPasswordValid = true
-            
+            isChangePasswordSubmitted = false // รีเซ็ตสถานะการส่ง
         } else {
-            print("Form validation failed. Please check the fields.")
+            withAnimation {
+                self.showErrorPopup = true
+            }
         }
     }
 }

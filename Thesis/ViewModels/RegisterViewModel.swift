@@ -25,6 +25,7 @@ class RegisterViewModel: ObservableObject {
     @Published var isPrivacyAccepted: Bool = false
     @Published var showPrivacyPopup: Bool = false
     @Published var showSuccessPopup: Bool = false
+    @Published var showErrorPopup: Bool = false
     @Published var isRegisterSubmitted: Bool = false
     
     // MARK: - Validation States (สำหรับแสดงสีแดง/ข้อความเตือนใน UI)
@@ -43,40 +44,55 @@ class RegisterViewModel: ObservableObject {
     var passwordHasDigit: Bool { ValidationHelper.hasDigit(password) }
     var passwordHasSpecial: Bool { ValidationHelper.hasSpecialCharacter(password) }
     
+    func clearError(for field: String) {
+        switch field {
+        case "firstName": isFirstNameValid = true
+        case "lastName": isLastNameValid = true
+        case "email": isEmailValid = true
+        case "phone": isPhoneValid = true
+        case "password": isPasswordValid = true
+        case "confirmPassword": isConfirmPasswordValid = true
+        default: break
+        }
+        
+        // หมายเหตุ: ไม่ต้องสั่ง isRegisterSubmitted = false แล้ว
+        // เพราะเราต้องการให้ช่องอื่นๆ ที่ยังไม่ได้แก้ ยังโชว์ Error ค้างไว้อยู่
+    }
+    
     
     @discardableResult
     func validateFormRegister() -> Bool {
-        // 1. ตรวจสอบชื่อและนามสกุล (ต้องไม่ว่าง และ เป็นภาษาเดียวตามเงื่อนไข)
+        // 1. ใส่ Logic การเช็คแต่ละช่องที่คุณมีอยู่แล้วตรงนี้
         isFirstNameValid = !firstName.isEmpty && ValidationHelper.isNameValid(name: firstName)
         isLastNameValid = !lastName.isEmpty && ValidationHelper.isNameValid(name: lastName)
-        
-        // 2. ตรวจสอบอีเมล
         isEmailValid = !email.isEmpty && ValidationHelper.isValidEmail(email)
-        
-        // 3. ตรวจสอบเบอร์โทรศัพท์
         isPhoneValid = !phone.isEmpty && ValidationHelper.isValidPhone(phone)
+        isPasswordValid = !password.isEmpty && ValidationHelper.isPasswordValid(password)
+        isConfirmPasswordValid = !confirmPassword.isEmpty && (password == confirmPassword)
         
-        // 4. ตรวจสอบความแข็งแรงของรหัสผ่าน
-        isPasswordValid = !ValidationHelper.isEmpty(password) && ValidationHelper.isPasswordValid(password)
+        // 2. ✅ นำส่วนที่ถามมาวางไว้ตรงนี้ (บรรทัดสุดท้ายของฟังก์ชัน)
+        let isDataValid = isFirstNameValid &&
+                         isLastNameValid &&
+                         isEmailValid &&
+                         isPhoneValid &&
+                         isPasswordValid &&
+                         isConfirmPasswordValid
         
-        // 5. ตรวจสอบการยืนยันรหัสผ่าน
-        if ValidationHelper.isEmpty(confirmPassword) {
-            isConfirmPasswordValid = false
+        // คืนค่าผลลัพธ์รวม (ต้องติ๊กยอมรับ Privacy ด้วยถึงจะผ่าน)
+        return isDataValid && isPrivacyAccepted
+    }
+    
+    func register() {
+        // 1. สั่งเปิดสถานะ Submit เพื่อให้ขอบแดงทำงาน
+        self.isRegisterSubmitted = true
+        
+        // 2. ตรวจสอบความถูกต้องของข้อมูลทั้งหมด
+        if validateFormRegister() {
+            // ✅ กรณีข้อมูลถูกต้องทั้งหมด
+            self.showSuccessPopup = true
         } else {
-            // ต้องเหมือนกับรหัสผ่านหลัก
-            isConfirmPasswordValid = (password == confirmPassword)
+            // ❌ กรณีข้อมูลไม่ถูกต้อง หรือลืมติ๊ก Privacy
+            self.showErrorPopup = true
         }
-        
-        // บันทึกสถานะว่ามีการกด Submit แล้ว (เผื่อใช้โชว์ Error ทันที)
-        isRegisterSubmitted = true
-        
-        // คืนค่า true เฉพาะเมื่อทุกอย่างถูกต้องและยอมรับเงื่อนไขแล้วเท่านั้น
-        return isFirstNameValid &&
-        isLastNameValid &&
-        isEmailValid &&
-        isPhoneValid &&
-        isPasswordValid &&
-        isConfirmPasswordValid &&
-        isPrivacyAccepted
     }
 }
