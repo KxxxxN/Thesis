@@ -145,14 +145,14 @@ struct ErrorPopupView: View {
 //    PrivacyPopupView(showPrivacyPopup: .constant(true))
 //}
 
-#Preview("Error Popup") {
-    ErrorPopupView(title: "เปลี่ยนรหัสผ่านไม่สำเร็จ") {
-        print("Dismissed")
-    }
-}
-
-//#Preview("Success Popup") {
-//    SuccessPopupView(message: "เปลี่ยนรหัสผ่านสำเร็จ") {
+//#Preview("Error Popup") {
+//    ErrorPopupView(title: "เปลี่ยนรหัสผ่านไม่สำเร็จ") {
 //        print("Dismissed")
 //    }
 //}
+
+#Preview("Success Popup") {
+    SuccessPopupView(message: "เปลี่ยนรหัสผ่านสำเร็จ") {
+        print("Dismissed")
+    }
+}
