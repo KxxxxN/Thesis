@@ -61,8 +61,59 @@ struct BackButton: View {
         } label: {
             Image(systemName: "chevron.left")
                 .foregroundColor(.black)
-                .font(.system(size: 24, weight: .bold))
+                .font(.system(size: 25))
         }
         .padding(.leading, 25)
     }
 }
+
+struct BackButtonWhite: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        Button {
+            dismiss()
+        } label: {
+            Image(systemName: "chevron.left")
+                .foregroundColor(.white)
+                .font(.system(size: 25))
+        }
+        .padding(.leading, 25)
+    }
+}
+
+struct XBackButtonWhite: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        Button {
+            dismiss()
+        } label: {
+            Image(systemName: "xmark")
+                .font(.system(size: 20))
+                .foregroundColor(.white)
+                .frame(width: 24, height: 24)
+        }
+        .padding(.leading, 25)
+    }
+}
+
+struct XBackButtonBlack: View {
+    @Binding var index: Int
+
+    var body: some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.35)) {
+                index = 0
+            }
+        } label: {
+            Image(systemName: "xmark")
+                .font(.system(size: 20))
+                .foregroundColor(.black)
+                .frame(width: 24, height: 24)
+        }
+        .padding(.leading, 25)
+    }
+}
+
+

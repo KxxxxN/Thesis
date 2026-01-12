@@ -37,17 +37,9 @@ struct DetailWasteTypeView: View {
                         .foregroundColor(.black)
                     
                     HStack {
-                        Button(action: {
-                            hideTabBar = false
-                            dismiss()
-                        }) {
-                            Image(systemName: "chevron.left")
-                                .foregroundColor(.black)
-                                .font(.system(size: 20))
-                        }
+                        BackButton()
                         Spacer()
                     }
-                    .padding(.horizontal, 18)
                 }
                 .padding(.bottom,27)
                 
@@ -157,14 +149,14 @@ struct DetailWasteTypeView: View {
                         }
                         .padding(.horizontal, 37)
                         .padding(.top, 20)
-                        .padding(.bottom, 40)
+                        .padding(.bottom, 20)
                         
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(Color.knowledgeBackground)
                     .cornerRadius(20, corners: [.topLeft, .topRight])
-                    .edgesIgnoringSafeArea(.bottom)  // ⭐ ให้ยาวจนสุดขอบล่าง
                 }
+                .edgesIgnoringSafeArea(.bottom)  // ⭐ ให้ยาวจนสุดขอบล่าง
             }
         }
         .navigationBarHidden(true)

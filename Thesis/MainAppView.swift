@@ -71,7 +71,7 @@ struct MainAppView: View {
                     HistorySection(hideTabBar: $hideTabBar,items: historyItems)
                     RewardExchangeSection(hideTabBar: $hideTabBar)
                     FrequentWasteSection(hideTabBar: $hideTabBar, items: recyclableItems)
-                    WasteSeparationGuideSection(currentIndex: $currentCarouselIndex)
+                    WasteSeparationGuideSection(currentIndex: $currentCarouselIndex, hideTabBar: $hideTabBar)
                 }
                 .padding()
             }
@@ -117,8 +117,8 @@ struct FrequentWasteSection: View {
     let items: [RecyclableItem]
     
     var body: some View {
-        VStack(spacing: 12) {
-            SectionHeader(title: "วิธีการแยกขยะ", destinationView: FrequentWasteView())
+        VStack(spacing: 7) {
+            SectionHeader(title: "ขยะที่แยกบ่อย", destinationView: FrequentWasteView())
             
             HStack(spacing: 8) {
                 ForEach(items) { item in
@@ -137,14 +137,15 @@ struct RecyclableItemCard: View {
     
     var body: some View {
         VStack(spacing: 0) {
+            
+            Spacer()
+            
             Image(item.imageName)
                 .resizable()
                 .scaledToFit()
                 .frame(height: 92)
-                .padding(.top, 8)
             
             VStack(spacing: 2) {
-                
                 Text(item.title)
                     .font(.noto(14, weight: .semibold))
                     .foregroundColor(.black)
@@ -154,7 +155,9 @@ struct RecyclableItemCard: View {
                     .font(.noto(10, weight: .medium))
                     .foregroundColor(.black)
             }
-
+            .padding(.top, 4)
+            
+            Spacer()
         }
         .frame(maxWidth: .infinity)
         .frame(height: 150)
@@ -163,13 +166,16 @@ struct RecyclableItemCard: View {
     }
 }
 
+
 struct WasteSeparationGuideSection: View {
     @Binding var currentIndex: Int
+    @Binding var hideTabBar: Bool
+
     let totalPages = 3
     
     var body: some View {
-        VStack(spacing: 12) {
-            SectionHeader(title: "วิธีการแยกขยะ", destinationView: WasteSeparationGuideView())
+        VStack(spacing: 7) {
+            SectionHeader(title: "วิธีการแยกขยะ", destinationView: KnowledgeView(hideTabBar: $hideTabBar))
             
             VStack(spacing: 12) {
                 ZStack {
