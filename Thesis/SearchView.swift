@@ -20,7 +20,32 @@ struct SearchView: View {
     var body: some View {
         Text("Hello, SearchView!")
         
-        
+
+    }
+    
+    var headerView: some View {
+        HStack {
+            BackButton()
+
+            Spacer()
+
+            HStack(alignment: .firstTextBaseline, spacing: 0) {
+                Text("ค้นหา")
+                    .font(.noto(25, weight: .bold))
+
+            }
+            .foregroundColor(.black)
+
+            Spacer()
+
+
+        }
+        .padding(.bottom, 15) // เว้นระยะห่างด้านล่างเนื้อหา
+        .frame(maxWidth: .infinity)
+        .background(
+            Color.backgroundColor
+                .ignoresSafeArea(edges: .top) // ให้สีพื้นหลังถมส่วน Notch/Status Bar
+        )
     }
 }
 

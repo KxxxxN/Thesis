@@ -99,11 +99,13 @@ struct XBackButtonWhite: View {
 }
 
 struct XBackButtonBlack: View {
-    @Environment(\.dismiss) private var dismiss
+    @Binding var index: Int
 
     var body: some View {
         Button {
-            dismiss()
+            withAnimation(.easeInOut(duration: 0.35)) {
+                index = 0
+            }
         } label: {
             Image(systemName: "xmark")
                 .font(.system(size: 20))
@@ -113,3 +115,5 @@ struct XBackButtonBlack: View {
         .padding(.leading, 25)
     }
 }
+
+

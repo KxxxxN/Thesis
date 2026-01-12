@@ -6,6 +6,7 @@ struct QRScanView: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var hideTabBar: Bool
     @State private var showDetailView = false
+    @Binding var index: Int 
     
     @State private var selectedTabnavigationItem = 1
     @State private var isFlashOn = false
@@ -193,7 +194,7 @@ struct QRScanView: View {
     // MARK: - Header
     private var headerView: some View {
         HStack {
-            XBackButtonBlack()
+            XBackButtonBlack(index: $index)
 
             Spacer()
 
