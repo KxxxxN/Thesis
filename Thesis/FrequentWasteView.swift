@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct WasteItem: Identifiable {
+struct WasteItem: Identifiable, Hashable {
     let id = UUID()
     let imageName: String
     let title: String
@@ -17,6 +17,8 @@ struct WasteItem: Identifiable {
 struct FrequentWasteView: View {
 
     @Environment(\.dismiss) var dismiss
+
+    @State private var selectedWaste: WasteItem? = nil    
 
     let wasteItems = [
         WasteItem(imageName: "Bottle", title: "ขวดพลาสติก", count: "33 ครั้ง"),
@@ -36,7 +38,9 @@ struct FrequentWasteView: View {
     ]
 
     var sortedWasteItems: [WasteItem] {
-        wasteItems.sorted { extractNumber($0.count) > extractNumber($1.count) }
+        wasteItems.sorted {
+            extractNumber($0.count) > extractNumber($1.count)
+        }
     }
 
     func extractNumber(_ text: String) -> Int {
@@ -56,36 +60,27 @@ struct FrequentWasteView: View {
         Int(ceil(Double(sortedWasteItems.count) / Double(itemsPerPage)))
     }
 
-    // MARK: - Header
     var headerView: some View {
         ZStack {
             Color.mainColor
-            HStack {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.white)
-                        .font(.system(size: 20))
-                }
 
-                Spacer()
-
+            ZStack {
                 Text("ขยะที่แยกทั้งหมด")
                     .font(.noto(25, weight: .bold))
                     .foregroundColor(.white)
 
-                Spacer()
-
-                Image(systemName: "chevron.left")
-                    .foregroundColor(.clear)
-                    .font(.system(size: 20))
+                HStack {
+                    BackButtonWhite()
+                    Spacer()
+                }
             }
-            .padding(.horizontal, 18)
-            .padding(.bottom, 28)
             .padding(.top, 69)
+            .padding(.bottom, 28)
         }
         .frame(height: 123)
         .cornerRadius(20, corners: [.bottomLeft, .bottomRight])
     }
+
 
     var paginationSection: some View {
         HStack(spacing: 19) {
@@ -126,13 +121,18 @@ struct FrequentWasteView: View {
                 headerView
 
                 ScrollView {
-                    LazyVGrid(columns: [
-                        GridItem(.flexible(), spacing: 16),
-                        GridItem(.flexible(), spacing: 16)
-                    ], spacing: 16) {
-
-                        ForEach(paginatedItems) { item in
+                    LazyVGrid(
+                        columns: [
+                            GridItem(.flexible(), spacing: 16),
+                            GridItem(.flexible(), spacing: 16)
+                        ],
+                        spacing: 16
+                    ) {
+                        ForEach(paginatedItems, id: \.self) { item in
                             WasteCardView(item: item)
+                                .onTapGesture {
+                                    selectedWaste = item
+                                }
                         }
                     }
                     .padding(.horizontal, 18)
@@ -140,15 +140,19 @@ struct FrequentWasteView: View {
                 }
 
                 paginationSection
-                
             }
             .edgesIgnoringSafeArea(.top)
         }
+        .navigationDestination(item: $selectedWaste) { _ in
+            WasteTypeView(hideTabBar: .constant(true))
+                .navigationBarBackButtonHidden(true)
+        }
     }
+
 }
 
 
-// MARK: - Card View
+// MARK: - CARD
 struct WasteCardView: View {
     let item: WasteItem
 
@@ -159,7 +163,6 @@ struct WasteCardView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(height: 100)
-                    .foregroundColor(Color.thirdColor)
             }
             .frame(maxWidth: .infinity)
             .frame(height: 140)

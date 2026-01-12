@@ -13,6 +13,8 @@ struct MainTabView: View {
 
     var body: some View {
         ZStack {
+            (index == 2 ? Color.knowledgeBackground : Color.backgroundColor)
+            
             Color.mainColor
                 .clipShape(TabCorner(radius: 20, corners: [.topLeft, .topRight]))
                 .ignoresSafeArea(edges: .bottom)

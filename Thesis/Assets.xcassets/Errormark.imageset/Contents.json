@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "error.png",
+      "filename" : "Errormark.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "error 1.png",
+      "filename" : "Errormark 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "error 2.png",
+      "filename" : "Errormark 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

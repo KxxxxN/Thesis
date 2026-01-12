@@ -19,6 +19,8 @@ extension Color {
     static let errorColor = Color(red: 0xE3/255, green: 0x36/255, blue: 0x29/255)
     static let placeholderColor = Color(red: 0x9C/255, green: 0x9C/255, blue: 0x9C/255)
     static let accountSecColor = Color(red: 0xEC/255, green: 0xED/255, blue: 0xE9/255)
+    static let searchColor = Color(red: 0xEE/255, green: 0xEE/255, blue: 0xEE/255)
+
 
     static let knowledgeBackground = Color(red: 0xE8/255, green: 0xE6/255, blue: 0xE2/255)
     static let wetWasteColor = Color(red: 0x00/255, green: 0x93/255, blue: 0x45/255)
@@ -26,6 +28,8 @@ extension Color {
     static let generalWasteColor = Color(red: 0x1A/255, green: 0x75/255, blue: 0xBB/255)
     static let recycleWasteColor = Color(red: 0xE9/255, green: 0xAF/255, blue: 0x43/255)
     static let redeemColor = Color(red: 0xD7/255, green: 0x69/255, blue: 0x69/255)
+    static let cameraBackground = Color(red: 0xEB/255, green: 0xEB/255, blue: 0xEB/255)
+
 }
 
 extension Font {
@@ -44,6 +48,22 @@ extension Font {
             return .custom("Noto Sans Thai Bold", size: size)
         default:
             return .custom("Noto Sans Thai Regular", size: size)
+        }
+    }
+    static func inter(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        switch weight {
+        case .thin:
+            return .custom("Inter-Thin", size: size)
+        case .light:
+            return .custom("Inter-Light", size: size)
+        case .medium:
+            return .custom("Inter-Medium", size: size)
+        case .semibold:
+            return .custom("Inter-SemiBold", size: size)
+        case .bold:
+            return .custom("Inter-Bold", size: size)
+        default:
+            return .custom("Inter-Regular", size: size)
         }
     }
     
