@@ -7,9 +7,6 @@
 
 import SwiftUI
 
-
-import SwiftUI
-
 struct DetailBarcodeView: View {
 
     @Environment(\.dismiss) var dismiss
@@ -164,14 +161,17 @@ struct DetailBarcodeView: View {
                         }
                         .padding(.horizontal, 37)
                         .padding(.top, 20)
-                        .padding(.bottom, 40)
-                        
+                        .padding(.bottom, 20)
+
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.knowledgeBackground)
+                    .background(
+                        Color.knowledgeBackground
+                            .ignoresSafeArea()
+                    )
                     .cornerRadius(20, corners: [.topLeft, .topRight])
-                    .edgesIgnoringSafeArea(.bottom)  // ⭐ ให้ยาวจนสุดขอบล่าง
                 }
+                .edgesIgnoringSafeArea(.bottom)
             }
         }
         .navigationBarHidden(true)

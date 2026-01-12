@@ -203,9 +203,9 @@ struct SearchBar: View {
                 .padding(.leading, 23)
 
             Button { } label: {
-                Image(systemName: "magnifyingglass")
-                    .font(.system(size: 22))
-                    .foregroundColor(.gray)
+                Image("SearchBlack")       
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: 37, height: 37)
             }
             .padding(.trailing, 23)

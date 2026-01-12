@@ -149,14 +149,15 @@ struct DetailView: View {
                         }
                         .padding(.horizontal, 37)
                         .padding(.top, 20)
-                        .padding(.bottom, 40)
+                        .padding(.bottom, 20)
                         
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(Color.knowledgeBackground)
                     .cornerRadius(20, corners: [.topLeft, .topRight])
-                    .edgesIgnoringSafeArea(.bottom)  // ⭐ ให้ยาวจนสุดขอบล่าง
                 }
+                .edgesIgnoringSafeArea(.bottom)  // ⭐ ให้ยาวจนสุดขอบล่าง
+
             }
         }
         .navigationBarHidden(true)

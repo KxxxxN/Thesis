@@ -69,7 +69,7 @@ struct KnowledgeView: View {
                     WasteExample(image: "Bottle", label: "ขวดพลาสติก"),
                     WasteExample(image: "Box", label: "กล่องกระดาษ"),
                     WasteExample(image: "Plasticcup", label: "แก้วพลาสติก"),
-                    WasteExample(image: "Glassbottle", label: "ขวดแก้ว"),
+                    WasteExample(image: "GlassBottle", label: "ขวดแก้ว"),
                     WasteExample(image: "Can", label: "กระป๋อง"),
                     WasteExample(image: "Bag", label: "ถุงพลาสติก")
                 ]

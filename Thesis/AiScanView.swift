@@ -211,6 +211,7 @@ struct AiScanView: View {
     private var headerView: some View {
         HStack {
             BackButton()
+            Color.clear.frame(width: 10,height: 10)
 
             Spacer()
 
@@ -225,9 +226,10 @@ struct AiScanView: View {
             Spacer()
 
             Button { isFlashOn.toggle() } label: {
-                Image(systemName: isFlashOn ? "bolt.fill" : "bolt")
-                    .font(.system(size: 25))
-                    .foregroundColor(.black)
+                Image(isFlashOn ? "FlashOn" : "FlashOff")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 35, height: 35)
                     .padding(.trailing, 25)
             }
         }

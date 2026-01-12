@@ -16,16 +16,15 @@ struct ConfirmPhotoView: View {
 
     @State private var isFlashOn = false
     @State private var selectedItem: PhotosPickerItem? = nil
-    @State private var selectedImage: Image? = nil
+    @State private var selectedUIImage: UIImage? = nil // 🔹 เปลี่ยนเป็น UIImage
 
     var body: some View {
-        NavigationStack {   // ✅ ต้องอยู่ใน NavigationStack
             ZStack(alignment: .top) {
 
                 GeometryReader { geo in
                     ZStack {
-                        if let selectedImage {
-                            selectedImage
+                        if let uiImage = selectedUIImage {
+                            Image(uiImage: uiImage) // 🔹 แสดง Image จาก UIImage
                                 .resizable()
                                 .scaledToFill()
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -55,6 +54,7 @@ struct ConfirmPhotoView: View {
                             Spacer()
 
                             Button {
+                                guard selectedUIImage != nil else { return }
                                 hideTabBar = true
                                 showSaveSearchPhotoView = true
                             } label: {
@@ -83,30 +83,36 @@ struct ConfirmPhotoView: View {
                     }
                 }
             }
+            // 🔹 ส่ง selectedUIImage ไป SaveSearchPhotoView
             .navigationDestination(isPresented: $showSaveSearchPhotoView) {
-                SaveSearchPhotoView(hideTabBar: $hideTabBar)
+                if let uiImage = selectedUIImage {
+                    SaveSearchPhotoView(hideTabBar: $hideTabBar, selectedImage: uiImage)
+                }
             }
             .navigationBarHidden(true)
-
-        }
     }
 
     var headerView: some View {
         HStack {
             BackButton()
+            Color.clear.frame(width: 10,height: 10)
+
             Spacer()
+            
             Text("ยืนยันภาพถ่าย")
                 .font(.noto(25, weight: .bold))
                 .foregroundColor(.black)
+            
             Spacer()
+            
             Button { isFlashOn.toggle() } label: {
-                Image(systemName: isFlashOn ? "bolt.fill" : "bolt")
-                    .font(.system(size: 25))
-                    .foregroundColor(.black)
+                Image(isFlashOn ? "FlashOn" : "FlashOff")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 35, height: 35)
                     .padding(.trailing, 25)
             }
         }
-//        .padding(.top, 69)
         .padding(.bottom, 18)
         .frame(maxWidth: .infinity)
         .background(Color.backgroundColor.ignoresSafeArea(edges: .top))
@@ -119,9 +125,10 @@ struct ConfirmPhotoView: View {
                 if case .success(let data) = result,
                    let data,
                    let uiImage = UIImage(data: data) {
-                    selectedImage = Image(uiImage: uiImage)
+                    selectedUIImage = uiImage // 🔹 เก็บเป็น UIImage
                 }
             }
         }
     }
 }
+

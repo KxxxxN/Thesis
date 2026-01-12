@@ -195,6 +195,7 @@ struct QRScanView: View {
     private var headerView: some View {
         HStack {
             XBackButtonBlack(index: $index)
+            Color.clear.frame(width: 10,height: 10)
 
             Spacer()
 
@@ -205,9 +206,10 @@ struct QRScanView: View {
             Spacer()
 
             Button { isFlashOn.toggle() } label: {
-                Image(systemName: isFlashOn ? "bolt.fill" : "bolt")
-                    .font(.system(size: 25))
-                    .foregroundColor(.black)
+                Image(isFlashOn ? "FlashOn" : "FlashOff")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 35, height: 35)
                     .padding(.trailing, 25)
             }
         }
