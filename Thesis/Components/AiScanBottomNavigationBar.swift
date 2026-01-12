@@ -21,7 +21,6 @@ struct AiScanBottomNavigationBar: View {
                 .fill(Color.mainColor)
                 .frame(width: 110, height: 42)
                 .offset(x: CGFloat(selectedTab - 1) * 110)
-                .animation(.easeInOut(duration: 0.3), value: selectedTab)
 
             HStack(spacing: 7) {
                 tabButton(icon: "Barcode", label: "บาร์โค้ด", index: 0)
@@ -34,7 +33,9 @@ struct AiScanBottomNavigationBar: View {
 
     private func tabButton(icon: String, label: String, index: Int) -> some View {
         Button {
-            selectedTab = index
+            withAnimation(.easeInOut(duration: 0.3)) {
+                            selectedTab = index
+            }
             onSelect(index)
         } label: {
             HStack(spacing: 6) {

@@ -11,6 +11,7 @@ struct DetailSearchView: View {
 
     @Environment(\.dismiss) var dismiss
     @Binding var hideTabBar: Bool
+    @State private var showConfirmPhotoView = false
 
     let separationSteps = [
         SeparationStep(imageName: "DetailRecycle1", text: "เทน้ำให้หมด", imageSize: CGSize(width: 40, height: 88)),
@@ -152,7 +153,7 @@ struct DetailSearchView: View {
                             VStack(alignment: .trailing, spacing: 20) {
                                 Button {
                                     hideTabBar = true
-                                    //ไปหน้าต่อปุยยย
+                                    showConfirmPhotoView = true
                                 } label: {
                                     Text("ยืนยันภาพถ่าย")
                                         .font(.noto(20, weight: .bold))
@@ -181,10 +182,14 @@ struct DetailSearchView: View {
                     .edgesIgnoringSafeArea(.bottom)
                 }
             }
-            .navigationBarHidden(true)
             .onAppear {
                 hideTabBar = true
             }
+            .navigationDestination(isPresented: $showConfirmPhotoView) {
+                 ConfirmPhotoView(hideTabBar: $hideTabBar)
+             }
+            .navigationBarHidden(true)
+
         }
     }
 

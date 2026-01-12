@@ -58,7 +58,7 @@ struct SearchView: View {
                             showDetailSearch = true
                         }
                     )
-                    .padding(.top, 22)
+                    .padding(.top, 18)
                     .padding(.horizontal, 35)
 
                     Spacer()
@@ -74,7 +74,7 @@ struct SearchView: View {
                         }
                     }
                     .padding(.horizontal, 47)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, 18)
                 }
             }
             .navigationDestination(isPresented: $showDetailSearch) {
@@ -83,6 +83,12 @@ struct SearchView: View {
                         hideTabBar: $hideTabBar
                     )
                 }
+            }
+            .navigationDestination(isPresented: $showAiScanView) {
+                AiScanView(hideTabBar: $hideTabBar)
+            }
+            .navigationDestination(isPresented: $showBarcodeView) {
+                BarcodeScanView(hideTabBar: $hideTabBar)
             }
             .navigationBarHidden(true)
             .edgesIgnoringSafeArea(.top)
@@ -105,7 +111,7 @@ struct SearchView: View {
             Color.clear.frame(width: 25)
         }
         .padding(.trailing, 18)
-        .padding(.top, 69)
+        .padding(.top, 67)
         .padding(.bottom, 20)
         .frame(maxWidth: .infinity)
         .frame(height: 123)

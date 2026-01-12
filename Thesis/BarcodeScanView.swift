@@ -24,132 +24,114 @@ struct BarcodeScanView: View {
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var selectedImage: Image? = nil
 
-//    @State private var aiResult: String = "ขวดพลาสติก"
-//
-//    // MARK: - Attributed Result Title
-//    private var resultTitle: AttributedString {
-//        var text = AttributedString("ขยะชิ้นนี้คือ \(aiResult) \nถูกต้องหรือไม่?")
-//        if let range = text.range(of: aiResult) {
-//            text[range].font = .noto(25, weight: .bold)
-//        }
-//        return text
-//    }
-
     var body: some View {
-        ZStack(alignment: .top) {
-
-            GeometryReader { geo in
-                ZStack {
-                    if let selectedImage {
-                        selectedImage
-                            .resizable()
-                            .scaledToFill() // เปลี่ยนเป็น Fill เพื่อให้เต็มจอเหมือนกล้อง
-//                            .frame(width: geo.size.width, height: geo.size.height)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .clipped()
-                            .background(Color.cameraBackground)
-                    } else {
-                        CameraPreview()
-                        Color.black.opacity(0.25)
+        NavigationStack {
+            ZStack(alignment: .top) {
+                
+                GeometryReader { geo in
+                    ZStack {
+                        if let selectedImage {
+                            selectedImage
+                                .resizable()
+                                .scaledToFill() // เปลี่ยนเป็น Fill เพื่อให้เต็มจอเหมือนกล้อง
+                            //                            .frame(width: geo.size.width, height: geo.size.height)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .clipped()
+                                .background(Color.cameraBackground)
+                        } else {
+                            CameraPreview()
+                            Color.black.opacity(0.25)
+                        }
                     }
+                    .ignoresSafeArea()
                 }
-                .ignoresSafeArea()
-            }
-            
-//            GeometryReader { geo in
-//                    Image("BarcodeEx")
-//                        .resizable()
-//                        .scaledToFill()
-//                        .frame(width: geo.size.width, height: geo.size.height) // กำหนดขนาดให้เท่าหน้าจอ
-//                        .clipped() // ตัดส่วนที่ล้นออก
-//                }
-//                .ignoresSafeArea()
-
-            VStack(spacing: 0) {
-
-                headerView // อยู่บนสุดเสมอ
-
-                VStack {
-
-                    Spacer() // ใช้ Spacer ตัวเดียวดันทุกอย่างลงล่าง แทนการระบุความสูง 509
-
-                    // 📸 Gallery + AI Scan Button
-                    HStack {
-                        GalleryPickerButton(selectedItem: $selectedItem)
-                            .onChange(of: selectedItem) { _, newItem in
-                                loadImage(from: newItem)
-                            }
-
+                
+                
+                VStack(spacing: 0) {
+                    
+                    headerView
+                    
+                    VStack {
+                        
                         Spacer()
-
-                        Button {
+                            .frame(height: 565)
+                        
+                        // 📸 Gallery + AI Scan Button
+                        HStack {
+                            GalleryPickerButton(selectedItem: $selectedItem)
+                                .onChange(of: selectedItem) { _, newItem in
+                                    loadImage(from: newItem)
+                                }
+                            
+                            Spacer()
+                            
+                            Button {
+                                hideTabBar = true
+                                showDetailBarcodeView = true
+                            } label: {
+                                ZStack {
+                                    Circle()
+                                        .stroke(Color.mainColor, lineWidth: 3)
+                                        .frame(width: 85, height: 85)
+                                    
+                                    Circle()
+                                        .fill(Color.mainColor)
+                                        .frame(width: 73, height: 73)
+                                    
+                                    Image("Barcode")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 45, height: 45)
+                                }
+                            }
+                            
+                            
+                            Spacer()
+                            // เพื่อให้ปุ่ม AI อยู่กึ่งกลางพอดี
+                            Color.clear.frame(width: 55, height: 1)
+                        }
+                        .frame(maxWidth: 343)
+                        
+                        // Navigation Bar ด้านล่าง
+                        AiScanBottomNavigationBar(
+                            selectedTab: $selectedTabnavigationItem
+                        ) { index in
                             hideTabBar = true
-                            showDetailBarcodeView = true
-                        } label: {
-                            ZStack {
-                                Circle()
-                                    .stroke(Color.mainColor, lineWidth: 3)
-                                    .frame(width: 85, height: 85)
-
-                                Circle()
-                                    .fill(Color.mainColor)
-                                    .frame(width: 73, height: 73)
-
-                                Image("Barcode")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 45, height: 45)
+                            
+                            switch index {
+                            case 0:
+                                break
+                                
+                            case 1:
+                                showAiScanView = true
+                                
+                            case 2:
+                                showSearchView = true
+                                
+                            default:
+                                break
                             }
                         }
-
-
-                        Spacer()
-                        // เพื่อให้ปุ่ม AI อยู่กึ่งกลางพอดี
-                        Color.clear.frame(width: 55, height: 1)
+                        .padding(.bottom, 25)
+                        .padding(.top, 21)
                     }
-                    .frame(maxWidth: 343)
-
-                    // Navigation Bar ด้านล่าง
-                    AiScanBottomNavigationBar(
-                        selectedTab: $selectedTabnavigationItem
-                    ) { index in
-                        hideTabBar = true
-
-                        switch index {
-                        case 0:
-                            break
-
-                        case 1:
-                            showAiScanView = true
-
-                        case 2:
-                            showSearchView = true
-
-                        default:
-                            break
-                        }
-                    }
-                    .padding(.bottom, 25)
-                    .padding(.top, 21)
-
-                    .padding(.bottom, 25)
-                    .padding(.top, 21)
                 }
+                
             }
- 
-        }
-        .onAppear { hideTabBar = true }
-        .onDisappear { hideTabBar = false }
-        .fullScreenCover(isPresented: $showAiScanView) {
-            AiScanView(hideTabBar: $hideTabBar)
-        }
-        .fullScreenCover(isPresented: $showSearchView) {
-            SearchView(hideTabBar: $hideTabBar)
-        }
-        .fullScreenCover(isPresented: $showDetailBarcodeView) {
-            DetailBarcodeView(hideTabBar: $hideTabBar)
-        }
+            .onAppear { hideTabBar = true }
+            .onDisappear { hideTabBar = false }
+            .navigationDestination(isPresented: $showAiScanView) {
+                AiScanView(hideTabBar: $hideTabBar)
+            }
+            .navigationDestination(isPresented: $showSearchView) {
+                SearchView(hideTabBar: $hideTabBar)
+            }
+            .navigationDestination(isPresented: $showDetailBarcodeView) {
+                DetailBarcodeView(hideTabBar: $hideTabBar)
+            }
+            .navigationBarHidden(true)
 
+        }
     }
 
     // MARK: - Header (ปรับปรุงใหม่)

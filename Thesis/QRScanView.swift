@@ -8,7 +8,6 @@ struct QRScanView: View {
     @State private var showDetailView = false
     @Binding var index: Int 
     
-    @State private var selectedTabnavigationItem = 1
     @State private var isFlashOn = false
     @State private var showResultAlert = false
     @State private var showErrorAlert = false
@@ -35,9 +34,9 @@ struct QRScanView: View {
     }
 
     var body: some View {
-        ZStack(alignment: .top) {
-            
-            GeometryReader { geo in
+            ZStack(alignment: .top) {
+                
+                GeometryReader { geo in
                     Image("QRBackground")
                         .resizable()
                         .scaledToFill()
@@ -45,151 +44,152 @@ struct QRScanView: View {
                         .clipped() // ตัดส่วนที่ล้นออก
                 }
                 .ignoresSafeArea()
-
-            VStack(spacing: 0) {
-                
-                headerView
                 
                 VStack(spacing: 0) {
                     
-                    Button(action: {
-                        showResultAlert = true
-                    }) {
-                        Text("โปรดสแกนคิวอาร์โค้ด\nที่ติดอยู่บนถังขยะเพื่อเริ่มใช้งาน")
-                            .font(.noto(20, weight: .medium))
-                            .foregroundColor(.black)
-                            .multilineTextAlignment(.center)
-                            .frame(width: 343, height: 115)
-                            .background(Color.textFieldColor)
-                            .cornerRadius(20)
-                    }
-                    .padding(.top, 62) // ระยะห่างจาก Header
-
+                    headerView
                     
-                    // เฟรมสแกน QR
-                    QRScanFrameView()
-                        .padding(.top, 93)
-                        .onTapGesture {
+                    VStack(spacing: 0) {
+                        
+                        Button(action: {
+                            showResultAlert = true
+                        }) {
+                            Text("โปรดสแกนคิวอาร์โค้ด\nที่ติดอยู่บนถังขยะเพื่อเริ่มใช้งาน")
+                                .font(.noto(20, weight: .medium))
+                                .foregroundColor(.black)
+                                .multilineTextAlignment(.center)
+                                .frame(width: 343, height: 115)
+                                .background(Color.textFieldColor)
+                                .cornerRadius(20)
+                        }
+                        .padding(.top, 62) // ระยะห่างจาก Header
+                        
+                        
+                        // เฟรมสแกน QR
+                        QRScanFrameView()
+                            .padding(.top, 93)
+                            .onTapGesture {
                                 showErrorAlert = true // เมื่อกดที่เฟรม ให้แสดง Error Alert
                             }
-                    
-                    Spacer()
-                    
-                    Color.clear.frame(height: 50)
+                        
+                        Spacer()
+                        
+                        Color.clear.frame(height: 50)
+                    }
                 }
-            }
-
-            // ===============================
-            // 🔔 Custom Alert (Overlay)
-            // ===============================
-            if showResultAlert {
-                ZStack {
-                    Rectangle()
-                        .fill(.ultraThinMaterial)
-                        .opacity(0.8)
-                        .ignoresSafeArea()
-
-                    VStack(spacing: 0) {
-                        Image("Passmark")
+                
+                // ===============================
+                // 🔔 Custom Alert (Overlay)
+                // ===============================
+                if showResultAlert {
+                    ZStack {
+                        Rectangle()
+                            .fill(.ultraThinMaterial)
+                            .opacity(0.8)
+                            .ignoresSafeArea()
+                        
+                        VStack(spacing: 0) {
+                            Image("Passmark")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 111, height: 111)
                                 .multilineTextAlignment(.center)
                                 .padding(.top, 25)
-                        
-                        Text("ยืนยันถังขยะ")
-                            .font(.noto(25, weight: .bold))
-                            .foregroundColor(.black)
-                            .multilineTextAlignment(.center)
-                            .padding(.top, 10)
-                        
-                        Text(resultTitle)
-                            .foregroundColor(.black)
-                            .multilineTextAlignment(.center)
-                            .padding(.top, 4)
-
-
-                        HStack(spacing: 21) {
-                            Button {
-                                showResultAlert = false
-                            } label: {
-                                Text("ยกเลิก")
-                                    .font(.noto(16, weight: .bold))
-                                    .foregroundColor(.mainColor)
-                                    .frame(width: 120, height: 40)
-                                    .background(Color.white)
-                                    .cornerRadius(20)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 20)
-                                            .stroke(Color.mainColor, lineWidth: 2)
-                                    )
+                            
+                            Text("ยืนยันถังขยะ")
+                                .font(.noto(25, weight: .bold))
+                                .foregroundColor(.black)
+                                .multilineTextAlignment(.center)
+                                .padding(.top, 10)
+                            
+                            Text(resultTitle)
+                                .foregroundColor(.black)
+                                .multilineTextAlignment(.center)
+                                .padding(.top, 4)
+                            
+                            
+                            HStack(spacing: 21) {
+                                Button {
+                                    showResultAlert = false
+                                } label: {
+                                    Text("ยกเลิก")
+                                        .font(.noto(16, weight: .bold))
+                                        .foregroundColor(.mainColor)
+                                        .frame(width: 120, height: 40)
+                                        .background(Color.white)
+                                        .cornerRadius(20)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .stroke(Color.mainColor, lineWidth: 2)
+                                        )
+                                }
+                                
+                                Button {
+                                    hideTabBar = true
+                                    showResultAlert = false
+                                    showAiScanView = true
+                                } label: {
+                                    Text("ยืนยัน")
+                                        .font(.noto(16, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .frame(width: 120, height: 40)
+                                        .background(Color.mainColor)
+                                        .cornerRadius(20)
+                                }
                             }
-
-                            Button {
-                                hideTabBar = true
-                                showResultAlert = false
-                                showAiScanView = true
-                            } label: {
-                                Text("ยืนยัน")
-                                    .font(.noto(16, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .frame(width: 120, height: 40)
-                                    .background(Color.mainColor)
-                                    .cornerRadius(20)
-                            }
+                            .padding(25)
                         }
-                        .padding(25)
+                        .padding(20)
+                        .frame(width: 343, height: 320)
+                        .background(Color.white)
+                        .cornerRadius(20)
                     }
-                    .padding(20)
-                    .frame(width: 343, height: 320)
-                    .background(Color.white)
-                    .cornerRadius(20)
                 }
-            }
-            if showErrorAlert {
-                ZStack {
-                    Rectangle()
-                        .fill(.ultraThinMaterial)
-                        .opacity(0.8)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            showErrorAlert = false // กดที่ว่างแล้วปิด Alert
-                        }
-
-                    VStack(spacing: 0) {
-                        Image("Errormark")
+                if showErrorAlert {
+                    ZStack {
+                        Rectangle()
+                            .fill(.ultraThinMaterial)
+                            .opacity(0.8)
+                            .ignoresSafeArea()
+                            .onTapGesture {
+                                showErrorAlert = false // กดที่ว่างแล้วปิด Alert
+                            }
+                        
+                        VStack(spacing: 0) {
+                            Image("Errormark")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 137, height: 137)
                                 .multilineTextAlignment(.center)
-                        
-                        Text("สแกนไม่สำเร็จ")
-                            .font(.noto(25, weight: .bold))
-                            .foregroundColor(.black)
-                            .multilineTextAlignment(.center)
-                        
-                        Text("กรุณาลองใหม่อีกครั้ง")
-                            .font(.noto(18, weight: .medium))
-                            .foregroundColor(.black)
-                            .multilineTextAlignment(.center)
-                            .padding(.top, 4)
-
-                    }
-                    .padding(20)
-                    .frame(width: 343, height: 260)
-                    .background(Color.white)
-                    .cornerRadius(20)
-                    .onTapGesture {
+                            
+                            Text("สแกนไม่สำเร็จ")
+                                .font(.noto(25, weight: .bold))
+                                .foregroundColor(.black)
+                                .multilineTextAlignment(.center)
+                            
+                            Text("กรุณาลองใหม่อีกครั้ง")
+                                .font(.noto(18, weight: .medium))
+                                .foregroundColor(.black)
+                                .multilineTextAlignment(.center)
+                                .padding(.top, 4)
+                            
+                        }
+                        .padding(20)
+                        .frame(width: 343, height: 260)
+                        .background(Color.white)
+                        .cornerRadius(20)
+                        .onTapGesture {
+                        }
                     }
                 }
             }
+            .onAppear { hideTabBar = true }
+            .onDisappear { hideTabBar = false }
+            .navigationDestination(isPresented: $showAiScanView) {
+                AiScanView(hideTabBar: $hideTabBar)
+            }
         }
-        .onAppear { hideTabBar = true }
-        .onDisappear { hideTabBar = false }
-        .fullScreenCover(isPresented: $showAiScanView) {
-            AiScanView(hideTabBar: $hideTabBar)
-        }
-    }
+
 
     // MARK: - Header
     private var headerView: some View {

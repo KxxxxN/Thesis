@@ -35,168 +35,176 @@ struct AiScanView: View {
     }
 
     var body: some View {
-        ZStack(alignment: .top) {
-
-            GeometryReader { geo in
-                ZStack {
-                    if let selectedImage {
-                        selectedImage
-                            .resizable()
-                            .scaledToFill() // เปลี่ยนเป็น Fill เพื่อให้เต็มจอเหมือนกล้อง
-//                            .frame(width: geo.size.width, height: geo.size.height)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .clipped()
-                            .background(Color.cameraBackground)
-                    } else {
-                        CameraPreview()
-                        Color.black.opacity(0.25)
-                    }
-                }
-                .ignoresSafeArea()
-            }
-
-            VStack(spacing: 0) {
-
-                headerView // อยู่บนสุดเสมอ
-
-                VStack {
-                    Text("กรุณาสแกนขยะทีละชิ้นเพื่อแยกประเภท")
-                        .font(.noto(20, weight: .medium))
-                        .foregroundColor(.black)
-                        .multilineTextAlignment(.center)
-                        .frame(width: 343, height: 60)
-                        .background(Color.textFieldColor)
-                        .cornerRadius(20)
-
-                    Spacer() // ใช้ Spacer ตัวเดียวดันทุกอย่างลงล่าง แทนการระบุความสูง 509
-
-                    // 📸 Gallery + AI Scan Button
-                    HStack {
-                        GalleryPickerButton(selectedItem: $selectedItem)
-                            .onChange(of: selectedItem) { _, newItem in
-                                loadImage(from: newItem)
-                            }
-
-                        Spacer()
-
-                        Button {
-                            showResultAlert = true
-                        } label: {
-                            ZStack {
-                                Circle()
-                                    .stroke(Color.mainColor, lineWidth: 3)
-                                    .frame(width: 85, height: 85)
-
-                                Circle()
-                                    .fill(Color.mainColor)
-                                    .frame(width: 73, height: 73)
-
-                                Image("Tabler_ai")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 57, height: 57)
-                            }
-                        }
-
-                        Spacer()
-                        // เพื่อให้ปุ่ม AI อยู่กึ่งกลางพอดี
-                        Color.clear.frame(width: 55, height: 1)
-                    }
-                    .frame(maxWidth: 343)
-
-                    AiScanBottomNavigationBar(
-                        selectedTab: $selectedTabnavigationItem
-                    ) { index in
-                        hideTabBar = true   // ⭐ ซ่อน MainTabBar
-
-                        switch index {
-                        case 0:
-                            showBarcodeView = true
-                        case 1:
-                            // อยู่หน้าเดิม (AiScan)
-                            break
-
-                        case 2:
-                            // ไปหน้าค้นหา
-                            showSearchView = true
-
-                        default:
-                            break
+        NavigationStack {
+            
+            ZStack(alignment: .top) {
+                
+                GeometryReader { geo in
+                    ZStack {
+                        if let selectedImage {
+                            selectedImage
+                                .resizable()
+                                .scaledToFill()
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .clipped()
+                                .background(Color.cameraBackground)
+                        } else {
+                            CameraPreview()
+                            Color.black.opacity(0.25)
                         }
                     }
-                    .padding(.bottom, 25)
-                    .padding(.top, 21)
+                    .ignoresSafeArea()
                 }
-            }
-
-            // ===============================
-            // 🔔 Custom Alert
-            // ===============================
-            if showResultAlert {
-                ZStack {
-                    Rectangle()
-                        .fill(.ultraThinMaterial)
-                        .opacity(0.8)
-                        .ignoresSafeArea()
-
-                    VStack(spacing: 16) {
-                        Text(resultTitle)
-                            .font(.noto(25, weight: .medium))
+                
+                VStack(spacing: 0) {
+                    
+                    headerView
+                    
+                    VStack {
+                        Text("กรุณาสแกนขยะทีละชิ้นเพื่อแยกประเภท")
+                            .font(.noto(20, weight: .medium))
                             .foregroundColor(.black)
                             .multilineTextAlignment(.center)
+                            .frame(width: 343, height: 60)
+                            .background(Color.textFieldColor)
+                            .cornerRadius(20)
+                        
+                        Spacer()
+                            .frame(height: 505)
 
-                        Text("ผลการสแกนตรงกับขยะของคุณหรือไม่?\nหากไม่ถูกต้อง กรุณาสแกนใหม่")
-                            .font(.noto(16, weight: .medium))
-                            .foregroundColor(.gray)
-                            .multilineTextAlignment(.center)
-
-                        HStack(spacing: 21) {
+                        // 📸 Gallery + AI Scan Button
+                        HStack {
+                            GalleryPickerButton(selectedItem: $selectedItem)
+                                .onChange(of: selectedItem) { _, newItem in
+                                    loadImage(from: newItem)
+                                }
+                            
+                            Spacer()
+                            
                             Button {
-                                selectedImage = nil
-                                showResultAlert = false
+                                showResultAlert = true
                             } label: {
-                                Text("สแกนใหม่")
-                                    .font(.noto(16, weight: .bold))
-                                    .foregroundColor(.mainColor)
-                                    .frame(width: 120, height: 40)
-                                    .background(Color.white)
-                                    .cornerRadius(20)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 20)
-                                            .stroke(Color.mainColor, lineWidth: 2)
-                                    )
+                                ZStack {
+                                    Circle()
+                                        .stroke(Color.mainColor, lineWidth: 3)
+                                        .frame(width: 85, height: 85)
+                                    
+                                    Circle()
+                                        .fill(Color.mainColor)
+                                        .frame(width: 73, height: 73)
+                                    
+                                    Image("Tabler_ai")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 57, height: 57)
+                                }
                             }
-
-                            Button {
-                                showResultAlert = false
-                                showDetailView = true
-                            } label: {
-                                Text("ถูกต้อง")
-                                    .font(.noto(16, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .frame(width: 120, height: 40)
-                                    .background(Color.mainColor)
-                                    .cornerRadius(20)
+                            
+                            Spacer()
+                            // เพื่อให้ปุ่ม AI อยู่กึ่งกลางพอดี
+                            Color.clear.frame(width: 55, height: 1)
+                        }
+                        .frame(maxWidth: 343)
+                        
+                        AiScanBottomNavigationBar(
+                            selectedTab: $selectedTabnavigationItem
+                        ) { index in
+                            hideTabBar = true   // ⭐ ซ่อน MainTabBar
+                            
+                            switch index {
+                            case 0:
+                                showBarcodeView = true
+                            case 1:
+                                // อยู่หน้าเดิม (AiScan)
+                                break
+                                
+                            case 2:
+                                // ไปหน้าค้นหา
+                                showSearchView = true
+                                
+                            default:
+                                break
                             }
                         }
+                        .padding(.bottom, 25)
+                        .padding(.top, 21)
                     }
-                    .padding(20)
-                    .frame(width: 343, height: 255)
-                    .background(Color.white)
-                    .cornerRadius(20)
+                }
+                
+                // ===============================
+                // 🔔 Custom Alert
+                // ===============================
+                if showResultAlert {
+                    ZStack {
+                        Rectangle()
+                            .fill(.ultraThinMaterial)
+                            .opacity(0.8)
+                            .ignoresSafeArea()
+                        
+                        VStack(spacing: 16) {
+                            Text(resultTitle)
+                                .font(.noto(25, weight: .medium))
+                                .foregroundColor(.black)
+                                .multilineTextAlignment(.center)
+                            
+                            Text("ผลการสแกนตรงกับขยะของคุณหรือไม่?\nหากไม่ถูกต้อง กรุณาสแกนใหม่")
+                                .font(.noto(16, weight: .medium))
+                                .foregroundColor(.gray)
+                                .multilineTextAlignment(.center)
+                            
+                            HStack(spacing: 21) {
+                                Button {
+                                    selectedImage = nil
+                                    showResultAlert = false
+                                } label: {
+                                    Text("สแกนใหม่")
+                                        .font(.noto(16, weight: .bold))
+                                        .foregroundColor(.mainColor)
+                                        .frame(width: 120, height: 40)
+                                        .background(Color.white)
+                                        .cornerRadius(20)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .stroke(Color.mainColor, lineWidth: 2)
+                                        )
+                                }
+                                
+                                Button {
+                                    showResultAlert = false
+                                    showDetailView = true
+                                } label: {
+                                    Text("ถูกต้อง")
+                                        .font(.noto(16, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .frame(width: 120, height: 40)
+                                        .background(Color.mainColor)
+                                        .cornerRadius(20)
+                                }
+                            }
+                        }
+                        .padding(20)
+                        .frame(width: 343, height: 255)
+                        .background(Color.white)
+                        .cornerRadius(20)
+                    }
                 }
             }
-        }
-        .onAppear { hideTabBar = true }
-        .onDisappear { hideTabBar = false }
-        .fullScreenCover(isPresented: $showDetailView) {
-            DetailAiScanView(hideTabBar: $hideTabBar)
-        }
-        .fullScreenCover(isPresented: $showBarcodeView) {
-            BarcodeScanView(hideTabBar: $hideTabBar)
-        }
-        .fullScreenCover(isPresented: $showSearchView) {
-            SearchView(hideTabBar: $hideTabBar)
+            .onAppear {
+                hideTabBar = true
+                selectedTabnavigationItem = 1
+            }
+            .onDisappear { hideTabBar = false }
+            .navigationDestination(isPresented: $showDetailView) {
+                DetailAiScanView(hideTabBar: $hideTabBar)
+            }
+            .navigationDestination(isPresented: $showBarcodeView) {
+                BarcodeScanView(hideTabBar: $hideTabBar)
+            }
+            .navigationDestination(isPresented: $showSearchView) {
+                SearchView(hideTabBar: $hideTabBar)
+            }
+            .navigationBarHidden(true)
+
         }
     }
 
@@ -248,3 +256,4 @@ struct AiScanView: View {
         }
     }
 }
+
