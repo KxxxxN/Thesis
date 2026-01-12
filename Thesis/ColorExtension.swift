@@ -19,6 +19,8 @@ extension Color {
     static let errorColor = Color(red: 0xE3/255, green: 0x36/255, blue: 0x29/255)
     static let placeholderColor = Color(red: 0x9C/255, green: 0x9C/255, blue: 0x9C/255)
     static let accountSecColor = Color(red: 0xEC/255, green: 0xED/255, blue: 0xE9/255)
+    static let searchColor = Color(red: 0xEE/255, green: 0xEE/255, blue: 0xEE/255)
+
 
     static let knowledgeBackground = Color(red: 0xE8/255, green: 0xE6/255, blue: 0xE2/255)
     static let wetWasteColor = Color(red: 0x00/255, green: 0x93/255, blue: 0x45/255)

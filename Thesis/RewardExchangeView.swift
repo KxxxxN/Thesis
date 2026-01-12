@@ -51,6 +51,7 @@ struct RewardExchangeView: View {
                         .frame(width: 24, height: 24)
                 }
                 .padding(.top, 69)
+                .padding(.trailing, 18)
                 .padding(.bottom, 20)
             }
             .frame(maxWidth: .infinity)

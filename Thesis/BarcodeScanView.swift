@@ -44,7 +44,8 @@ struct BarcodeScanView: View {
                         selectedImage
                             .resizable()
                             .scaledToFill() // เปลี่ยนเป็น Fill เพื่อให้เต็มจอเหมือนกล้อง
-                            .frame(width: geo.size.width, height: geo.size.height)
+//                            .frame(width: geo.size.width, height: geo.size.height)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .clipped()
                             .background(Color.cameraBackground)
                     } else {
@@ -112,22 +113,25 @@ struct BarcodeScanView: View {
                     AiScanBottomNavigationBar(
                         selectedTab: $selectedTabnavigationItem
                     ) { index in
-                        hideTabBar = true   // ⭐ ซ่อน MainTabBar
+                        hideTabBar = true
 
                         switch index {
                         case 0:
                             break
+
                         case 1:
                             showAiScanView = true
 
                         case 2:
-                            // ไปหน้าค้นหา
                             showSearchView = true
 
                         default:
                             break
                         }
                     }
+                    .padding(.bottom, 25)
+                    .padding(.top, 21)
+
                     .padding(.bottom, 25)
                     .padding(.top, 21)
                 }
@@ -168,12 +172,16 @@ struct BarcodeScanView: View {
                     .padding(.trailing, 25)
             }
         }
-        .padding(.bottom, 15) // เว้นระยะห่างด้านล่างเนื้อหา
+        .padding(.top, 69)
+        .padding(.bottom, 20)
         .frame(maxWidth: .infinity)
+        .frame(height: 123)
         .background(
             Color.backgroundColor
                 .ignoresSafeArea(edges: .top) // ให้สีพื้นหลังถมส่วน Notch/Status Bar
         )
+        .edgesIgnoringSafeArea(.top)
+
     }
 
     // MARK: - Load Image Function

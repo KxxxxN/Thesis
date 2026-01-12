@@ -43,7 +43,8 @@ struct AiScanView: View {
                         selectedImage
                             .resizable()
                             .scaledToFill() // เปลี่ยนเป็น Fill เพื่อให้เต็มจอเหมือนกล้อง
-                            .frame(width: geo.size.width, height: geo.size.height)
+//                            .frame(width: geo.size.width, height: geo.size.height)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .clipped()
                             .background(Color.cameraBackground)
                     } else {
@@ -66,7 +67,6 @@ struct AiScanView: View {
                         .frame(width: 343, height: 60)
                         .background(Color.textFieldColor)
                         .cornerRadius(20)
-                        .padding(.top, 34)
 
                     Spacer() // ใช้ Spacer ตัวเดียวดันทุกอย่างลงล่าง แทนการระบุความสูง 509
 
@@ -200,7 +200,6 @@ struct AiScanView: View {
         }
     }
 
-    // MARK: - Header (ปรับปรุงใหม่)
     private var headerView: some View {
         HStack {
             BackButton()
@@ -224,12 +223,15 @@ struct AiScanView: View {
                     .padding(.trailing, 25)
             }
         }
-        .padding(.bottom, 15) // เว้นระยะห่างด้านล่างเนื้อหา
+        .padding(.top, 69)
+        .padding(.bottom, 18)
         .frame(maxWidth: .infinity)
         .background(
             Color.backgroundColor
-                .ignoresSafeArea(edges: .top) // ให้สีพื้นหลังถมส่วน Notch/Status Bar
+                .ignoresSafeArea(edges: .top)
         )
+        .edgesIgnoringSafeArea(.all)
+
     }
 
     // MARK: - Load Image Function
