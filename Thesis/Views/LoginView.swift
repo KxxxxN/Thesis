@@ -27,19 +27,11 @@ struct LoginView: View {
                         title: "อีเมล",
                         placeholder: "กรอกอีเมล",
                         text: $viewModel.email,
-                        isValid: .constant(viewModel.emailError == nil),
-                        errorMessage: viewModel.emailError ?? ""
+                        isValid: .constant(!viewModel.isLoginSubmitted || viewModel.emailError == nil),
+                        errorMessage: viewModel.isLoginSubmitted ? (viewModel.emailError ?? "") : ""
                     )
-                    .onChange(of: viewModel.email) {
-                        let currentEmail = viewModel.email.trimmingCharacters(in: .whitespacesAndNewlines)
-                        
-                        // 1. ตรวจสอบว่าช่องไม่ว่างเปล่า
-                        if !currentEmail.isEmpty {
-                            viewModel.emailError = nil
-                            
-                        } else {
-                            viewModel.emailError = "กรุณากรอกอีเมล"
-                        }
+                    .onChange(of: viewModel.email) { _, _ in
+                        viewModel.clearError(for: "email")
                     }
                     
                     // 2. ช่องป้อนรหัสผ่าน
@@ -47,20 +39,13 @@ struct LoginView: View {
                         title: "รหัสผ่าน",
                         placeholder: "กรอกรหัสผ่าน",
                         text: $viewModel.password,
-                        isValid: .constant(viewModel.passwordError == nil),
-                        errorMessage: viewModel.passwordError ?? "",
+                        isValid: .constant(!viewModel.isLoginSubmitted || viewModel.passwordError == nil),
+                        errorMessage: viewModel.isLoginSubmitted ? (viewModel.passwordError ?? "") : "",
                         isSecure: true,
                         isPasswordToggle: $viewModel.isPasswordVisible
                     )
-                    .onChange(of: viewModel.password) {
-                        let currentPassword = viewModel.password.trimmingCharacters(in: .whitespacesAndNewlines)
-                        
-                        if !currentPassword.isEmpty {
-                            viewModel.passwordError = nil
-                            
-                        } else {
-                            viewModel.passwordError = "กรุณากรอกรหัสผ่าน"
-                        }
+                    .onChange(of: viewModel.password) { _, _ in
+                        viewModel.clearError(for: "password")
                     }
                     .padding(.bottom, -15)
                     
