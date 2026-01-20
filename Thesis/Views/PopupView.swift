@@ -93,66 +93,7 @@ struct SuccessPopupView: View {
     }
 }
 
-<<<<<<< HEAD
-//struct ErrorPopupView: View {
-//    let title: String
-//    var onDismiss: () -> Void
-//    
-//    var body: some View {
-//        ZStack {
-//            Color.black.opacity(0.4).ignoresSafeArea()
-//                .onTapGesture { onDismiss() }
-//            VStack {
-//                VStack(spacing: 0) {
-//                    Image("Errormark")
-//                        .resizable()
-//                        .frame(width: 111, height: 111)
-//                        .padding(.bottom,29)
-//                    
-//                    
-//                    VStack(spacing:0){
-//                        Text(title)
-//                            .font(.noto(25, weight: .bold))
-//                            .foregroundColor(.black)
-//                            .multilineTextAlignment(.center)
-//                            .padding(.bottom,7)
-//                        
-//                        Text("กรุณาลองใหม่อีกครั้ง")
-//                            .font(.noto(18, weight: .medium))
-//                            .foregroundColor(.black)
-//                            .multilineTextAlignment(.center)
-//                    }
-//                }
-//                .padding(40)
-//                .frame(width: 343, height: 255)
-//                .background(Color.white)
-//                .cornerRadius(20)
-//                .shadow(radius: 10)
-//                .transition(.scale)
-//            }
-//            .padding()
-//        }
-//        .onAppear {
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-//                onDismiss()
-//            }
-//        }
-//    }
-//}
 
-
-// MARK: - Preview
-// สามารถรวม Preview ไว้ในไฟล์เดียวได้
-//#Preview("Privacy Popup") {
-//    PrivacyPopupView(showPrivacyPopup: .constant(true))
-//}
-
-//#Preview("Error Popup") {
-//    ErrorPopupView(title: "เปลี่ยนรหัสผ่านไม่สำเร็จ") {
-//        print("Dismissed")
-//    }
-//}
-=======
 struct ErrorPopupView: View {
     let title: String
     var onDismiss: () -> Void
@@ -174,6 +115,7 @@ struct ErrorPopupView: View {
                             .font(.noto(25, weight: .bold))
                             .foregroundColor(.black)
                             .multilineTextAlignment(.center)
+                            .padding(.bottom,7)
                         
                         Text("กรุณาลองใหม่อีกครั้ง")
                             .font(.noto(18, weight: .medium))
@@ -199,21 +141,18 @@ struct ErrorPopupView: View {
 }
 
 
-// MARK: - Preview
-//สามารถรวม Preview ไว้ในไฟล์เดียวได้
 #Preview("Privacy Popup") {
     PrivacyPopupView(showPrivacyPopup: .constant(true))
 }
->>>>>>> main
 
-//#Preview("Error Popup") {
-//    ErrorPopupView(title: "เปลี่ยนรหัสผ่านไม่สำเร็จ") {
-//        print("Dismissed")
-//    }
-//}
+#Preview("Error Popup") {
+    ErrorPopupView(title: "เปลี่ยนรหัสผ่านไม่สำเร็จ") {
+        print("Dismissed")
+    }
+}
 
-//#Preview("Success Popup") {
-//    SuccessPopupView(message: "เปลี่ยนรหัสผ่านสำเร็จ") {
-//        print("Dismissed")
-//    }
-//}
+#Preview("Success Popup") {
+    SuccessPopupView(message: "เปลี่ยนรหัสผ่านสำเร็จ") {
+        print("Dismissed")
+    }
+}

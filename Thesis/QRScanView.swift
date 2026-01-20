@@ -155,31 +155,31 @@ struct QRScanView: View {
                                 showErrorAlert = false // กดที่ว่างแล้วปิด Alert
                             }
                         
-//                        VStack(spacing: 0) {
-//                            Image("Errormark")
-//                                .resizable()
-//                                .scaledToFit()
-//                                .frame(width: 137, height: 137)
-//                                .multilineTextAlignment(.center)
-//                            
-//                            Text("สแกนไม่สำเร็จ")
-//                                .font(.noto(25, weight: .bold))
-//                                .foregroundColor(.black)
-//                                .multilineTextAlignment(.center)
-//                            
-//                            Text("กรุณาลองใหม่อีกครั้ง")
-//                                .font(.noto(18, weight: .medium))
-//                                .foregroundColor(.black)
-//                                .multilineTextAlignment(.center)
-//                                .padding(.top, 4)
-//                            
-//                        }
-//                        .padding(20)
-//                        .frame(width: 343, height: 260)
-//                        .background(Color.white)
-//                        .cornerRadius(20)
-//                        .onTapGesture {
-//                        }
+                        VStack(spacing: 0) {
+                            Image("Errormark")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 137, height: 137)
+                                .multilineTextAlignment(.center)
+                            
+                            Text("สแกนไม่สำเร็จ")
+                                .font(.noto(25, weight: .bold))
+                                .foregroundColor(.black)
+                                .multilineTextAlignment(.center)
+                            
+                            Text("กรุณาลองใหม่อีกครั้ง")
+                                .font(.noto(18, weight: .medium))
+                                .foregroundColor(.black)
+                                .multilineTextAlignment(.center)
+                                .padding(.top, 4)
+                            
+                        }
+                        .padding(20)
+                        .frame(width: 343, height: 260)
+                        .background(Color.white)
+                        .cornerRadius(20)
+                        .onTapGesture {
+                        }
                     }
                 }
             }
