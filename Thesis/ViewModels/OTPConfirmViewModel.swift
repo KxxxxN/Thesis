@@ -13,25 +13,26 @@ import SwiftUI
 class OTPConfirmViewModel: ObservableObject {
     // สถานะสำหรับช่องกรอก OTP
     @Published var otpFields: [String] = Array(repeating: "", count: 6)
+    @Published var isFieldInvalid: [Bool] = Array(repeating: false, count: 6)
     
-    // สถานะสำหรับจัดการ Error
+    @Published var isSubmitted: Bool = false
+    @Published var showSuccessPopup: Bool = false
+    @Published var showErrorPopup: Bool = false
     @Published var showIncompleteError: Bool = false
     @Published var showIncorrectError: Bool = false
     
-    // สถานะสำหรับขอบแดงของแต่ละช่อง
-    @Published var isFieldInvalid: [Bool] = Array(repeating: false, count: 6)
     
-    // สถานะสำหรับการนำทาง (ใช้ @Published แทน @AppStorage เพื่อให้ ViewModel ทดสอบได้ง่ายขึ้น)
     @Published var navigateToChangePW: Bool = false
+    @Published var navigateToNewPW: Bool = false
     
     // *** จำลองรหัส OTP ที่ถูกต้อง (สามารถเปลี่ยนได้) ***
     private let correctOTP = "123456"
-
+    
     // Computed Property: รหัส OTP ทั้งหมดที่กรอก
     var fullOTP: String {
         otpFields.joined()
     }
-
+    
     // Computed Property: ข้อความ Error ที่ควรแสดง
     var errorMessage: String {
         if showIncompleteError {
@@ -41,72 +42,51 @@ class OTPConfirmViewModel: ObservableObject {
         }
         return ""
     }
-
+    
     // Computed Property: ควรแสดง Error หรือไม่
     var shouldShowError: Bool {
-        return showIncompleteError || showIncorrectError
+        // ✅ แสดง Error ต่อเมื่อกด Submit แล้วเท่านั้น
+        return isSubmitted && (showIncompleteError || showIncorrectError)
     }
 
-    // MARK: - Logic Functions
-
-    // จัดการการเปลี่ยนแปลงค่าในช่อง OTP แต่ละช่อง (เช่น การกรอกทีละตัว)
-    func handleOTPChange(index: Int, newValue: String, focusedField: inout Int?) {
-        let filtered = newValue.filter { $0.isNumber }
+    func handleOTPChange(index: Int, newValue: String) -> Int? {
+        if isSubmitted { isSubmitted = false }
         
-        // 1. จัดการการวาง (Paste) - (ไม่มีการเปลี่ยนแปลง)
-        if filtered.count > 1 {
-            handlePaste(filtered, focusedField: &focusedField)
-            return
+        // 1. ถ้าเป็นการลบ (newValue ว่าง)
+        if newValue.isEmpty {
+            return index > 0 ? index - 1 : 0
         }
         
-        // 2. จัดการการลบ (Delete) และ การกรอก (Type)
-        if filtered.isEmpty {
-            // A) การลบ (Delete/Backspace)
-            
-            // ล้างค่าในช่องปัจจุบัน
-            otpFields[index] = ""
-            
-            // ย้าย Focus ไปช่องก่อนหน้าเสมอ (ถ้าไม่ใช่ช่องแรกสุด)
-            if index > 0 {
-                focusedField = index - 1
-            } else {
-                focusedField = 0 // ถ้าลบตัวแรก ให้ Focus อยู่ที่ช่อง 0
-            }
-            
-        } else {
-            // B) การกรอก (Type) - (ไม่มีการเปลี่ยนแปลง)
-            
-            otpFields[index] = String(filtered.prefix(1))
-            
+        // 2. ถ้ามีการพิมพ์ (เอาเฉพาะตัวเลขตัวล่าสุด)
+        let filtered = newValue.filter { $0.isNumber }
+        if let lastDigit = filtered.last {
+            otpFields[index] = String(lastDigit) // บังคับให้มีแค่ตัวเดียว
             isFieldInvalid[index] = false
             
-            // เลื่อน focus ไปช่องถัดไป
-            if index < 5 {
-                focusedField = index + 1
-            } else {
-                focusedField = nil // ซ่อนคีย์บอร์ดเมื่อกรอกครบ
-            }
+            // ส่ง Index ถัดไปกลับไปให้ View จัดการ Focus
+            return index < 5 ? index + 1 : nil
         }
         
-        // 3. ตรวจสอบ Live Validation (ตรรกะเดิม)
-        if fullOTP.isEmpty {
-            showIncompleteError = true
-            showIncorrectError = false
-            isFieldInvalid = Array(repeating: true, count: 6)
-        } else {
-            showIncompleteError = false
-            showIncorrectError = false
-            if !isFieldInvalid.allSatisfy({ $0 == false }) {
-                isFieldInvalid = Array(repeating: false, count: 6)
-            }
-        }
+        return index
     }
-        
+    // ฟังก์ชันเสริมสำหรับ Paste (ปรับให้ return index)
+    private func handlePasteReturningIndex(_ value: String) -> Int? {
+        let digits = Array(value.filter { $0.isNumber }.prefix(6))
+        for i in 0..<6 {
+            if i < digits.count {
+                otpFields[i] = String(digits[i])
+            } else {
+                otpFields[i] = ""
+            }
+        }
+        return digits.count < 6 ? digits.count : nil
+    }
+    
     // ฟังก์ชันกระจายตัวเลขเมื่อมีการวาง (paste)
     func handlePaste(_ value: String, focusedField: inout Int?) {
         let digits = value.filter { $0.isNumber }
         let limited = String(digits.prefix(6)) // จำกัดสูงสุด 6 ตัว
-
+        
         for i in 0..<6 {
             if i < limited.count {
                 otpFields[i] = String(limited[limited.index(limited.startIndex, offsetBy: i)])
@@ -114,7 +94,7 @@ class OTPConfirmViewModel: ObservableObject {
                 otpFields[i] = ""
             }
         }
-
+        
         // ตั้งค่า focus ไปยังช่องถัดไป หรือซ่อนคีย์บอร์ด
         focusedField = limited.count < 6 ? limited.count : nil
         
@@ -122,30 +102,42 @@ class OTPConfirmViewModel: ObservableObject {
         showIncompleteError = false
         showIncorrectError = false
     }
-
+    
+    func resetOTPFields() {
+        otpFields = Array(repeating: "", count: 6)
+        isFieldInvalid = Array(repeating: false, count: 6)
+        showIncorrectError = false
+        showIncompleteError = false
+        isSubmitted = false // ✅ รีเซ็ตสถานะ Submit ด้วย
+    }
+    
     // ฟังก์ชันที่ทำงานเมื่อกดปุ่ม "ยืนยัน"
-    func verifyOTP() {
-        // 1. ล้างสถานะ Error เดิม
+    func verifyOTP(source: OTPSource) {
+        // ✅ บันทึกว่ามีการกด Submit แล้ว
+        self.isSubmitted = true
+        
         showIncompleteError = false
         showIncorrectError = false
         isFieldInvalid = Array(repeating: false, count: 6)
-
+        
         if fullOTP.count < 6 {
-            // 2. ถ้ากรอกไม่ครบ: แสดง Error "ไม่ครบถ้วน"
             showIncompleteError = true
-            for i in 0..<6 {
-                isFieldInvalid[i] = otpFields[i].isEmpty // ขอบแดงเฉพาะช่องที่ว่าง
-            }
+            for i in 0..<6 { isFieldInvalid[i] = otpFields[i].isEmpty }
         } else {
-            // 3. ถ้ากรอกครบ 6 หลัก: ตรวจสอบความถูกต้อง
             if fullOTP == correctOTP {
-                // รหัสถูกต้อง: ดำเนินการต่อ (นำทาง)
-                navigateToChangePW = true
+                switch source {
+                case .forgotPassword: navigateToChangePW = true
+                case .confirmEmail: navigateToNewPW = true
+                case .changeEmail: showSuccessPopup = true
+                }
             } else {
-                // รหัสไม่ถูกต้อง: แสดง Error "ไม่ถูกต้อง"
                 showIncorrectError = true
-                isFieldInvalid = Array(repeating: true, count: 6) // ขอบแดงทุกช่อง
-                print("OTP Incorrect: \(fullOTP)")
+                isFieldInvalid = Array(repeating: true, count: 6)
+                
+                // ✅ แสดง Error Popup เฉพาะเคสเปลี่ยนอีเมลเหมือนเดิม
+                if source == .changeEmail {
+                    withAnimation { self.showErrorPopup = true }
+                }
             }
         }
     }

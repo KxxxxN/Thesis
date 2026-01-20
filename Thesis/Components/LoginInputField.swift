@@ -50,7 +50,7 @@ struct LoginInputField: View {
                 }
             }
             .frame(width: 345, height: 49)
-            .background(Color.textFieldColor) // สมมติว่า Color.textFieldColor มีอยู่
+            .background(Color.textFieldColor)
             .cornerRadius(20)
             .modifier(ValidationBorder(isValid: isValid))
             

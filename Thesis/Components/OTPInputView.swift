@@ -14,7 +14,7 @@ struct OTPInputView: View {
     @FocusState.Binding var focusedField: Int?
     
     private func borderColor(for index: Int) -> Color {
-        if viewModel.isFieldInvalid[index] {
+        if viewModel.isSubmitted && viewModel.isFieldInvalid[index] {
             return Color.errorColor
         } else {
             return Color.clear
@@ -40,9 +40,22 @@ struct OTPInputView: View {
                     .focused($focusedField, equals: index)
                     // ใช้ .onChange เพื่อจัดการ Logic ผ่าน ViewModel
                     .onChange(of: viewModel.otpFields[index]) { oldValue, newValue in
-                        // เรียกใช้ฟังก์ชันใน ViewModel และส่ง focusedField เข้าไป
-                        viewModel.handleOTPChange(index: index, newValue: newValue, focusedField: &focusedField)
-                    }
+                            // ป้องกัน Logic ทำงานตอนที่เราสั่งล้างค่า หรือค่าไม่ได้เปลี่ยนจริง
+                            guard newValue != oldValue else { return }
+                            
+                            // ถ้าพิมพ์เกิน 1 ตัว (เช่น พิมพ์ทับตัวเดิม) ให้ตัดเหลือตัวเดียวทันที
+                            if newValue.count > 1 {
+                                viewModel.otpFields[index] = String(newValue.last!)
+                            }
+                            
+                            // หา Index ที่ต้อง Focus ต่อ
+                            let nextIndex = viewModel.handleOTPChange(index: index, newValue: newValue)
+                            
+                            // ใช้ DispatchQueue เพื่อให้ UI คืนค่า TextField ให้เสร็จก่อนเปลี่ยน Focus
+                            DispatchQueue.main.async {
+                                focusedField = nextIndex
+                            }
+                        }
             }
         }
     }

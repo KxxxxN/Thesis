@@ -10,6 +10,8 @@ import Foundation
 import Combine
 
 class RegisterViewModel: ObservableObject {
+    
+    // MARK: - Input Fields
     @Published var firstName: String = ""
     @Published var lastName: String = ""
     @Published var email: String = ""
@@ -17,13 +19,16 @@ class RegisterViewModel: ObservableObject {
     @Published var password: String = ""
     @Published var confirmPassword: String = ""
     
+    // MARK: - UI States
     @Published var isPasswordVisible: Bool = false
     @Published var isConfirmPasswordVisible: Bool = false
     @Published var isPrivacyAccepted: Bool = false
     @Published var showPrivacyPopup: Bool = false
     @Published var showSuccessPopup: Bool = false
+    @Published var showErrorPopup: Bool = false
     @Published var isRegisterSubmitted: Bool = false
     
+    // MARK: - Validation States (สำหรับแสดงสีแดง/ข้อความเตือนใน UI)
     @Published var isFirstNameValid: Bool = true
     @Published var isLastNameValid: Bool = true
     @Published var isEmailValid: Bool = true
@@ -31,117 +36,63 @@ class RegisterViewModel: ObservableObject {
     @Published var isPasswordValid: Bool = true
     @Published var isConfirmPasswordValid: Bool = true
     
-    // MARK: - Phone
-    func isValidPhone(phone: String) -> Bool {
-        let phoneRegex = "^(0[0-9]{2}-?)([0-9]{3}-?)([0-9]{4})$"
-        let phonePredicate = NSPredicate(format:"SELF MATCHES %@", phoneRegex)
-        return phonePredicate.evaluate(with: phone)
-    }
+    // MARK: - Password Checklist Helpers
+    // เรียกใช้ ValidationHelper เพื่อเช็คเงื่อนไขแต่ละข้อสำหรับแสดงใน UI
+    var passwordHasLength: Bool { ValidationHelper.hasMinimumLength(password) }
+    var passwordHasUpper: Bool { ValidationHelper.hasUppercase(password) }
+    var passwordHasLower: Bool { ValidationHelper.hasLowercase(password) }
+    var passwordHasDigit: Bool { ValidationHelper.hasDigit(password) }
+    var passwordHasSpecial: Bool { ValidationHelper.hasSpecialCharacter(password) }
     
-    // MARK: - Email
-    func isValidEmail(email: String) -> Bool {
-        let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-        let emailPredicate = NSPredicate(format:"SELF MATCHES %@", emailRegex)
-        return emailPredicate.evaluate(with: email)
-    }
-    
-    // MARK: - Name & Lastname
-    func isNameValid(name: String) -> Bool {
-        if name.isEmpty { return true }
+    func clearError(for field: String) {
+        switch field {
+        case "firstName": isFirstNameValid = true
+        case "lastName": isLastNameValid = true
+        case "email": isEmailValid = true
+        case "phone": isPhoneValid = true
+        case "password": isPasswordValid = true
+        case "confirmPassword": isConfirmPasswordValid = true
+        default: break
+        }
         
-        // 2. ตรวจสอบว่ามีแต่ภาษาไทยหรือไม่ (ก-ฮ, Space, Hyphen)
-        let thaiRegex = "^[\\p{Thai}\\s\\-]+$"
-        let isThaiOnly = NSPredicate(format: "SELF MATCHES %@", thaiRegex).evaluate(with: name)
-        
-        // 3. ตรวจสอบว่ามีแต่ภาษาอังกฤษหรือไม่ (a-z, A-Z, Space, Hyphen)
-        let englishRegex = "^[a-zA-Z\\s\\-]+$"
-        let isEnglishOnly = NSPredicate(format: "SELF MATCHES %@", englishRegex).evaluate(with: name)
-        
-        // 4. ถ้าเป็นภาษาใดภาษาหนึ่งเท่านั้น ให้ถือว่าถูกต้อง
-        return isThaiOnly || isEnglishOnly
+        // หมายเหตุ: ไม่ต้องสั่ง isRegisterSubmitted = false แล้ว
+        // เพราะเราต้องการให้ช่องอื่นๆ ที่ยังไม่ได้แก้ ยังโชว์ Error ค้างไว้อยู่
     }
     
-    // MARK: - Password
-    func isPasswordValid(password: String) -> Bool {
-        let regex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%&*_-]).{8,}$"
-        
-        let passwordPredicate = NSPredicate(format: "SELF MATCHES %@", regex)
-        return passwordPredicate.evaluate(with: password)
-    }
     
-    func hasMinimumLength(_ password: String) -> Bool {
-        return password.count >= 8
-    }
-
-    func hasUppercase(_ password: String) -> Bool {
-        let regex = ".*[A-Z]+.*"
-        return NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: password)
-    }
-
-    func hasLowercase(_ password: String) -> Bool {
-        let regex = ".*[a-z]+.*"
-        return NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: password)
-    }
-
-    func hasDigit(_ password: String) -> Bool {
-        let regex = ".*[0-9]+.*"
-        return NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: password)
-    }
-
-    func hasSpecialCharacter(_ password: String) -> Bool {
-        // อักขระพิเศษ: !@#$%&*_-
-        let regex = ".*[!@#$%&*_-]+.*"
-        return NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: password)
-    }
-    
-    // MARK: - Main Validation Logic
-    // เพิ่ม @discardableResult เพื่อให้ Xcode ไม่เตือนว่าผลลัพธ์ไม่ได้ถูกใช้ หากมีการเรียกใช้ฟังก์ชันนี้เพื่ออัปเดตสถานะเท่านั้น
     @discardableResult
     func validateFormRegister() -> Bool {
-        // ตรวจสอบว่าช่องว่างหรือไม่
-        isFirstNameValid = !firstName.isEmpty
-        isLastNameValid = !lastName.isEmpty
-        isEmailValid = !email.isEmpty
-        isPhoneValid = !phone.isEmpty
-        isPasswordValid = !password.isEmpty
-        isConfirmPasswordValid = !confirmPassword.isEmpty
+        // 1. ใส่ Logic การเช็คแต่ละช่องที่คุณมีอยู่แล้วตรงนี้
+        isFirstNameValid = !firstName.isEmpty && ValidationHelper.isNameValid(name: firstName)
+        isLastNameValid = !lastName.isEmpty && ValidationHelper.isNameValid(name: lastName)
+        isEmailValid = !email.isEmpty && ValidationHelper.isValidEmail(email)
+        isPhoneValid = !phone.isEmpty && ValidationHelper.isValidPhone(phone)
+        isPasswordValid = !password.isEmpty && ValidationHelper.isPasswordValid(password)
+        isConfirmPasswordValid = !confirmPassword.isEmpty && (password == confirmPassword)
         
-        // MARK: - ตรวจสอบความถูกต้องของชื่อ/นามสกุล
-        if isFirstNameValid { // ถ้าไม่ว่าง ให้ตรวจสอบรูปแบบ
-            isFirstNameValid = isNameValid(name: firstName)
-        }
-        if isLastNameValid { // ถ้าไม่ว่าง ให้ตรวจสอบรูปแบบ
-            isLastNameValid = isNameValid(name: lastName)
-        }
+        // 2. ✅ นำส่วนที่ถามมาวางไว้ตรงนี้ (บรรทัดสุดท้ายของฟังก์ชัน)
+        let isDataValid = isFirstNameValid &&
+                         isLastNameValid &&
+                         isEmailValid &&
+                         isPhoneValid &&
+                         isPasswordValid &&
+                         isConfirmPasswordValid
         
-        // MARK: - ตรวจสอบรหัสผ่านตามเงื่อนไขใหม่
-        if !password.isEmpty {
-            isPasswordValid = isPasswordValid(password: password)
+        // คืนค่าผลลัพธ์รวม (ต้องติ๊กยอมรับ Privacy ด้วยถึงจะผ่าน)
+        return isDataValid && isPrivacyAccepted
+    }
+    
+    func register() {
+        // 1. สั่งเปิดสถานะ Submit เพื่อให้ขอบแดงทำงาน
+        self.isRegisterSubmitted = true
+        
+        // 2. ตรวจสอบความถูกต้องของข้อมูลทั้งหมด
+        if validateFormRegister() {
+            // ✅ กรณีข้อมูลถูกต้องทั้งหมด
+            self.showSuccessPopup = true
         } else {
-            isPasswordValid = false
+            // ❌ กรณีข้อมูลไม่ถูกต้อง หรือลืมติ๊ก Privacy
+            self.showErrorPopup = true
         }
-        // MARK: - ตรวจสอบว่ารหัสผ่านและยืนยันรหัสผ่านตรงกันหรือไม่
-        if isPasswordValid && isConfirmPasswordValid && !password.isEmpty && !confirmPassword.isEmpty {
-            if password != confirmPassword {
-                isPasswordValid = false // ตั้งให้ช่อง Password เป็น Invalid ด้วย
-                isConfirmPasswordValid = false
-            } else {
-                // ถ้าตรงกัน ให้ตั้งเป็น true อีกครั้งหากก่อนหน้านี้ถูกตั้งเป็น false
-                isConfirmPasswordValid = true
-            }
-        }
-        
-        // MARK: - ตรวจสอบรูปแบบอีเมล
-        if isEmailValid { // ถ้าไม่ว่าง ให้ตรวจสอบรูปแบบ
-            isEmailValid = isValidEmail(email: email)
-        }
-        
-        // MARK: - ตรวจสอบรูปแบบเบอร์โทรศัพท์
-        if isPhoneValid { // ถ้าไม่ว่าง ให้ตรวจสอบรูปแบบ
-            isPhoneValid = isValidPhone(phone: phone)
-        }
-        
-        // คืนค่า true ถ้าทุกช่องถูกต้อง
-        return isFirstNameValid && isLastNameValid && isEmailValid && isPhoneValid && isPasswordValid && isConfirmPasswordValid && isPrivacyAccepted
     }
 }
