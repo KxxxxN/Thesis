@@ -36,15 +36,11 @@ struct RegisterView: View {
                                 title: "ชื่อ",
                                 placeholder: "กรอกชื่อภาษาไทย",
                                 text: $viewModel.firstName,
-                                isValid: $viewModel.isFirstNameValid,
-                                errorMessage: viewModel.firstName.isEmpty ? "จำเป็นต้องระบุ" : "กรุณากรอกชื่อให้ถูกต้อง",
-                                
+                                isValid: .constant(!viewModel.isRegisterSubmitted || viewModel.isFirstNameValid),
+                                errorMessage: viewModel.isRegisterSubmitted && !viewModel.isFirstNameValid ? (viewModel.firstName.isEmpty ? "จำเป็นต้องระบุ" : "กรุณากรอกชื่อให้ถูกต้อง") : ""
                             )
-                            // ใช้ onChange รูปแบบใหม่
-                            .onChange(of: viewModel.firstName) {
-                                if !viewModel.firstName.isEmpty {
-                                    viewModel.isFirstNameValid = viewModel.isNameValid(name: viewModel.firstName)
-                                }
+                            .onChange(of: viewModel.firstName) { _, _ in
+                                viewModel.clearError(for: "firstName")
                             }
                             
                             // Last Name
@@ -52,14 +48,11 @@ struct RegisterView: View {
                                 title: "นามสกุล",
                                 placeholder: "กรอกนามสกุลภาษาไทย",
                                 text: $viewModel.lastName,
-                                isValid: $viewModel.isLastNameValid,
-                                // ปรับ errorMessage ให้เข้ากับ ViewModel
-                                errorMessage: viewModel.lastName.isEmpty ? "จำเป็นต้องระบุ" : "กรุณากรอกนามสกุลให้ถูกต้อง",
+                                isValid: .constant(!viewModel.isRegisterSubmitted || viewModel.isLastNameValid),
+                                errorMessage: viewModel.isRegisterSubmitted && !viewModel.isLastNameValid ? (viewModel.lastName.isEmpty ? "จำเป็นต้องระบุ" : "กรุณากรอกนามสกุลให้ถูกต้อง") : ""
                             )
-                            .onChange(of: viewModel.lastName) {
-                                if !viewModel.lastName.isEmpty {
-                                    viewModel.isLastNameValid = viewModel.isNameValid(name: viewModel.lastName)
-                                }
+                            .onChange(of: viewModel.lastName) { _, _ in
+                                viewModel.clearError(for: "lastName")
                             }
                             
                             // Email
@@ -67,31 +60,24 @@ struct RegisterView: View {
                                 title: "อีเมล",
                                 placeholder: "กรอกอีเมล",
                                 text: $viewModel.email,
-                                isValid: $viewModel.isEmailValid,
-                                // ปรับ errorMessage ให้เข้ากับ ViewModel
-                                errorMessage: viewModel.email.isEmpty ? "จำเป็นต้องระบุ" : "รูปแบบอีเมลไม่ถูกต้อง",
+                                isValid: .constant(!viewModel.isRegisterSubmitted || viewModel.isEmailValid),
+                                errorMessage: viewModel.isRegisterSubmitted && !viewModel.isEmailValid ? (viewModel.email.isEmpty ? "จำเป็นต้องระบุ" : "รูปแบบอีเมลไม่ถูกต้อง") : ""
                             )
-                            .onChange(of: viewModel.email) {
-                                // Live validation
-                                if !viewModel.email.isEmpty {
-                                    viewModel.isEmailValid = viewModel.isValidEmail(email: viewModel.email)
-                                }
+                            .onChange(of: viewModel.email) { _, _ in
+                                viewModel.clearError(for: "email")
                             }
+
                             
                             // Phone
                             RegisterInputField(
                                 title: "เบอร์โทร",
                                 placeholder: "0XX-XXX-XXXX",
                                 text: $viewModel.phone,
-                                isValid: $viewModel.isPhoneValid,
-                                // ปรับ errorMessage ให้เข้ากับ ViewModel
-                                errorMessage: viewModel.phone.isEmpty ? "จำเป็นต้องระบุ" : "รูปแบบเบอร์โทรไม่ถูกต้อง",
+                                isValid: .constant(!viewModel.isRegisterSubmitted || viewModel.isPhoneValid),
+                                errorMessage: viewModel.isRegisterSubmitted && !viewModel.isPhoneValid ? (viewModel.phone.isEmpty ? "จำเป็นต้องระบุ" : "รูปแบบเบอร์โทรไม่ถูกต้อง") : ""
                             )
-                            .onChange(of: viewModel.phone) {
-                                // Live validation
-                                if !viewModel.phone.isEmpty {
-                                    viewModel.isPhoneValid = viewModel.isValidPhone(phone: viewModel.phone)
-                                }
+                            .onChange(of: viewModel.phone) { _, _ in
+                                viewModel.clearError(for: "phone")
                             }
                             
                             // Password
@@ -99,20 +85,22 @@ struct RegisterView: View {
                                 title: "รหัสผ่าน",
                                 placeholder: "อย่างน้อย 8 ตัวอักษร",
                                 text: $viewModel.password,
-                                isValid: $viewModel.isPasswordValid,
-                                errorMessage: viewModel.password.isEmpty ? "จำเป็นต้องระบุ" : "รูปแบบรหัสผ่านไม่ถูกต้อง",
+                                isValid: .constant(!viewModel.isRegisterSubmitted || viewModel.isPasswordValid),
+                                errorMessage: viewModel.isRegisterSubmitted && !viewModel.isPasswordValid ? (viewModel.password.isEmpty ? "จำเป็นต้องระบุ" : "รูปแบบรหัสผ่านไม่ถูกต้อง") : "",
                                 isSecure: true,
                                 isPasswordToggle: $viewModel.isPasswordVisible
                             )
-                            .onChange(of: viewModel.password) {
-                                if !viewModel.password.isEmpty {
-                                    viewModel.isPasswordValid = viewModel.isPasswordValid(password:viewModel.password)
+                            .onChange(of: viewModel.password) { _, _ in
+                                viewModel.clearError(for: "password")
+                                // ตรวจสอบ Confirm Password ใหม่ด้วยถ้ามีข้อมูลอยู่แล้ว
+                                if !viewModel.confirmPassword.isEmpty {
+                                    viewModel.isConfirmPasswordValid = (viewModel.password == viewModel.confirmPassword)
                                 }
                             }
                             
                             // Password Validation Checklist
-                            if !viewModel.isPasswordValid(password: viewModel.password) {
-                                PasswordValidatCheckRegister(viewModel: viewModel)
+                            if !ValidationHelper.isPasswordValid(viewModel.password) {
+                                PasswordValidationCheckView(password: viewModel.password)
                                     .padding(.top, 0)
                                     .padding(.bottom, 5)
                             }
@@ -122,27 +110,15 @@ struct RegisterView: View {
                                 title: "ยืนยันรหัสผ่าน",
                                 placeholder: "กรอกรหัสผ่านอีกครั้ง",
                                 text: $viewModel.confirmPassword,
-                                isValid: $viewModel.isConfirmPasswordValid,
-                                errorMessage: viewModel.confirmPassword.isEmpty ? "จำเป็นต้องระบุ" : "รหัสผ่านไม่ตรงกัน",
+                                isValid: .constant(!viewModel.isRegisterSubmitted || viewModel.isConfirmPasswordValid),
+                                errorMessage: viewModel.isRegisterSubmitted && !viewModel.isConfirmPasswordValid ? (viewModel.confirmPassword.isEmpty ? "จำเป็นต้องระบุ" : "รหัสผ่านไม่ตรงกัน") : "",
                                 isSecure: true,
                                 isPasswordToggle: $viewModel.isConfirmPasswordVisible
                             )
-                            // ตรวจสอบเมื่อมีการเปลี่ยนแปลงในช่องยืนยันรหัสผ่าน
-                            .onChange(of: viewModel.confirmPassword) {
-                                if !viewModel.confirmPassword.isEmpty {
-                                    viewModel.isConfirmPasswordValid = (viewModel.password == viewModel.confirmPassword)
-                                } else {
-                                    // หากช่องยืนยันว่างเปล่า ให้ถือว่าไม่ถูกต้อง
-                                    viewModel.isConfirmPasswordValid = false
-                                }
+                            .onChange(of: viewModel.confirmPassword) { _, _ in
+                                viewModel.clearError(for: "confirmPassword")
                             }
-                            // 💡 สิ่งที่ต้องเพิ่ม: ตรวจสอบเมื่อมีการเปลี่ยนแปลงในช่องรหัสผ่าน (Password)
-                            .onChange(of: viewModel.password) {
-                                // บังคับให้ตรวจสอบความถูกต้องใหม่ หากช่องยืนยันรหัสผ่านถูกกรอกแล้ว
-                                if !viewModel.confirmPassword.isEmpty {
-                                    viewModel.isConfirmPasswordValid = (viewModel.password == viewModel.confirmPassword)
-                                }
-                            }
+                            
                         }//ปิด Vstack2
                         .padding(.horizontal, 40)
                             
@@ -180,22 +156,7 @@ struct RegisterView: View {
                         PrimaryButton(
                             title: "สร้างบัญชี",
                             action: {
-                                viewModel.isRegisterSubmitted = true
-                                if viewModel.validateFormRegister() {
-                                    print("สร้างบัญชีสำเร็จ")
-                                    viewModel.showSuccessPopup = true
-
-                                    Task {
-                                        try await Task.sleep(nanoseconds: 2_000_000_000)
-
-                                        if viewModel.showSuccessPopup {
-                                            viewModel.showSuccessPopup = false
-                                            dismiss()
-                                        }
-                                    }
-                                } else {
-                                    print("มีช่องที่ต้องกรอก")
-                                }
+                                viewModel.register()
                             },
                             width: 155,
                             height: 49
@@ -217,7 +178,22 @@ struct RegisterView: View {
                 
                 // MARK: Success Popup
                 if viewModel.showSuccessPopup {
-                    SuccessPopupView()
+                    SuccessPopupView(message: "สร้างบัญชีสำเร็จ") {
+                        // action เมื่อกดปิด popup เอง (ถ้ามีปุ่มหรือการเคาะพื้นหลัง)
+                        withAnimation {
+                            viewModel.showSuccessPopup = false
+                            dismiss()
+                        }
+                    }
+                }
+                
+                // MARK: Error Popup
+                if viewModel.showErrorPopup{
+                    ErrorPopupView(title: "สร้างบัญชีไม่สำเร็จ"){
+                        withAnimation {
+                            viewModel.showErrorPopup = false
+                        }
+                    }
                 }
             }
         }

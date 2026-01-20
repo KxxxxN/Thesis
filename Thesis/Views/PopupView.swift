@@ -53,18 +53,74 @@ struct PrivacyPopupView: View {
 
 // MARK: - Success Popup View
 struct SuccessPopupView: View {
+    let message: String
+    var onDismiss: () -> Void
+    
     var body: some View {
         ZStack {
             Color.black.opacity(0.4).ignoresSafeArea()
+                .onTapGesture {
+                    withAnimation {
+                        onDismiss()
+                    }
+                }
+            
             VStack {
                 VStack(spacing: 29) {
                     Image("Passmark") // ต้องมั่นใจว่า asset นี้มีอยู่ในโครงการ
                         .resizable()
                         .frame(width: 111, height: 111)
                     
-                    Text("สร้างบัญชีสำเร็จ")
+                    Text(message)
                         .font(.noto(25, weight: .bold))
                         .foregroundColor(.black)
+                        .multilineTextAlignment(.center)
+                }
+//                .padding(40)
+                .frame(width: 343, height: 255)
+                .background(Color.white)
+                .cornerRadius(20)
+                .shadow(radius: 10)
+                .transition(.scale)
+            }
+            .padding()
+        }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                onDismiss()
+            }
+        }
+    }
+}
+
+struct ErrorPopupView: View {
+    let title: String
+    var onDismiss: () -> Void
+    
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.4).ignoresSafeArea()
+                .onTapGesture { onDismiss() }
+            VStack {
+                VStack(spacing: 0) {
+                    Image("Errormark")
+                        .resizable()
+                        .frame(width: 111, height: 111)
+                        .padding(.bottom,29)
+                    
+                    
+                    VStack(spacing:0){
+                        Text(title)
+                            .font(.noto(25, weight: .bold))
+                            .foregroundColor(.black)
+                            .multilineTextAlignment(.center)
+                            .padding(.bottom,7)
+                        
+                        Text("กรุณาลองใหม่อีกครั้ง")
+                            .font(.noto(18, weight: .medium))
+                            .foregroundColor(.black)
+                            .multilineTextAlignment(.center)
+                    }
                 }
                 .padding(40)
                 .frame(width: 343, height: 255)
@@ -75,15 +131,29 @@ struct SuccessPopupView: View {
             }
             .padding()
         }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                onDismiss()
+            }
+        }
     }
 }
 
+
 // MARK: - Preview
 // สามารถรวม Preview ไว้ในไฟล์เดียวได้
-#Preview("Privacy Popup") {
-    PrivacyPopupView(showPrivacyPopup: .constant(true))
+//#Preview("Privacy Popup") {
+//    PrivacyPopupView(showPrivacyPopup: .constant(true))
+//}
+
+#Preview("Error Popup") {
+    ErrorPopupView(title: "เปลี่ยนรหัสผ่านไม่สำเร็จ") {
+        print("Dismissed")
+    }
 }
 
-#Preview("Success Popup") {
-    SuccessPopupView()
-}
+//#Preview("Success Popup") {
+//    SuccessPopupView(message: "เปลี่ยนรหัสผ่านสำเร็จ") {
+//        print("Dismissed")
+//    }
+//}
