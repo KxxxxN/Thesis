@@ -140,10 +140,10 @@ struct ErrorPopupView: View {
 
 
 // MARK: - Preview
-// สามารถรวม Preview ไว้ในไฟล์เดียวได้
-//#Preview("Privacy Popup") {
-//    PrivacyPopupView(showPrivacyPopup: .constant(true))
-//}
+//สามารถรวม Preview ไว้ในไฟล์เดียวได้
+#Preview("Privacy Popup") {
+    PrivacyPopupView(showPrivacyPopup: .constant(true))
+}
 
 //#Preview("Error Popup") {
 //    ErrorPopupView(title: "เปลี่ยนรหัสผ่านไม่สำเร็จ") {
@@ -151,8 +151,8 @@ struct ErrorPopupView: View {
 //    }
 //}
 
-#Preview("Success Popup") {
-    SuccessPopupView(message: "เปลี่ยนรหัสผ่านสำเร็จ") {
-        print("Dismissed")
-    }
-}
+//#Preview("Success Popup") {
+//    SuccessPopupView(message: "เปลี่ยนรหัสผ่านสำเร็จ") {
+//        print("Dismissed")
+//    }
+//}
