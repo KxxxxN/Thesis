@@ -14,15 +14,22 @@ struct DetailSearchView: View {
     @State private var showConfirmPhotoView = false
 
     let separationSteps = [
-        SeparationStep(imageName: "DetailRecycle1", text: "เทน้ำให้หมด", imageSize: CGSize(width: 40, height: 88)),
-        SeparationStep(imageName: "DetailRecycle2", text: "เอาฝาและฉลากออก", imageSize: CGSize(width: 78, height: 63)),
-        SeparationStep(imageName: "DetailRecycle3", text: "บีบขวดให้แบน", imageSize: CGSize(width: 43, height: 72))
+        SeparationStep(imageName: "DetailRecycle1", text: "เทน้ำให้หมด", imageSize: CGSize(width: 100, height: 100)),
+        SeparationStep(imageName: "DetailRecycle2", text: "เอาฝาและฉลากออก", imageSize: CGSize(width: 120, height: 120)),
+        SeparationStep(imageName: "DetailRecycle3", text: "บีบขวดให้แบน", imageSize: CGSize(width: 100, height: 100))
     ]
     
     let recyclingMethods = [
         "ใช้เป็นกระถางปลูกต้นไม้เล็กๆ",
         "ตัดครึ่งขวดทำเป็นที่ใส่ปากกา",
         "นำไปหลอมเป็นเส้นใยพลาสติก"
+    ]
+    
+    let plasticbottleStep = [
+        PlasticbottleStep(imageName: "bin-icon1", text: "ถังขยะเปียก", imageSize: CGSize(width: 40, height: 40)),
+        PlasticbottleStep(imageName: "bin-icon3", text: "ถังขยะรีไซเคิล", imageSize: CGSize(width: 40, height: 40)),
+        PlasticbottleStep(imageName: "bin-icon2", text: "ถังขยะทั่วไป", imageSize: CGSize(width: 40, height: 40)),
+        PlasticbottleStep(imageName: "bin-icon3", text: "ถังขยะรีไซเคิล", imageSize: CGSize(width: 40, height: 40))
     ]
     
     var body: some View {
@@ -69,10 +76,11 @@ struct DetailSearchView: View {
                             .padding(.top, 22)
                             .padding(.horizontal, 37)
                             
-                            HStack(spacing: 32) {
+                            HStack(spacing: 0) {
                                 Image("Bin3")
                                     .resizable()
-                                    .frame(width: 68, height: 107)
+                                    .scaledToFill()
+                                    .frame(width: 200, height: 200)
                                 
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("ประเภทถังขยะ")
@@ -90,8 +98,6 @@ struct DetailSearchView: View {
                                     }
                                 }
                             }
-                            .padding(.horizontal, 58)
-                            .padding(.top, 20)
                             
                             VStack(alignment: .leading, spacing: -10) {
                                 Text("วิธีการแยกขยะ")
@@ -116,6 +122,7 @@ struct DetailSearchView: View {
                                                 
                                                 Image(separationSteps[index].imageName)
                                                     .resizable()
+                                                    .scaledToFill()
                                                     .aspectRatio(contentMode: .fit)
                                                     .frame(
                                                         width: separationSteps[index].imageSize.width,
@@ -131,9 +138,28 @@ struct DetailSearchView: View {
                                         }
                                     }
                                 }
+                                HStack (spacing: 35){
+                                    ForEach(plasticbottleStep.indices, id: \.self) { index in
+                                        VStack(spacing: 4) {
+                                            Image(plasticbottleStep[index].imageName)
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(
+                                                    width: plasticbottleStep[index].imageSize.width,
+                                                    height: plasticbottleStep[index].imageSize.height
+                                                )
+
+                                            Text(plasticbottleStep[index].text)
+                                                .font(.noto(12, weight: .medium))
+                                                .foregroundColor(.black)
+                                        }
+                                    }
+                                }
+                                .padding(.horizontal, 20)
+                                .padding(.top, 25)
+
                             }
                             .padding(.horizontal, 37)
-                            .padding(.top, 20)
                             
                             VStack(alignment: .leading, spacing: 9) {
                                 Text("การรีไซเคิล")
@@ -193,6 +219,11 @@ struct DetailSearchView: View {
         }
     }
 
-                    
-                
-                
+struct PlasticbottleStep {
+    let imageName: String
+    let text: String
+    let imageSize: CGSize
+}
+
+
+
