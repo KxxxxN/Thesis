@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "DetailRecycle2.png",
+      "filename" : "bottle-graphic2.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "DetailRecycle2 1.png",
+      "filename" : "bottle-graphic2 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "DetailRecycle2 2.png",
+      "filename" : "bottle-graphic2 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
