@@ -43,6 +43,17 @@ struct ConfirmPhotoView: View {
                     headerView
 
                     VStack {
+                        
+                        Text("กรุณาถ่ายรูปขยะทีละชิ้น ให้ตรงกับที่ค้นหา")
+                            .font(.noto(20, weight: .medium))
+                            .foregroundColor(.black)
+                            .multilineTextAlignment(.center)
+                            .frame(width: 343, height: 60)
+                            .background(Color.textFieldColor)
+                            .cornerRadius(20)
+                            .padding(.top, 35)
+                        
+                        
                         Spacer()
 
                         HStack {
@@ -79,7 +90,7 @@ struct ConfirmPhotoView: View {
                         }
                         .frame(maxWidth: 343)
                         .padding(.bottom, 25)
-                        .padding(.top, 21)
+//                        .padding(.top, 21)
                     }
                 }
             }

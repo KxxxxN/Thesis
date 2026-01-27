@@ -7,6 +7,21 @@
 
 import SwiftUI
 
+struct WasteExample: Identifiable {
+    let id = UUID()
+    let image: String
+    let label: String
+}
+
+struct WasteCategory {
+    let name: String
+    let colorName: String
+    let color: Color
+    let description: String
+    let binImage: String
+    let examples: [WasteExample]
+}
+
 struct KnowledgeWasteCard: View {
     let example: WasteExample
     

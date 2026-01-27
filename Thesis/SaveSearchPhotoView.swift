@@ -37,6 +37,7 @@ struct SaveSearchPhotoView: View {
                     headerView
 
                     VStack {
+                        
                         Spacer()
                         // สามารถเพิ่ม preview, caption, หรือ UI อื่นได้
                     }
