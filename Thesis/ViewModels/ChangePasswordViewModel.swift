@@ -10,6 +10,8 @@ import Foundation
 import SwiftUI
 
 class ChangePasswordViewModel: ObservableObject {
+    @Published var userEmail: String = ""
+    
     @Published var password: String = ""
     @Published var confirmPassword: String = ""
         
@@ -67,19 +69,58 @@ class ChangePasswordViewModel: ObservableObject {
         return isPasswordValid && isConfirmPasswordValid
     }
     
+//    func changePassword() {
+//        // 1. เช็คก่อนว่า Validate ผ่านไหม
+//        if validateFormChangePassword() {
+//            print("DEBUG: Validation ผ่าน กำลังบันทึกให้ \(userEmail)")
+//            
+//            Task {
+//                do {
+//                    // 2. เรียก Manager บันทึกลง Firestore
+//                    try await AuthenticationManager.shared.changePassword(
+//                        email: userEmail,
+//                        newPassword: password
+//                    )
+//                    
+//                    await MainActor.run {
+//                        withAnimation { self.showSuccessPopup = true }
+//                    }
+//                } catch {
+//                    await MainActor.run {
+//                        print("Error: \(error.localizedDescription)")
+//                        withAnimation { self.showErrorPopup = true }
+//                    }
+//                }
+//            }
+//        } else {
+//            // 3. ถ้า Validation ไม่ผ่าน (เช่น รหัสไม่ตรงกัน หรือไม่ครบกฎ)
+//            print("DEBUG: Validation ไม่ผ่าน")
+//            withAnimation { self.showErrorPopup = true }
+//        }
+//    }
+    
     func changePassword() {
-        if validateFormChangePassword() {
-            print("Password successfully changed.")
-            withAnimation {
-                self.showSuccessPopup = true
-            }
-            // รีเซ็ตค่าหลังจากสำเร็จ
-            password = ""
-            confirmPassword = ""
-            isChangePasswordSubmitted = false // รีเซ็ตสถานะการส่ง
-        } else {
-            withAnimation {
-                self.showErrorPopup = true
+        // ตรวจสอบว่ามีอีเมลส่งมาจากหน้าก่อนหน้าไหม
+        guard !userEmail.isEmpty else {
+            self.showErrorPopup = true
+            return
+        }
+
+        Task {
+            do {
+                // ✅ เปลี่ยนมาเรียกใช้การส่งลิงก์แทนการบันทึกรหัสใหม่
+                try await AuthenticationManager.shared.sendPasswordReset(email: userEmail)
+                
+                await MainActor.run {
+                    withAnimation {
+                        self.showSuccessPopup = true // แสดง Popup ว่าส่งลิงก์สำเร็จ
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    print("Error: \(error.localizedDescription)")
+                    self.showErrorPopup = true
+                }
             }
         }
     }

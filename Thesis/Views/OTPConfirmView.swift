@@ -15,6 +15,8 @@ enum OTPSource {
 
 struct OTPConfirmView: View {
     let source: OTPSource
+    let email: String
+    let refCode: String
     // ใช้ @StateObject เพื่อสร้างและจัดการ ViewModel
     @StateObject private var viewModel = OTPConfirmViewModel()
     @Environment(\.dismiss) var dismiss
@@ -63,7 +65,7 @@ struct OTPConfirmView: View {
                             .font(.noto(15, weight: .medium))
                             .foregroundColor(Color.placeholderColor)
                         
-                        let refCode = "A9F4K2"
+//                        let refCode = "A9F4K2"
                         Text(refCode)
                             .font(.noto(15, weight: .medium))
                             .foregroundColor(Color.placeholderColor)
@@ -87,8 +89,7 @@ struct OTPConfirmView: View {
                             .foregroundColor(.black)
                         
                         Button(action: {
-                            print("New OTP")
-                            // TODO: Implement Resend OTP logic in ViewModel
+                            viewModel.resendOTP()
                         }) {
                             Text("ส่งรหัสใหม่")
                                 .font(.noto(15,weight: .bold))
@@ -104,12 +105,16 @@ struct OTPConfirmView: View {
                 .background(Color.backgroundColor)
                 .blur(radius: (viewModel.showSuccessPopup || viewModel.showErrorPopup) ? 3 : 0)
                 .disabled(viewModel.showSuccessPopup || viewModel.showErrorPopup)
-                .onAppear { focusedField = 0 }
+                .onAppear {
+                    viewModel.userEmail = email
+                    viewModel.displayRefCode = refCode
+                    focusedField = 0
+                }
                 
                 // ผูกสถานะการนำทางจาก ViewModel กับ AppStorage/Navigation
                 // MARK: - 3 เส้นทาง Navigation
                 .navigationDestination(isPresented: $viewModel.navigateToChangePW) {
-                    ChangePasswordView()
+                    ChangePasswordView(email: viewModel.userEmail)
                 }
                 .navigationDestination(isPresented: $viewModel.navigateToNewPW) {
                     NewPasswordView()

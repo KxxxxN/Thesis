@@ -61,7 +61,11 @@ struct ConfirmEmailView: View {
                 dismiss()
             }
             .navigationDestination(isPresented: $viewModel.navigateToOTP) {
-                OTPConfirmView(source: .confirmEmail)
+                OTPConfirmView(
+                    source: .confirmEmail,
+                    email: viewModel.email,
+                    refCode: viewModel.refCodeGenerated
+                )
             }
         }
         .navigationBarBackButtonHidden(true)

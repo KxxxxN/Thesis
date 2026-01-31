@@ -9,6 +9,8 @@
 import Foundation
 import SwiftUI
 import Combine
+import FirebaseAuth
+import FirebaseFirestore
 
 class LoginViewModel: ObservableObject {
     
@@ -21,9 +23,10 @@ class LoginViewModel: ObservableObject {
     
     @Published var isLoginSubmitted: Bool = false
     
-//    @Published var loginErrorMessage: String? = nil
+    //    @Published var loginErrorMessage: String? = nil
     
     @AppStorage("isLoggedIn") var isLoggedIn = false
+    private let db = Firestore.firestore()
     
     func clearError(for field: String) {
         if field == "email" {
@@ -59,19 +62,25 @@ class LoginViewModel: ObservableObject {
     }
     
     func login() {
-        // ✅ สั่งว่ามีการกด Submit แล้ว เพื่อให้ UI เริ่มโชว์ Error
         self.isLoginSubmitted = true
         
         if validateFormLogin() {
-            let validUsername = "user@gmail.com"
-            let validPassword = "12345678"
-            
-            if email == validUsername && password == validPassword {
-                isLoggedIn = true
-            } else {
-                // กรณีรหัสผิด ให้แดงทั้งสองช่อง
-                emailError = "อีเมลหรือรหัสผ่านไม่ถูกต้อง"
-                passwordError = "อีเมลหรือรหัสผ่านไม่ถูกต้อง"
+            Task { [weak self] in
+                guard let self = self else { return }
+                do {
+                    // ✅ กลับมาใช้มาตรฐาน Firebase Auth (เพราะรหัสผ่านจะถูกอัปเดตในระบบ Auth หลักแล้ว)
+                    _ = try await AuthenticationManager.shared.signIn(email: email, password: password)
+                    
+                    await MainActor.run {
+                        withAnimation { self.isLoggedIn = true }
+                    }
+                } catch {
+                    await MainActor.run {
+                        // หากยังไม่ได้กดลิงก์ในเมล หรือรหัสผิด จะเข้า Error ตรงนี้
+                        self.emailError = "อีเมลหรือรหัสผ่านไม่ถูกต้อง"
+                        self.passwordError = "กรุณาตรวจสอบว่าได้ยืนยันรหัสใหม่ในอีเมลแล้ว"
+                    }
+                }
             }
         }
     }

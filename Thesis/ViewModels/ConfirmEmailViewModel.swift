@@ -12,25 +12,32 @@ class ConfirmEmailViewModel: ObservableObject {
     @Published var email = ""
     @Published var emailError: String? = nil
     @Published var navigateToOTP = false
+    @Published var refCodeGenerated: String = ""
     
     @Published var isSubmitted = false
     
     func verifyEmailBeforeChange() {
         self.isSubmitted = true
         
-        let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        if trimmedEmail.isEmpty {
+        if email.isEmpty {
             emailError = "กรุณากรอกอีเมล"
             return
         }
         
-        if ValidationHelper.isValidEmail(trimmedEmail) {
-            emailError = nil
-            // TODO: เรียก API เพื่อส่ง OTP
-            navigateToOTP = true
-        } else {
-            emailError = "รูปแบบอีเมลไม่ถูกต้อง"
+        Task {
+            do {
+                // เรียกฟังก์ชันเพื่อส่ง OTP และรับค่า refCode
+                let ref = try await AuthenticationManager.shared.sendCustomOTP(email: email)
+                
+                await MainActor.run {
+                    self.refCodeGenerated = ref // ✅ บันทึกค่า Ref
+                    self.navigateToOTP = true
+                }
+            } catch {
+                await MainActor.run {
+                    self.emailError = error.localizedDescription
+                }
+            }
         }
     }
     

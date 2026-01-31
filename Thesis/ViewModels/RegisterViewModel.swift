@@ -7,34 +7,37 @@
 
 
 import Foundation
-import Combine
+import FirebaseFirestore
+import FirebaseAuth
 
 class RegisterViewModel: ObservableObject {
     
-    // MARK: - Input Fields
-    @Published var firstName: String = ""
-    @Published var lastName: String = ""
-    @Published var email: String = ""
-    @Published var phone: String = ""
-    @Published var password: String = ""
-    @Published var confirmPassword: String = ""
+    // ข้อมูลจาก View (อิงตาม @StateObject ในโค้ดของคุณ)
+    @Published var firstName = ""
+    @Published var lastName = ""
+    @Published var email = ""
+    @Published var phone = ""
+    @Published var password = ""
+    @Published var confirmPassword = ""
+    @Published var isPrivacyAccepted = false
     
-    // MARK: - UI States
-    @Published var isPasswordVisible: Bool = false
-    @Published var isConfirmPasswordVisible: Bool = false
-    @Published var isPrivacyAccepted: Bool = false
-    @Published var showPrivacyPopup: Bool = false
-    @Published var showSuccessPopup: Bool = false
-    @Published var showErrorPopup: Bool = false
-    @Published var isRegisterSubmitted: Bool = false
+    // UI States
+    @Published var isRegisterSubmitted = false
+    @Published var showSuccessPopup = false
+    @Published var showErrorPopup = false
+    @Published var showPrivacyPopup = false
+    @Published var isPasswordVisible = false
+    @Published var isConfirmPasswordVisible = false
     
-    // MARK: - Validation States (สำหรับแสดงสีแดง/ข้อความเตือนใน UI)
-    @Published var isFirstNameValid: Bool = true
-    @Published var isLastNameValid: Bool = true
-    @Published var isEmailValid: Bool = true
-    @Published var isPhoneValid: Bool = true
-    @Published var isPasswordValid: Bool = true
-    @Published var isConfirmPasswordValid: Bool = true
+    // Validation States (ตัวอย่าง)
+    @Published var isFirstNameValid = true
+    @Published var isLastNameValid = true
+    @Published var isEmailValid = true
+    @Published var isPhoneValid = true
+    @Published var isPasswordValid = true
+    @Published var isConfirmPasswordValid = true
+    
+    private var db = Firestore.firestore()
     
     // MARK: - Password Checklist Helpers
     // เรียกใช้ ValidationHelper เพื่อเช็คเงื่อนไขแต่ละข้อสำหรับแสดงใน UI
@@ -72,27 +75,71 @@ class RegisterViewModel: ObservableObject {
         
         // 2. ✅ นำส่วนที่ถามมาวางไว้ตรงนี้ (บรรทัดสุดท้ายของฟังก์ชัน)
         let isDataValid = isFirstNameValid &&
-                         isLastNameValid &&
-                         isEmailValid &&
-                         isPhoneValid &&
-                         isPasswordValid &&
-                         isConfirmPasswordValid
+        isLastNameValid &&
+        isEmailValid &&
+        isPhoneValid &&
+        isPasswordValid &&
+        isConfirmPasswordValid
         
         // คืนค่าผลลัพธ์รวม (ต้องติ๊กยอมรับ Privacy ด้วยถึงจะผ่าน)
         return isDataValid && isPrivacyAccepted
     }
     
     func register() {
-        // 1. สั่งเปิดสถานะ Submit เพื่อให้ขอบแดงทำงาน
         self.isRegisterSubmitted = true
         
-        // 2. ตรวจสอบความถูกต้องของข้อมูลทั้งหมด
+        // 1. ตรวจสอบข้อมูลใน Form ก่อน
         if validateFormRegister() {
-            // ✅ กรณีข้อมูลถูกต้องทั้งหมด
-            self.showSuccessPopup = true
+            // ใช้ Task เพื่อรองรับ async function
+            Task { [weak self] in
+                guard let self = self else { return }
+                
+                do {
+                    // 2. สร้าง User ผ่าน Manager (ส่ง Email และ Password)
+                    let authResult = try await AuthenticationManager.shared.createUser(email: email, password: password)
+                    
+                    // 3. เมื่อสร้างสำเร็จ นำ UID ที่ได้ไปบันทึกข้อมูลส่วนตัวลง Firestore
+                    await saveUserData(uid: authResult.uid)
+                    
+                    // 4. อัปเดต UI เมื่อทุกอย่างสำเร็จ
+                    await MainActor.run {
+                        self.showSuccessPopup = true
+                    }
+                } catch {
+                    // ❌ กรณีเกิด Error (เช่น อีเมลซ้ำ หรือรหัสผ่านไม่ปลอดภัย)
+                    await MainActor.run {
+                        print("Registration Error: \(error.localizedDescription)")
+                        self.showErrorPopup = true
+                    }
+                }
+            }
         } else {
-            // ❌ กรณีข้อมูลไม่ถูกต้อง หรือลืมติ๊ก Privacy
-            self.showErrorPopup = true
+            print("Form is invalid")
+        }
+    }
+        
+    private func saveUserData(uid: String) async {
+        let db = Firestore.firestore()
+        
+        let userData: [String: Any] = [
+            "uid": uid,
+            "firstName": firstName,
+            "lastName": lastName,
+            "email": email.lowercased(),
+            "phone": phone,
+            "createdAt": FieldValue.serverTimestamp(),
+            "role": "user"
+        ]
+        
+        do {
+            // ใช้ try await แทนการใช้ Closure
+            try await db.collection("users").document(uid).setData(userData)
+            print("Firestore: Save user data success")
+        } catch {
+            print("Firestore Error: \(error.localizedDescription)")
+            await MainActor.run {
+                self.showErrorPopup = true
+            }
         }
     }
 }

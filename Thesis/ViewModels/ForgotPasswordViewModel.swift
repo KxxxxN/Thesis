@@ -14,7 +14,7 @@ class ForgotPasswordViewModel: ObservableObject {
     
     @Published var emailForgotPassword: String = ""
     @Published var emailErrorForgot: String? = nil
-    @Published var forgotErrorMessage: String? = nil // ใช้สำหรับ Error ที่มาจาก Server/API
+    @Published var refCodeGenerated: String = ""
     
     @Published var isForgotSubmitted: Bool = false
     
@@ -24,6 +24,7 @@ class ForgotPasswordViewModel: ObservableObject {
     
     func clearError() {
         emailErrorForgot = nil
+        isForgotSubmitted = false
     }
     
     @discardableResult
@@ -40,17 +41,37 @@ class ForgotPasswordViewModel: ObservableObject {
         return true
     }
     
+//    func forgotPassword() {
+//        self.isForgotSubmitted = true
+//        
+//        if validateFormForgot() {
+//            // จำลองการตรวจสอบกับ Database
+//            let emailForgot = "user@gmail.com"
+//            
+//            if emailForgotPassword == emailForgot {
+//                navigateToOTP = true
+//            } else {
+//                emailErrorForgot = "อีเมลนี้ยังไม่ได้ลงทะเบียน"
+//            }
+//        }
+//    }
     func forgotPassword() {
         self.isForgotSubmitted = true
+        self.emailErrorForgot = nil
         
-        if validateFormForgot() {
-            // จำลองการตรวจสอบกับ Database
-            let emailForgot = "user@gmail.com"
-            
-            if emailForgotPassword == emailForgot {
-                navigateToOTP = true
-            } else {
-                emailErrorForgot = "อีเมลนี้ยังไม่ได้ลงทะเบียน"
+        Task {
+            do {
+                // เรียกใช้ sendCustomOTP และรับค่า refCode กลับมา
+                let ref = try await AuthenticationManager.shared.sendCustomOTP(email: emailForgotPassword)
+                
+                await MainActor.run {
+                    self.refCodeGenerated = ref
+                    self.navigateToOTP = true
+                }
+            } catch {
+                await MainActor.run {
+                    self.emailErrorForgot = error.localizedDescription
+                }
             }
         }
     }

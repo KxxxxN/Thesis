@@ -11,6 +11,12 @@ import SwiftUI
 struct ChangePasswordView: View {
     @StateObject private var viewModel = ChangePasswordViewModel()
     
+    init(email: String) {
+        let vm = ChangePasswordViewModel()
+        vm.userEmail = email
+        _viewModel = StateObject(wrappedValue: vm)
+    }
+    
     var body: some View {
         ZStack {
             NavigationStack {
@@ -110,5 +116,5 @@ struct ChangePasswordView: View {
 }
 
 #Preview {
-    ChangePasswordView()
+    ChangePasswordView(email: "test@gmail.com")
 }

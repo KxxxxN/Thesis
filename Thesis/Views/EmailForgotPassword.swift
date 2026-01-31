@@ -55,7 +55,11 @@ struct EmailForgotPassword: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.backgroundColor)
             .navigationDestination(isPresented: $viewModel.navigateToOTP) {
-                OTPConfirmView(source: .forgotPassword)
+                OTPConfirmView(
+                    source: .forgotPassword,
+                    email: viewModel.emailForgotPassword, // ส่งอีเมลไปเพื่อใช้ตรวจสอบ
+                    refCode: viewModel.refCodeGenerated
+                )
             }
         }
         .navigationBarBackButtonHidden(true)
