@@ -11,27 +11,22 @@ import Foundation
 import SwiftUI
 
 class OTPConfirmViewModel: ObservableObject {
-    @Published var userEmail: String = ""
-    @Published var displayRefCode: String = ""
-    
     // สถานะสำหรับช่องกรอก OTP
     @Published var otpFields: [String] = Array(repeating: "", count: 6)
     @Published var isFieldInvalid: [Bool] = Array(repeating: false, count: 6)
     
     @Published var isSubmitted: Bool = false
-//    @Published var isLoading: Bool = false
-    
     @Published var showSuccessPopup: Bool = false
     @Published var showErrorPopup: Bool = false
     @Published var showIncompleteError: Bool = false
     @Published var showIncorrectError: Bool = false
-    @Published var errorMessage: String = ""
     
     
     @Published var navigateToChangePW: Bool = false
     @Published var navigateToNewPW: Bool = false
     
-//    private let correctOTP = "123456"
+    // *** จำลองรหัส OTP ที่ถูกต้อง (สามารถเปลี่ยนได้) ***
+    private let correctOTP = "123456"
     
     // Computed Property: รหัส OTP ทั้งหมดที่กรอก
     var fullOTP: String {
@@ -39,17 +34,18 @@ class OTPConfirmViewModel: ObservableObject {
     }
     
     // Computed Property: ข้อความ Error ที่ควรแสดง
-//    var errorMessage: String {
-//        if showIncompleteError {
-//            return "กรุณากรอกรหัส OTP ให้ครบถ้วน"
-//        } else if showIncorrectError {
-//            return "รหัส OTP ไม่ถูกต้อง"
-//        }
-//        return ""
-//    }
+    var errorMessage: String {
+        if showIncompleteError {
+            return "กรุณากรอกรหัส OTP ให้ครบถ้วน"
+        } else if showIncorrectError {
+            return "รหัส OTP ไม่ถูกต้อง"
+        }
+        return ""
+    }
     
     // Computed Property: ควรแสดง Error หรือไม่
     var shouldShowError: Bool {
+        // ✅ แสดง Error ต่อเมื่อกด Submit แล้วเท่านั้น
         return isSubmitted && (showIncompleteError || showIncorrectError)
     }
 
@@ -99,8 +95,10 @@ class OTPConfirmViewModel: ObservableObject {
             }
         }
         
+        // ตั้งค่า focus ไปยังช่องถัดไป หรือซ่อนคีย์บอร์ด
         focusedField = limited.count < 6 ? limited.count : nil
         
+        // ล้างสถานะ Error ทันทีที่ผู้ใช้มีการวาง
         showIncompleteError = false
         showIncorrectError = false
     }
@@ -110,86 +108,37 @@ class OTPConfirmViewModel: ObservableObject {
         isFieldInvalid = Array(repeating: false, count: 6)
         showIncorrectError = false
         showIncompleteError = false
-        isSubmitted = false
-    }
-    
-    // เพิ่มฟังก์ชันนี้ใน OTPConfirmViewModel
-    func resendOTP() {
-        Task {
-            do {
-                // เรียกส่ง OTP อีกครั้งโดยใช้อีเมลเดิม
-                let newRef = try await AuthenticationManager.shared.sendCustomOTP(email: self.userEmail)
-                
-                await MainActor.run {
-                    self.displayRefCode = newRef // อัปเดตรหัสอ้างอิงใหม่บนหน้าจอ
-                    self.resetOTPFields() // ล้างช่องกรอกเดิม
-                    // อาจจะเพิ่ม alert แจ้งเตือนว่า "ส่งรหัสใหม่สำเร็จ"
-                }
-            } catch {
-                print("Resend Error: \(error.localizedDescription)")
-            }
-        }
+        isSubmitted = false // ✅ รีเซ็ตสถานะ Submit ด้วย
     }
     
     // ฟังก์ชันที่ทำงานเมื่อกดปุ่ม "ยืนยัน"
     func verifyOTP(source: OTPSource) {
+        // ✅ บันทึกว่ามีการกด Submit แล้ว
         self.isSubmitted = true
-        self.showIncompleteError = false
-        self.showIncorrectError = false
-        self.isFieldInvalid = Array(repeating: false, count: 6)
         
-        // 1. ตรวจสอบว่ากรอกครบไหม
+        showIncompleteError = false
+        showIncorrectError = false
+        isFieldInvalid = Array(repeating: false, count: 6)
+        
         if fullOTP.count < 6 {
-            self.showIncompleteError = true
-            self.errorMessage = "กรุณากรอกรหัส OTP ให้ครบถ้วน"
+            showIncompleteError = true
             for i in 0..<6 { isFieldInvalid[i] = otpFields[i].isEmpty }
-            return
-        }
-        
-        // 2. ตรวจสอบรหัสกับ Firebase Firestore
-//        self.isLoading = true
-        Task { [weak self] in
-            guard let self = self else { return }
-            
-            do {
-                // เรียกใช้ Manager ที่เราเขียนไว้ก่อนหน้า
-                let isCorrect = try await AuthenticationManager.shared.verifyCustomOTP(
-                    email: self.userEmail,
-                    enteredOTP: self.fullOTP
-                )
-                
-                await MainActor.run {
-//                    self.isLoading = false
-                    if isCorrect {
-                        // ✅ รหัสถูกต้อง
-                        self.handleSuccessNavigation(source: source)
-                    } else {
-                        // ❌ รหัสผิด หรือ หมดอายุ
-                        self.showIncorrectError = true
-                        self.errorMessage = "รหัส OTP ไม่ถูกต้องหรือหมดอายุ"
-                        self.isFieldInvalid = Array(repeating: true, count: 6)
-                        
-                        if source == .changeEmail {
-                            withAnimation { self.showErrorPopup = true }
-                        }
-                    }
+        } else {
+            if fullOTP == correctOTP {
+                switch source {
+                case .forgotPassword: navigateToChangePW = true
+                case .confirmEmail: navigateToNewPW = true
+                case .changeEmail: showSuccessPopup = true
                 }
-            } catch {
-                await MainActor.run {
-//                    self.isLoading = false
-                    self.showIncorrectError = true
-                    self.errorMessage = "เกิดข้อผิดพลาดในการตรวจสอบรหัส"
-                    print("Error: \(error.localizedDescription)")
+            } else {
+                showIncorrectError = true
+                isFieldInvalid = Array(repeating: true, count: 6)
+                
+                // ✅ แสดง Error Popup เฉพาะเคสเปลี่ยนอีเมลเหมือนเดิม
+                if source == .changeEmail {
+                    withAnimation { self.showErrorPopup = true }
                 }
             }
-        }
-    }
-    
-    private func handleSuccessNavigation(source: OTPSource) {
-        switch source {
-        case .forgotPassword: navigateToChangePW = true
-        case .confirmEmail: navigateToNewPW = true
-        case .changeEmail: showSuccessPopup = true
         }
     }
 }

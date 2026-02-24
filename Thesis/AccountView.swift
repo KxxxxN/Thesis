@@ -7,25 +7,7 @@
 
 import SwiftUI
 
-@MainActor
-final class AccountViewModel: ObservableObject {
-    func signOut() throws {
-        try AuthenticationManager.shared.signOut()
-    }
-    
-//    func resetPassword() async throws {
-//        let authUser = try AuthenticationManager.shared.getAuthenticatedUser()
-//        
-//        guard let email = authUser?.email else {
-//            throw URLError(.fileDoesNotExist)
-//        }
-//        
-//        try await  AuthenticationManager.shared.resetPassword(email: email)
-//    }
-}
-
 struct AccountView: View {
-    @StateObject private var viewModel = AccountViewModel()
     @State private var isNotificationOn = true
     
     @AppStorage("isLoggedIn") var isLoggedIn = false
@@ -117,17 +99,7 @@ struct AccountView: View {
                             AccountMenuRow(
                                 title: "ออกจากระบบ",
                                 imageName: "IconLogout",
-                                action: {
-                                    do {
-                                        
-                                        try viewModel.signOut()
-                                        isLoggedIn = false
-                                        
-                                        print("Logout Success")
-                                    } catch {
-                                        print("Error signing out: \(error.localizedDescription)")
-                                    }
-                                }
+                                action: { isLoggedIn = false; print("Logout") }
                             )
                             
                             // ลบบัญชี (Button)
@@ -136,17 +108,6 @@ struct AccountView: View {
                                 imageName: "IconDelete",
                                 action: { print("Delete Account") }
                             )
-//                            
-//                            Button("Reset password"){
-//                                task{
-//                                    do{
-//                                        try await viewModel.resetPassword()
-//                                        print("Password reset success")
-//                                    } catch {
-//                                        print(error)
-//                                    }
-//                                }
-//                            }
                         }
                     }
                 }

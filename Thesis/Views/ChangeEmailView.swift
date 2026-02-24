@@ -55,11 +55,7 @@ struct ChangeEmailView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.backgroundColor)
             .navigationDestination(isPresented: $viewModel.navigateToOTP) {
-                OTPConfirmView(
-                    source: .changeEmail,
-                    email: viewModel.newEmail,
-                    refCode: viewModel.refCodeGenerated
-                )
+                OTPConfirmView(source: .changeEmail)
             }
         }
         .navigationBarBackButtonHidden(true)
