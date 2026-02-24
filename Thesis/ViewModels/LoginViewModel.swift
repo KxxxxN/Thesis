@@ -8,8 +8,9 @@
 
 import Foundation
 import SwiftUI
-import Combine
+import Supabase
 
+@MainActor
 class LoginViewModel: ObservableObject {
     
     @Published var email: String = ""
@@ -20,8 +21,8 @@ class LoginViewModel: ObservableObject {
     @Published var passwordError: String? = nil
     
     @Published var isLoginSubmitted: Bool = false
+    @Published var authErrorMessage: String? = nil
     
-//    @Published var loginErrorMessage: String? = nil
     
     @AppStorage("isLoggedIn") var isLoggedIn = false
     
@@ -31,6 +32,7 @@ class LoginViewModel: ObservableObject {
         } else if field == "password" {
             passwordError = nil
         }
+        authErrorMessage = nil
     }
     
     
@@ -42,7 +44,7 @@ class LoginViewModel: ObservableObject {
         
         // 2. ตรวจสอบอีเมล
         if ValidationHelper.isEmpty(email) {
-            emailError = "กรุณากรอกอีเมล" // กำหนดข้อความเฉพาะ
+            emailError = "กรุณากรอกอีเมล"
             allFieldsValid = false
         } else if !ValidationHelper.isValidEmail(email) {
             emailError = "รูปแบบอีเมลไม่ถูกต้อง"
@@ -51,27 +53,27 @@ class LoginViewModel: ObservableObject {
         
         // 3. ตรวจสอบรหัสผ่าน
         if ValidationHelper.isEmpty(password) {
-            passwordError = "กรุณากรอกรหัสผ่าน" // กำหนดข้อความเฉพาะ
+            passwordError = "กรุณากรอกรหัสผ่าน"
             allFieldsValid = false
         }
         
         return allFieldsValid
     }
     
-    func login() {
-        // ✅ สั่งว่ามีการกด Submit แล้ว เพื่อให้ UI เริ่มโชว์ Error
+    func login() async {
         self.isLoginSubmitted = true
+        self.authErrorMessage = nil
         
         if validateFormLogin() {
-            let validUsername = "user@gmail.com"
-            let validPassword = "12345678"
-            
-            if email == validUsername && password == validPassword {
-                isLoggedIn = true
-            } else {
-                // กรณีรหัสผิด ให้แดงทั้งสองช่อง
-                emailError = "อีเมลหรือรหัสผ่านไม่ถูกต้อง"
-                passwordError = "อีเมลหรือรหัสผ่านไม่ถูกต้อง"
+            do {
+                // เชื่อมต่อ Supabase
+                _ = try await supabase.auth.signIn(email: email, password: password)
+                self.isLoggedIn = true
+                print("Sign in Success!")
+            } catch {
+                self.emailError = "อีเมลหรือรหัสผ่านไม่ถูกต้อง"
+                self.passwordError = "อีเมลหรือรหัสผ่านไม่ถูกต้อง"
+                print("Login Failed: \(error.localizedDescription)")
             }
         }
     }
