@@ -8,7 +8,9 @@
 
 import Foundation
 import SwiftUI
+import Supabase
 
+@MainActor
 class ChangePasswordViewModel: ObservableObject {
     @Published var password: String = ""
     @Published var confirmPassword: String = ""
@@ -22,6 +24,7 @@ class ChangePasswordViewModel: ObservableObject {
     
     @Published var showSuccessPopup: Bool = false
     @Published var showErrorPopup: Bool = false
+    @Published var passwordErrorMessage: String = ""
         
     @Published var navigateToLogin: Bool = false
     @AppStorage("isLoggedIn") var isLoggedIn = false
@@ -67,19 +70,33 @@ class ChangePasswordViewModel: ObservableObject {
         return isPasswordValid && isConfirmPasswordValid
     }
     
-    func changePassword() {
+    func changePassword() async {
         if validateFormChangePassword() {
-            print("Password successfully changed.")
-            withAnimation {
-                self.showSuccessPopup = true
-            }
-            // รีเซ็ตค่าหลังจากสำเร็จ
-            password = ""
-            confirmPassword = ""
-            isChangePasswordSubmitted = false // รีเซ็ตสถานะการส่ง
-        } else {
-            withAnimation {
-                self.showErrorPopup = true
+            do {
+                try await supabase.auth.update(
+                    user: UserAttributes(password: password)
+                )
+                
+                try await supabase.auth.signOut()
+                self.isLoggedIn = false
+                
+                withAnimation {
+                    self.showSuccessPopup = true
+                }
+                
+                password = ""
+                confirmPassword = ""
+                isChangePasswordSubmitted = false
+                
+            } catch {
+                print("Change Password Error: \(error.localizedDescription)")
+                    
+                    if error.localizedDescription.contains("New password should be different from the old password") {
+                        self.isPasswordValid = false
+                        self.isConfirmPasswordValid = false
+                    } else {
+                    self.showErrorPopup = true
+                }
             }
         }
     }

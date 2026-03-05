@@ -48,7 +48,9 @@ struct NewPasswordView: View {
                         placeholder: "อย่างน้อย 8 ตัวอักษร",
                         text: $viewModel.password,
                         isValid: $viewModel.isPasswordValid, // ✅ ใช้ Valid รายช่อง
-                        errorMessage: viewModel.password.isEmpty ? "กรุณากรอกรหัสผ่าน" : "รูปแบบรหัสผ่านไม่ถูกต้อง",
+                        errorMessage: viewModel.password.isEmpty ? "กรุณากรอกรหัสผ่าน"
+                            : viewModel.password == viewModel.oldPassword ? "รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสผ่านเดิม"
+                            : "รูปแบบรหัสผ่านไม่ถูกต้อง",
                         isSecure: true,
                         isPasswordToggle: $viewModel.isPasswordVisible
                     )
@@ -86,9 +88,20 @@ struct NewPasswordView: View {
                     }
                     
                     HStack(alignment: .bottom,spacing: 35){
-                        SecondButton(title: "ยกเลิก", action: { dismiss() }, width: 155, height: 49)
+                        SecondButton(title: "ยกเลิก",
+                                     action: {
+                                        viewModel.navigateToProfile = true  },
+                                     width: 155,
+                                     height: 49)
                         
-                        PrimaryButton(title: "บันทึก", action: { viewModel.saveNewPassword() }, width: 155, height: 49)
+                        PrimaryButton(title: "บันทึก",
+                                      action: {
+                                          Task {
+                                              await viewModel.saveNewPassword()
+                                          }
+                                      },
+                                      width: 155,
+                                      height: 49)
                     }
                     .padding(.top,20)
                     
@@ -98,16 +111,17 @@ struct NewPasswordView: View {
                 .background(Color.backgroundColor)
                 .blur(radius: (viewModel.showSuccessAlert || viewModel.showErrorPopup) ? 3 : 0)
                 .disabled(viewModel.showSuccessAlert || viewModel.showErrorPopup)
+                .navigationDestination(isPresented: $viewModel.navigateToProfile) {
+                    ProfileView()
+                }
             }
             .navigationBarBackButtonHidden(true)
             
             // MARK: Success Popup
             if viewModel.showSuccessAlert {
                 SuccessPopupView(message: "เปลี่ยนรหัสผ่านสำเร็จ") {
-                    withAnimation {
-                        viewModel.showSuccessAlert = false
-                        dismiss()
-                    }
+                    viewModel.showSuccessAlert = false
+                    viewModel.navigateToProfile = true
                 }
             }
             

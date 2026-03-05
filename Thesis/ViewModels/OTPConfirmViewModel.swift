@@ -6,10 +6,11 @@
 //
 
 
-
 import Foundation
 import SwiftUI
+import Supabase
 
+@MainActor
 class OTPConfirmViewModel: ObservableObject {
     // สถานะสำหรับช่องกรอก OTP
     @Published var otpFields: [String] = Array(repeating: "", count: 6)
@@ -21,12 +22,15 @@ class OTPConfirmViewModel: ObservableObject {
     @Published var showIncompleteError: Bool = false
     @Published var showIncorrectError: Bool = false
     
-    
     @Published var navigateToChangePW: Bool = false
     @Published var navigateToNewPW: Bool = false
     
-    // *** จำลองรหัส OTP ที่ถูกต้อง (สามารถเปลี่ยนได้) ***
-    private let correctOTP = "123456"
+    @Published var navigateToProfile: Bool = false
+    
+    @Published var resendCooldown: Int = 0
+    private var cooldownTimer: Timer?
+    
+    @AppStorage("emailChangeSuccess") var emailChangeSuccess = false
     
     // Computed Property: รหัส OTP ทั้งหมดที่กรอก
     var fullOTP: String {
@@ -38,7 +42,7 @@ class OTPConfirmViewModel: ObservableObject {
         if showIncompleteError {
             return "กรุณากรอกรหัส OTP ให้ครบถ้วน"
         } else if showIncorrectError {
-            return "รหัส OTP ไม่ถูกต้อง"
+            return "รหัส OTP ไม่ถูกต้องหรือหมดอายุ"
         }
         return ""
     }
@@ -69,7 +73,7 @@ class OTPConfirmViewModel: ObservableObject {
         
         return index
     }
-    // ฟังก์ชันเสริมสำหรับ Paste (ปรับให้ return index)
+   
     private func handlePasteReturningIndex(_ value: String) -> Int? {
         let digits = Array(value.filter { $0.isNumber }.prefix(6))
         for i in 0..<6 {
@@ -82,7 +86,6 @@ class OTPConfirmViewModel: ObservableObject {
         return digits.count < 6 ? digits.count : nil
     }
     
-    // ฟังก์ชันกระจายตัวเลขเมื่อมีการวาง (paste)
     func handlePaste(_ value: String, focusedField: inout Int?) {
         let digits = value.filter { $0.isNumber }
         let limited = String(digits.prefix(6)) // จำกัดสูงสุด 6 ตัว
@@ -111,33 +114,88 @@ class OTPConfirmViewModel: ObservableObject {
         isSubmitted = false // ✅ รีเซ็ตสถานะ Submit ด้วย
     }
     
+    func startCooldown() {
+        resendCooldown = 60
+        cooldownTimer?.invalidate()
+        cooldownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
+            guard let self else { return }
+            Task { @MainActor in
+                if self.resendCooldown > 0 {
+                    self.resendCooldown -= 1
+                } else {
+                    timer.invalidate()
+                }
+            }
+        }
+    }
+    
+    func resendOTP(source: OTPSource, email: String) async {
+        guard resendCooldown == 0 else { return }
+        resetOTPFields()
+        startCooldown()
+        
+        do {
+            switch source {
+            case .forgotPassword, .confirmEmail:
+                try await supabase.auth.resetPasswordForEmail(email)
+            case .changeEmail:
+                try await supabase.auth.update(user: UserAttributes(email: email))
+            }
+        } catch {
+            // แสดง error ให้ user รู้ว่าส่งไม่ได้
+            print("Resend Failed: \(error.localizedDescription)")
+            self.showIncorrectError = true
+            self.resendCooldown = 0  // ← reset cooldown ถ้าส่งไม่สำเร็จ
+        }
+    }
+    
     // ฟังก์ชันที่ทำงานเมื่อกดปุ่ม "ยืนยัน"
-    func verifyOTP(source: OTPSource) {
-        // ✅ บันทึกว่ามีการกด Submit แล้ว
+    func verifyOTP(source: OTPSource, email: String) async {
         self.isSubmitted = true
+        self.showIncompleteError = false
+        self.showIncorrectError = false
+        self.isFieldInvalid = Array(repeating: false, count: 6)
         
-        showIncompleteError = false
-        showIncorrectError = false
-        isFieldInvalid = Array(repeating: false, count: 6)
-        
+        // 1. ตรวจสอบว่ากรอกครบไหม
         if fullOTP.count < 6 {
             showIncompleteError = true
             for i in 0..<6 { isFieldInvalid[i] = otpFields[i].isEmpty }
-        } else {
-            if fullOTP == correctOTP {
-                switch source {
-                case .forgotPassword: navigateToChangePW = true
-                case .confirmEmail: navigateToNewPW = true
-                case .changeEmail: showSuccessPopup = true
-                }
-            } else {
-                showIncorrectError = true
-                isFieldInvalid = Array(repeating: true, count: 6)
-                
-                // ✅ แสดง Error Popup เฉพาะเคสเปลี่ยนอีเมลเหมือนเดิม
-                if source == .changeEmail {
-                    withAnimation { self.showErrorPopup = true }
-                }
+            return
+        }
+        
+        
+        do {
+            if source == .forgotPassword || source == .confirmEmail {
+                try await supabase.auth.verifyOTP(
+                    email: email,
+                    token: fullOTP,
+                    type: .recovery
+                )
+            } else if source == .changeEmail {
+                try await supabase.auth.verifyOTP(
+                    email: email,
+                    token: fullOTP,
+                    type: .emailChange
+                )
+            }
+            
+            // ✅ ถ้าสำเร็จ
+            switch source {
+            case .forgotPassword:  navigateToChangePW = true
+            case .confirmEmail:    navigateToNewPW = true  
+            case .changeEmail:
+                emailChangeSuccess = true
+                showSuccessPopup = true
+            }
+            
+        } catch {
+            // ❌ ถ้าไม่สำเร็จ (รหัสผิด/หมดอายุ)
+            print("OTP Verification Failed: \(error.localizedDescription)")
+            self.showIncorrectError = true
+            self.isFieldInvalid = Array(repeating: true, count: 6)
+            
+            if source == .changeEmail {
+                self.showErrorPopup = true
             }
         }
     }

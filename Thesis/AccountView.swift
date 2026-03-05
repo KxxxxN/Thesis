@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct AccountView: View {
+    @StateObject private var authViewModel = AuthViewModel()
+    
     @State private var isNotificationOn = true
     
     @AppStorage("isLoggedIn") var isLoggedIn = false
@@ -99,7 +101,12 @@ struct AccountView: View {
                             AccountMenuRow(
                                 title: "ออกจากระบบ",
                                 imageName: "IconLogout",
-                                action: { isLoggedIn = false; print("Logout") }
+                                action: {
+                                    Task {
+                                        await authViewModel.signOut()
+                                        isLoggedIn = false
+                                    }
+                                }
                             )
                             
                             // ลบบัญชี (Button)
@@ -116,6 +123,11 @@ struct AccountView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(Color.backgroundColor)
             .navigationBarHidden(true)
+            .onAppear {
+                Task {
+                    await authViewModel.getInitialSession()
+                }
+            }
         }
     }
 }

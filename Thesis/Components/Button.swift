@@ -52,12 +52,32 @@ struct SecondButton: View {
 }
 
 //BackButton
+//struct BackButton: View {
+//    @Environment(\.dismiss) private var dismiss
+//
+//    var body: some View {
+//        Button {
+//            dismiss()
+//        } label: {
+//            Image(systemName: "chevron.left")
+//                .foregroundColor(.black)
+//                .font(.system(size: 25))
+//        }
+//        .padding(.leading, 25)
+//    }
+//}
+
 struct BackButton: View {
     @Environment(\.dismiss) private var dismiss
+    var action: (() -> Void)? = nil
 
     var body: some View {
         Button {
-            dismiss()
+            if let action {
+                action()
+            } else {
+                dismiss()
+            }
         } label: {
             Image(systemName: "chevron.left")
                 .foregroundColor(.black)
@@ -76,6 +96,39 @@ struct BackButtonWhite: View {
         } label: {
             Image(systemName: "chevron.left")
                 .foregroundColor(.white)
+                .font(.system(size: 25))
+        }
+        .padding(.leading, 25)
+    }
+}
+
+struct OTPBackButton: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        Button {
+            dismiss()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                dismiss()
+            }
+        } label: {
+            Image(systemName: "chevron.left")
+                .foregroundColor(.black)
+                .font(.system(size: 25))
+        }
+        .padding(.leading, 25)
+    }
+}
+
+struct BackToProfileButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button {
+            action()
+        } label: {
+            Image(systemName: "chevron.left")
+                .foregroundColor(.black)
                 .font(.system(size: 25))
         }
         .padding(.leading, 25)

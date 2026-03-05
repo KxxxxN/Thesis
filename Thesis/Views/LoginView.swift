@@ -65,8 +65,10 @@ struct LoginView: View {
                 
                 PrimaryButton(
                     title: "เข้าสู่ระบบ",
-                    action:{
-                        viewModel.login()
+                    action: {
+                        Task {
+                            await viewModel.login()
+                        }
                     },
                     width: 155,
                     height: 49

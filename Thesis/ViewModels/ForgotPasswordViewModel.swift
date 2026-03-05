@@ -1,32 +1,19 @@
-//
-//  ForgotPasswordViewModel.swift
-//  Thesis
-//
-//  Created by Kansinee Klinkhachon on 28/11/2568 BE.
-//
-
-
 import Foundation
 import SwiftUI
-import Combine
+import Supabase
 
+@MainActor
 class ForgotPasswordViewModel: ObservableObject {
     
     @Published var emailForgotPassword: String = ""
     @Published var emailErrorForgot: String? = nil
-    @Published var forgotErrorMessage: String? = nil // ใช้สำหรับ Error ที่มาจาก Server/API
-    
     @Published var isForgotSubmitted: Bool = false
-    
-    @AppStorage("navigateToOTP") var navigateToOTP = false
-    
-    // MARK: - Validation
+    @Published var navigateToOTP = false
     
     func clearError() {
         emailErrorForgot = nil
     }
     
-    @discardableResult
     func validateFormForgot() -> Bool {
         emailErrorForgot = nil
         
@@ -40,17 +27,29 @@ class ForgotPasswordViewModel: ObservableObject {
         return true
     }
     
-    func forgotPassword() {
+    func forgotPassword() async {
         self.isForgotSubmitted = true
         
         if validateFormForgot() {
-            // จำลองการตรวจสอบกับ Database
-            let emailForgot = "user@gmail.com"
+            let trimmedEmail = emailForgotPassword.trimmingCharacters(in: .whitespacesAndNewlines)
+            await sendResetPasswordRequest(to: trimmedEmail)
+        }
+    }
+    
+    private func sendResetPasswordRequest(to email: String) async {
+        self.emailErrorForgot = nil
+        
+        do {
+            try await supabase.auth.resetPasswordForEmail(email)
+            self.navigateToOTP = true
+            print("Reset password email sent to: \(email)")
             
-            if emailForgotPassword == emailForgot {
-                navigateToOTP = true
+        } catch {
+            print("Error: \(error.localizedDescription)")
+            if error.localizedDescription.contains("rate limit") {
+                self.emailErrorForgot = "ส่งคำขอบ่อยเกินไป กรุณารอสักครู่"
             } else {
-                emailErrorForgot = "อีเมลนี้ยังไม่ได้ลงทะเบียน"
+                self.emailErrorForgot = "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง"
             }
         }
     }

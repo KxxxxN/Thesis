@@ -15,25 +15,23 @@ enum OTPSource {
 
 struct OTPConfirmView: View {
     let source: OTPSource
-    // ใช้ @StateObject เพื่อสร้างและจัดการ ViewModel
-    @StateObject private var viewModel = OTPConfirmViewModel()
-    @Environment(\.dismiss) var dismiss
+    let email: String
+//    let refCode: String
     
-    // ย้าย FocusState มาที่ View หลักเพื่อส่งไปที่ Component
+    @StateObject private var viewModel = OTPConfirmViewModel()
     @FocusState private var focusedField: Int?
     
     var body: some View {
         ZStack{
-            NavigationStack {
+//            NavigationStack {
                 VStack {
-                    // Header (เดิม)
+                    // Header
                     ZStack {
                         Text("ยืนยันรหัส OTP")
                             .font(.noto(25, weight: .bold))
                         
                         HStack {
-                            BackButton()
-                            
+                            BackButton()                            
                             Spacer()
                         }
                     }
@@ -43,14 +41,11 @@ struct OTPConfirmView: View {
                         .font(.noto(20, weight: .semibold))
                         .padding(.bottom, 18)
                     
-                    // ** Component ช่อง OTP **
-                    OTPInputView(
-                        viewModel: viewModel,focusedField: $focusedField,
-//                        isInvalid: viewModel.isSubmitted ? viewModel.isFieldInvalid : Array(repeating: false, count: 6)
-                        )
+                    // Component ช่อง OTP
+                    OTPInputView(viewModel: viewModel, focusedField: $focusedField)
                         .padding(.bottom, 15)
                     
-                    // ** ส่วนแสดงผล Error **
+                    // ส่วนแสดงผล Error
                     Text(viewModel.errorMessage)
                         .font(.noto(15, weight: .medium))
                         .foregroundColor(Color.errorColor)
@@ -58,24 +53,26 @@ struct OTPConfirmView: View {
                         .padding(.bottom,0)
                         .opacity(viewModel.shouldShowError ? 1 : 0)
                     
-                    HStack(spacing: 5){
-                        Text("รหัสอ้างอิง :")
-                            .font(.noto(15, weight: .medium))
-                            .foregroundColor(Color.placeholderColor)
-                        
-                        let refCode = "A9F4K2"
-                        Text(refCode)
-                            .font(.noto(15, weight: .medium))
-                            .foregroundColor(Color.placeholderColor)
-                        
-                    }
+//                    HStack(spacing: 5){
+//                        Text("รหัสอ้างอิง :")
+//                            .font(.noto(15, weight: .medium))
+//                            .foregroundColor(Color.placeholderColor)
+//                        
+////                        let refCode = "A9F4K2"
+//                        Text(refCode)
+//                            .font(.noto(15, weight: .medium))
+//                            .foregroundColor(Color.placeholderColor)
+//                        
+//                    }
                     .padding(.bottom,18)
                     
                     PrimaryButton(
                         title: "ยืนยัน",
                         action: {
                             focusedField = nil
-                            viewModel.verifyOTP(source: source)
+                            Task {
+                                await viewModel.verifyOTP(source: source, email: email)
+                            }
                         },
                         width: 155, // ความกว้างของปุ่ม
                         height: 49 // ความสูงของปุ่ม
@@ -86,14 +83,21 @@ struct OTPConfirmView: View {
                             .font(.noto(15,weight: .medium))
                             .foregroundColor(.black)
                         
-                        Button(action: {
-                            print("New OTP")
-                            // TODO: Implement Resend OTP logic in ViewModel
-                        }) {
-                            Text("ส่งรหัสใหม่")
-                                .font(.noto(15,weight: .bold))
-                                .foregroundColor(.mainColor)
-                                .underline(color: .mainColor)
+                        if viewModel.resendCooldown > 0 {
+                            Text("ส่งรหัสใหม่ (\(viewModel.resendCooldown))")
+                                .font(.noto(15, weight: .bold))
+                                .foregroundColor(.placeholderColor)  // สีจางลงตอน cooldown
+                        } else {
+                            Button(action: {
+                                Task {
+                                    await viewModel.resendOTP(source: source, email: email)
+                                }
+                            }) {
+                                Text("ส่งรหัสใหม่")
+                                    .font(.noto(15, weight: .bold))
+                                    .foregroundColor(.mainColor)
+                                    .underline(color: .mainColor)
+                            }
                         }
                     }
                     .padding(.top,15)
@@ -104,7 +108,10 @@ struct OTPConfirmView: View {
                 .background(Color.backgroundColor)
                 .blur(radius: (viewModel.showSuccessPopup || viewModel.showErrorPopup) ? 3 : 0)
                 .disabled(viewModel.showSuccessPopup || viewModel.showErrorPopup)
-                .onAppear { focusedField = 0 }
+                .onAppear {
+                    focusedField = 0
+                    viewModel.startCooldown()
+                }
                 
                 // ผูกสถานะการนำทางจาก ViewModel กับ AppStorage/Navigation
                 // MARK: - 3 เส้นทาง Navigation
@@ -114,18 +121,18 @@ struct OTPConfirmView: View {
                 .navigationDestination(isPresented: $viewModel.navigateToNewPW) {
                     NewPasswordView()
                 }
+                .navigationDestination(isPresented: $viewModel.emailChangeSuccess) {
+                    ProfileView()
+                }
                 
-            }
+//            }
             .navigationBarBackButtonHidden(true)
             
             // MARK: Success Popup
             if viewModel.showSuccessPopup {
                 SuccessPopupView(message: "แก้ไขอีเมลสำเร็จ") {
-                    withAnimation {
-                        // ✅ ปิดผ่าน ViewModel
-                        viewModel.showSuccessPopup = false
-                        dismiss()
-                    }
+                    viewModel.showSuccessPopup = false
+                    viewModel.emailChangeSuccess = true
                 }
             }
             
@@ -143,3 +150,6 @@ struct OTPConfirmView: View {
     }
 }
 
+#Preview {
+    OTPConfirmView(source: .changeEmail, email: "1123kansinee@gmail.com")
+}

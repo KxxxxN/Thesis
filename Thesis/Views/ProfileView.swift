@@ -10,20 +10,15 @@ import SwiftUI
 struct ProfileView: View {
     @StateObject private var viewModel: ProfileViewModel
     
+    @AppStorage("emailChangeSuccess") var emailChangeSuccess = false
+    
     init() {
-        // ในสถานการณ์จริง ข้อมูลนี้อาจมาจาก UserSession หรือ Database
-        _viewModel = StateObject(wrappedValue: ProfileViewModel(
-            name: "สุนิสา",
-            lastName: "จินดาวัฒนา",
-            email: "sunisa.jindawan@gmail.com",
-            phone: "0832634573",
-            password: "12345678"
-        ))
+        _viewModel = StateObject(wrappedValue: ProfileViewModel())
     }
     
     var body: some View {
         ZStack {
-            NavigationStack {
+//            NavigationStack {
                 VStack(spacing: 0) {
                     ZStack {
                         Text("แก้ไขโปรไฟล์")
@@ -116,15 +111,18 @@ struct ProfileView: View {
                         }
                         // --- รหัสผ่าน ---
                         
-                        ProfilePasswordField(title: "รหัสผ่าน", password: viewModel.password, isEditing: $viewModel.isEditing, isPasswordVisible: $viewModel.isPasswordVisible)
+                        ProfilePasswordField(title: "รหัสผ่าน", password: viewModel.password, isEditing: $viewModel.isEditing,currentEmail: viewModel.email)
                     }
+                        
                     
                     Spacer()
                     
                     if viewModel.isEditing {
                         HStack(spacing: 35) {
                             SecondButton(title: "ยกเลิก", action: { viewModel.cancelEditing() }, width: 155, height: 49)
-                            PrimaryButton(title: "บันทึก", action: { viewModel.saveProfile() }, width: 155, height: 49)
+                            PrimaryButton(title: "บันทึก", action: {
+                                Task { await viewModel.saveProfile() }
+                            }, width: 155, height: 49)
                         }
                         .padding(.bottom, 20)
                     }
@@ -133,8 +131,10 @@ struct ProfileView: View {
                 .background(Color.backgroundColor)
                 .blur(radius: (viewModel.showSuccessPopup || viewModel.showErrorPopup) ? 3 : 0)
                 .disabled(viewModel.showSuccessPopup || viewModel.showErrorPopup)
-            }
-            .navigationBarBackButtonHidden(true)
+                .onAppear {
+                    emailChangeSuccess = false
+                    viewModel.isEditing = false
+                }
             
             if viewModel.showSuccessPopup {
                 SuccessPopupView(message: "บันทึกข้อมูลสำเร็จ") {
@@ -148,6 +148,7 @@ struct ProfileView: View {
                 })
             }
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
 

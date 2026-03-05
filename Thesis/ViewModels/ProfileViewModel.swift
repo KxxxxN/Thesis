@@ -8,7 +8,9 @@
 
 import Foundation
 import SwiftUI
+import Supabase
 
+@MainActor
 class ProfileViewModel: ObservableObject {
     // MARK: - Input Fields
     @Published var name: String = ""
@@ -34,16 +36,24 @@ class ProfileViewModel: ObservableObject {
     private var originalLastName: String = ""
     private var originalPhone: String = ""
     
-    // MARK: - Initializer
-    init(name: String, lastName: String, email: String, phone: String, password: String) {
-        self.name = name
-        self.lastName = lastName
-        self.email = email
-        self.phoneNumber = phone
-        self.password = password
-        
-        // บันทึกค่าเริ่มต้น
-        self.saveOriginalData()
+    init() {
+        Task { await loadProfile() }
+    }
+    
+    func loadProfile() async {
+        do {
+            let user = try await supabase.auth.session.user
+            let meta = user.userMetadata
+            
+            self.email = user.email ?? ""
+            self.name = meta["first_name"]?.stringValue ?? ""
+            self.lastName = meta["last_name"]?.stringValue ?? ""
+            self.phoneNumber = meta["phone"]?.stringValue ?? ""
+            
+            saveOriginalData()
+        } catch {
+            print("Load profile error: \(error.localizedDescription)")
+        }
     }
     
     private func saveOriginalData() {
@@ -89,19 +99,52 @@ class ProfileViewModel: ObservableObject {
         return !isNameInvalid && !isLastNameInvalid && !isPhoneInvalid
     }
     
-    func saveProfile() {
+    //    func saveProfile() {
+    //        isSubmitted = true
+    //
+    //        if validateForm() {
+    //            // บันทึกค่าใหม่เป็นค่าต้นฉบับ
+    //            saveOriginalData()
+    //
+    //            withAnimation {
+    //                showSuccessPopup = true
+    //                isEditing = false
+    //                isSubmitted = false
+    //            }
+    //            print("Profile updated successfully")
+    //        } else {
+    //            withAnimation {
+    //                showErrorPopup = true
+    //            }
+    //        }
+    //    }
+    //}
+    func saveProfile() async {
         isSubmitted = true
         
         if validateForm() {
-            // บันทึกค่าใหม่เป็นค่าต้นฉบับ
-            saveOriginalData()
-            
-            withAnimation {
-                showSuccessPopup = true
-                isEditing = false
-                isSubmitted = false
+            do {
+                try await supabase.auth.update(
+                    user: UserAttributes(data: [
+                        "first_name": .string(name),
+                        "last_name": .string(lastName),
+                        "phone": .string(phoneNumber)
+                    ])
+                )
+                
+                saveOriginalData()
+                
+                withAnimation {
+                    showSuccessPopup = true
+                    isEditing = false
+                    isSubmitted = false
+                }
+            } catch {
+                print("Save profile error: \(error.localizedDescription)")
+                withAnimation {
+                    showErrorPopup = true
+                }
             }
-            print("Profile updated successfully")
         } else {
             withAnimation {
                 showErrorPopup = true
@@ -109,3 +152,4 @@ class ProfileViewModel: ObservableObject {
         }
     }
 }
+

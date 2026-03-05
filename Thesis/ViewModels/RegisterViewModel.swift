@@ -8,7 +8,10 @@
 
 import Foundation
 import Combine
+import SwiftUI
+import Supabase
 
+@MainActor
 class RegisterViewModel: ObservableObject {
     
     // MARK: - Input Fields
@@ -35,6 +38,7 @@ class RegisterViewModel: ObservableObject {
     @Published var isPhoneValid: Bool = true
     @Published var isPasswordValid: Bool = true
     @Published var isConfirmPasswordValid: Bool = true
+    @Published var authErrorMessage: String? = nil
     
     // MARK: - Password Checklist Helpers
     // เรียกใช้ ValidationHelper เพื่อเช็คเงื่อนไขแต่ละข้อสำหรับแสดงใน UI
@@ -45,6 +49,7 @@ class RegisterViewModel: ObservableObject {
     var passwordHasSpecial: Bool { ValidationHelper.hasSpecialCharacter(password) }
     
     func clearError(for field: String) {
+        authErrorMessage = nil // ล้าง error กลางเมื่อมีการพิมพ์ใหม่
         switch field {
         case "firstName": isFirstNameValid = true
         case "lastName": isLastNameValid = true
@@ -54,15 +59,11 @@ class RegisterViewModel: ObservableObject {
         case "confirmPassword": isConfirmPasswordValid = true
         default: break
         }
-        
-        // หมายเหตุ: ไม่ต้องสั่ง isRegisterSubmitted = false แล้ว
-        // เพราะเราต้องการให้ช่องอื่นๆ ที่ยังไม่ได้แก้ ยังโชว์ Error ค้างไว้อยู่
     }
     
     
     @discardableResult
     func validateFormRegister() -> Bool {
-        // 1. ใส่ Logic การเช็คแต่ละช่องที่คุณมีอยู่แล้วตรงนี้
         isFirstNameValid = !firstName.isEmpty && ValidationHelper.isNameValid(name: firstName)
         isLastNameValid = !lastName.isEmpty && ValidationHelper.isNameValid(name: lastName)
         isEmailValid = !email.isEmpty && ValidationHelper.isValidEmail(email)
@@ -70,29 +71,49 @@ class RegisterViewModel: ObservableObject {
         isPasswordValid = !password.isEmpty && ValidationHelper.isPasswordValid(password)
         isConfirmPasswordValid = !confirmPassword.isEmpty && (password == confirmPassword)
         
-        // 2. ✅ นำส่วนที่ถามมาวางไว้ตรงนี้ (บรรทัดสุดท้ายของฟังก์ชัน)
-        let isDataValid = isFirstNameValid &&
-                         isLastNameValid &&
-                         isEmailValid &&
-                         isPhoneValid &&
-                         isPasswordValid &&
-                         isConfirmPasswordValid
+        let isDataValid = isFirstNameValid && isLastNameValid && isEmailValid && isPhoneValid && isPasswordValid && isConfirmPasswordValid
         
-        // คืนค่าผลลัพธ์รวม (ต้องติ๊กยอมรับ Privacy ด้วยถึงจะผ่าน)
         return isDataValid && isPrivacyAccepted
     }
     
-    func register() {
-        // 1. สั่งเปิดสถานะ Submit เพื่อให้ขอบแดงทำงาน
+    //    func register() {
+    //        // 1. สั่งเปิดสถานะ Submit เพื่อให้ขอบแดงทำงาน
+    //        self.isRegisterSubmitted = true
+    //
+    //        // 2. ตรวจสอบความถูกต้องของข้อมูลทั้งหมด
+    //        if validateFormRegister() {
+    //            // ✅ กรณีข้อมูลถูกต้องทั้งหมด
+    //            self.showSuccessPopup = true
+    //        }
+    //    }
+    //}
+    func register() async {
         self.isRegisterSubmitted = true
         
-        // 2. ตรวจสอบความถูกต้องของข้อมูลทั้งหมด
         if validateFormRegister() {
-            // ✅ กรณีข้อมูลถูกต้องทั้งหมด
-            self.showSuccessPopup = true
-        } else {
-            // ❌ กรณีข้อมูลไม่ถูกต้อง หรือลืมติ๊ก Privacy
-            self.showErrorPopup = true
+//            self.isLoading = true
+            self.authErrorMessage = nil
+            
+            do {
+                // 5. เรียกใช้ Supabase Auth SignUp
+                // ส่งชื่อ นามสกุล และเบอร์โทรเข้าไปใน user_metadata
+                let _ = try await supabase.auth.signUp(
+                    email: email,
+                    password: password,
+                    data: [
+                        "first_name": .string(firstName),
+                        "last_name": .string(lastName),
+                        "phone": .string(phone)
+                    ]
+                )
+                self.showSuccessPopup = true
+                
+            } catch {
+                // ❌ กรณีผิดพลาด (เช่น อีเมลซ้ำ หรือปัญหา Network)
+                print("Register Failed: \(error.localizedDescription)")
+//                self.authErrorMessage = error.localizedDescription
+//                self.showErrorPopup = true
+            }
         }
     }
 }

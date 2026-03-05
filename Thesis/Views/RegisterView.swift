@@ -156,7 +156,9 @@ struct RegisterView: View {
                         PrimaryButton(
                             title: "สร้างบัญชี",
                             action: {
-                                viewModel.register()
+                                Task {
+                                    await viewModel.register()
+                                }
                             },
                             width: 155,
                             height: 49

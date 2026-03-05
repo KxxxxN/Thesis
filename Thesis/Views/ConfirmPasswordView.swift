@@ -9,9 +9,9 @@ import SwiftUI
 
 struct ConfirmPasswordView: View {
     @StateObject private var viewModel = ConfirmPasswordViewModel()
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        NavigationStack {
             VStack(spacing: 0) {
                 // MARK: - Header
                 ZStack {
@@ -57,7 +57,6 @@ struct ConfirmPasswordView: View {
             .navigationDestination(isPresented: $viewModel.navigateToNextStep) {
                 ChangeEmailView()
             }
-        }
         .navigationBarBackButtonHidden(true)
     }
 }

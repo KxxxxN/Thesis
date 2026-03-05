@@ -58,6 +58,7 @@ struct ChangePasswordField: View {
             .frame(height: 20, alignment: .top)
             .clipped()
             .padding(.leading, 7)
+            .padding(.top, 4)
         }
     }
 }

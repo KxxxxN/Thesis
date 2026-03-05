@@ -8,7 +8,9 @@
 
 import Foundation
 import SwiftUI
+import Supabase
 
+@MainActor
 class NewPasswordViewModel: ObservableObject {
     // MARK: - Input Fields
     @Published var oldPassword: String = ""
@@ -30,8 +32,9 @@ class NewPasswordViewModel: ObservableObject {
     @Published var isSubmitted: Bool = false
     
     @Published var showOldError = false
-        @Published var showNewError = false
-        @Published var showConfirmError = false
+    @Published var showNewError = false
+    @Published var showConfirmError = false
+    @Published var navigateToProfile: Bool = false
     
     // MARK: - Navigation
     @Published var navigateToLogin: Bool = false
@@ -50,33 +53,50 @@ class NewPasswordViewModel: ObservableObject {
         return ValidationHelper.isPasswordValid(password) && (password == confirmPassword) && !password.isEmpty
     }
     
-    func clearErrorOnTyping(for field: String) {
-        // ✅ ไม่ต้องไปยุ่งกับ isSubmitted เพื่อให้ช่องอื่นยังแดงอยู่
-        switch field {
-        case "old":
-            isOldPasswordValid = true
-            showOldError = false // หายเฉพาะช่องนี้
-        case "new":
-            isPasswordValid = true
-            showNewError = false
-        case "confirm":
-            isConfirmPasswordValid = true
-            showConfirmError = false
-        default:
-            break
+    func saveNewPassword() async {
+        self.isSubmitted = true
+        
+        isOldPasswordValid = !oldPassword.isEmpty
+        isPasswordValid = ValidationHelper.isPasswordValid(password)
+        isConfirmPasswordValid = !confirmPassword.isEmpty && (password == confirmPassword)
+        
+        // เช็คว่ารหัสผ่านใหม่ซ้ำกับเก่าไหม
+        if password == oldPassword {
+            isPasswordValid = false
+            return
+        }
+        
+        guard isOldPasswordValid && isPasswordValid && isConfirmPasswordValid else {
+            return
+        }
+        
+        await updatePassword()
+    }
+
+    private func updatePassword() async {
+        do {
+            let session = try await supabase.auth.session
+            try await supabase.auth.signIn(
+                email: session.user.email ?? "",
+                password: oldPassword
+            )
+            print("✅ Re-authenticate สำเร็จ")
+            
+            try await supabase.auth.update(user: UserAttributes(password: password))
+            print("✅ เปลี่ยนรหัสผ่านสำเร็จ")
+            showSuccessAlert = true
+            
+        } catch {
+            print("❌ Update Password Error: \(error.localizedDescription)")
+            isOldPasswordValid = false
+            showErrorPopup = true
         }
     }
-    
-    func validateAndSave() -> Bool {
-        // 1. ตรวจสอบรหัสผ่านเก่า (สมมติว่ารหัสผ่านเก่าต้องเป็น "12345678" สำหรับ Thesis)
-        // ในระบบจริงต้องส่งไปเช็คที่ Database/API
-        let currentStoredPassword = "12345678" 
-        isOldPasswordValid = (oldPassword == currentStoredPassword)
         
-        // 2. ตรวจสอบรูปแบบรหัสผ่านใหม่
+    func validateAndSave() -> Bool {
+        isOldPasswordValid = !oldPassword.isEmpty
         isPasswordValid = !ValidationHelper.isEmpty(password) && ValidationHelper.isPasswordValid(password)
         
-        // 3. ตรวจสอบว่ารหัสผ่านใหม่ตรงกับช่องยืนยันไหม
         if ValidationHelper.isEmpty(confirmPassword) {
             isConfirmPasswordValid = false
         } else {
@@ -86,40 +106,34 @@ class NewPasswordViewModel: ObservableObject {
         return isOldPasswordValid && isPasswordValid && isConfirmPasswordValid
     }
     
-    func clearErrorOnTyping() {
-        if isSubmitted {
-            isSubmitted = false
+    func clearErrorOnTyping(for field: String) {
+        switch field {
+        case "old":
+            isOldPasswordValid = true
+            showOldError = false
+        case "new":
+            isPasswordValid = true
+            showNewError = false
+            if !confirmPassword.isEmpty {
+                isConfirmPasswordValid = (password == confirmPassword)
+            }
+        case "confirm":
+            isConfirmPasswordValid = true
+            showConfirmError = false
+        default:
+            break
         }
-        // ✅ ล้างค่า Valid ของทุกช่องให้กลับเป็น true เพื่อให้ขอบแดงหายไปทันทีเมื่อเริ่มพิมพ์
+    }
+    
+    func clearErrorOnTyping() {
+        if isSubmitted { isSubmitted = false }
         isOldPasswordValid = true
         isPasswordValid = true
         isConfirmPasswordValid = true
-        
-        // ✅ สั่งปิด Popup หาก User เริ่มพิมพ์ใหม่
         showErrorPopup = false
     }
-    
-    func saveNewPassword() {
-        self.isSubmitted = true
-        
-        // รัน Validation
-        let currentStoredPassword = "12345678"
-        isOldPasswordValid = (oldPassword == currentStoredPassword)
-        isPasswordValid = !ValidationHelper.isEmpty(password) && ValidationHelper.isPasswordValid(password)
-        isConfirmPasswordValid = !ValidationHelper.isEmpty(confirmPassword) && (password == confirmPassword)
-        
-        // ✅ สั่งให้โชว์ Error เฉพาะอันที่ผิด
-        showOldError = !isOldPasswordValid
-        showNewError = !isPasswordValid
-        showConfirmError = !isConfirmPasswordValid
-        
-        if isOldPasswordValid && isPasswordValid && isConfirmPasswordValid {
-            self.showSuccessAlert = true
-        } else {
-            self.showErrorPopup = true
-        }
-    }
-        
+
+    // MARK: - Reset Fields
     private func resetFields() {
         oldPassword = ""
         password = ""
