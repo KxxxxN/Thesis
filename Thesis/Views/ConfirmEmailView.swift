@@ -7,12 +7,13 @@
 
 import SwiftUI
 
+@MainActor
 struct ConfirmEmailView: View {
+    let currentEmail: String
     @StateObject private var viewModel = ConfirmEmailViewModel()
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        NavigationStack {
             VStack(spacing: 0) {
                 // MARK: - Header
                 ZStack {
@@ -28,25 +29,22 @@ struct ConfirmEmailView: View {
                 
 
                 // MARK: - Email Input Field
-                // ใช้ LoginInputField เพื่อให้มีพื้นที่จอง Error 20px ตามมาตรฐานแอปคุณ
-                LoginInputField(
-                    title: "ที่อยู่อีเมล",
-                    placeholder: "กรอกอีเมล",
-                    text: $viewModel.email,
-                    isValid: .constant(!viewModel.isSubmitted || viewModel.emailError == nil),
-                    errorMessage: viewModel.isSubmitted ? (viewModel.emailError ?? "") : ""
-                )
-                .keyboardType(.emailAddress)
-                .autocapitalization(.none)
-                .onChange(of: viewModel.email) { _, _ in
-                    viewModel.clearError()
-                }
+                ReadOnlyEmailField(title: "ที่อยู่อีเมล", email: viewModel.email)
+                
+                Text("เพื่อความปลอดภัย ไม่สามารถเปลี่ยนอีเมลได้ในหน้านี้")
+                    .font(.noto(15, weight: .medium))
+                    .foregroundColor(.placeholderColor)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.top, 10)
                 
                 // MARK: - Action Button
                 PrimaryButton(
                     title: "ส่งรหัส OTP",
                     action: {
-                        viewModel.verifyEmailBeforeChange()
+                        Task {
+                            await viewModel.verifyEmailBeforeChange()
+                        }
                     },
                     width: 155,
                     height: 49
@@ -60,14 +58,19 @@ struct ConfirmEmailView: View {
             .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("PopToProfile"))) { _ in
                 dismiss()
             }
-            .navigationDestination(isPresented: $viewModel.navigateToOTP) {
-                OTPConfirmView(source: .confirmEmail)
+            .onAppear {
+                viewModel.email = currentEmail
             }
-        }
+            .navigationDestination(isPresented: $viewModel.navigateToOTP) {
+                OTPConfirmView(
+                    source: .confirmEmail,
+                    email: viewModel.email
+                )
+            }
         .navigationBarBackButtonHidden(true)
     }
 }
 
 #Preview {
-    ConfirmEmailView()
+    ConfirmEmailView(currentEmail: "kansinee.klinkhachon@g.swu.ac.th")
 }

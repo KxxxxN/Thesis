@@ -12,7 +12,7 @@ struct EmailForgotPassword: View {
     @StateObject private var viewModel = ForgotPasswordViewModel()
     
     var body: some View {
-        NavigationStack {
+//        NavigationStack {
             VStack(spacing: 0){ //เปิด Vstack1
                 ZStack { //เปิด Zstack1
                     Text("ลืมรหัสผ่าน")
@@ -34,15 +34,16 @@ struct EmailForgotPassword: View {
                 )
                 .keyboardType(.emailAddress)
                 .autocapitalization(.none)
-                .onChange(of: viewModel.emailForgotPassword) { _, _ in
+                .onChange(of: viewModel.emailForgotPassword) {
                     viewModel.clearError()
                 }
-                
                 
                 PrimaryButton(
                     title: "ส่งรหัส OTP",
                     action: {
-                        viewModel.forgotPassword()
+                        Task {
+                            await viewModel.forgotPassword()
+                        }
                     },
                     width: 155,
                     height: 49
@@ -55,9 +56,10 @@ struct EmailForgotPassword: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.backgroundColor)
             .navigationDestination(isPresented: $viewModel.navigateToOTP) {
-                OTPConfirmView(source: .forgotPassword)
+                // ส่ง email ไปยังหน้า OTP ด้วยเพื่อให้ User รู้ว่าส่งไปที่ไหน หรือใช้ในการ verify ต่อ
+                OTPConfirmView(source: .forgotPassword, email: viewModel.emailForgotPassword)
             }
-        }
+//        }
         .navigationBarBackButtonHidden(true)
     }
 }

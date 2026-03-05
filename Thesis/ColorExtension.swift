@@ -60,8 +60,8 @@ extension Font {
             return .custom("Inter-Medium", size: size)
         case .semibold:
             return .custom("Inter-SemiBold", size: size)
-        case .bold:
-            return .custom("Inter-Bold", size: size)
+//        case .bold:
+//            return .custom("Inter-Bold", size: size)
         default:
             return .custom("Inter-Regular", size: size)
         }

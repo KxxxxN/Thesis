@@ -32,9 +32,9 @@ struct ChangePasswordView: View {
                         placeholder: "อย่างน้อย 8 ตัวอักษร",
                         text: $viewModel.password,
                         isValid: .constant(!viewModel.isChangePasswordSubmitted || viewModel.isPasswordValid),
-                        errorMessage: viewModel.isChangePasswordSubmitted && !viewModel.isPasswordValid ? (viewModel.password.isEmpty ? "กรุณากรอกรหัสผ่าน" : "รูปแบบรหัสผ่านไม่ถูกต้อง") : "",
+                        errorMessage: viewModel.isChangePasswordSubmitted && !viewModel.isPasswordValid ? (viewModel.password.isEmpty ? "กรุณากรอกรหัสผ่าน" : !ValidationHelper.isPasswordValid(viewModel.password) ? "รูปแบบรหัสผ่านไม่ถูกต้อง" : "รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสผ่านเดิม") : "",
                         isSecure: true,
-                        isPasswordToggle: $viewModel.isConfirmPasswordVisible
+                        isPasswordToggle: $viewModel.isPasswordVisible
                     )
                     .onChange(of: viewModel.password) { _, _ in
                         viewModel.clearError(for: "password")
@@ -55,7 +55,7 @@ struct ChangePasswordView: View {
                         placeholder: "กรอกรหัสผ่านอีกครั้ง",
                         text: $viewModel.confirmPassword,
                         isValid: .constant(!viewModel.isChangePasswordSubmitted || viewModel.isConfirmPasswordValid),
-                        errorMessage: viewModel.isChangePasswordSubmitted && !viewModel.isConfirmPasswordValid ? (viewModel.confirmPassword.isEmpty ? "กรุณากรอกรหัสผ่านอีกครั้ง" : "รหัสผ่านไม่ตรงกัน") : "",
+                        errorMessage: viewModel.isChangePasswordSubmitted && !viewModel.isConfirmPasswordValid ? (viewModel.confirmPassword.isEmpty ? "กรุณากรอกรหัสผ่านอีกครั้ง" : !viewModel.isPasswordValid ? "รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสผ่านเดิม" : "รหัสผ่านไม่ตรงกัน") : "",
                         isSecure: true,
                         isPasswordToggle: $viewModel.isConfirmPasswordVisible
                     )
@@ -66,7 +66,9 @@ struct ChangePasswordView: View {
                     PrimaryButton(
                         title: "ยืนยัน", // Text ที่ต้องการแสดงบนปุ่ม
                         action: { // โค้ดการทำงานเมื่อกดปุ่ม
-                            viewModel.changePassword()
+                            Task {
+                                await viewModel.changePassword()
+                            }
                         },
                         width: 155, // ความกว้างของปุ่ม
                         height: 49 // ความสูงของปุ่ม
@@ -88,7 +90,7 @@ struct ChangePasswordView: View {
                 SuccessPopupView(message: "เปลี่ยนรหัสผ่านสำเร็จ") {
                     withAnimation {
                         viewModel.showSuccessPopup = false
-                        viewModel.navigateToLogin = true // ✅ ย้ายหน้าหลังจากกดปิด Popup
+                        viewModel.navigateToLogin = true
                     }
                 }
             }

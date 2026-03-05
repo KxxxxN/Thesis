@@ -9,9 +9,10 @@ import SwiftUI
 
 struct ChangeEmailView: View {
     @StateObject private var viewModel = ChangeEmailViewModel()
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        NavigationStack {
+//        NavigationStack {
             VStack(spacing: 0) {
                 ZStack {
                     Text("ยืนยันแก้ไขอีเมล")
@@ -43,7 +44,9 @@ struct ChangeEmailView: View {
                 PrimaryButton(
                     title: "ส่งรหัส OTP",
                     action: {
-                        viewModel.validateEmail()
+                        Task {
+                            await viewModel.validateEmail()
+                        }
                     },
                     width: 155,
                     height: 49
@@ -55,9 +58,12 @@ struct ChangeEmailView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.backgroundColor)
             .navigationDestination(isPresented: $viewModel.navigateToOTP) {
-                OTPConfirmView(source: .changeEmail)
+                OTPConfirmView(
+                    source: .changeEmail,
+                    email: viewModel.newEmail
+                )
             }
-        }
+//        }
         .navigationBarBackButtonHidden(true)
     }
 }

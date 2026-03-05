@@ -52,8 +52,8 @@ struct ProfileInputField: View {
                 // ปุ่ม Pencil แสดงเฉพาะโหมดแก้ไข
                 if isEditing {
                     Image(systemName: "pencil")
-                        .foregroundColor(.mainColor)
-                        .frame(width: 16, height: 18)
+                        .foregroundColor(.black)
+                        .frame(height: 20)
                         .padding(.trailing, 15)
                 }
             }
@@ -98,10 +98,17 @@ struct ProfileEmailField: View {
                                 .font(.noto(20, weight: .medium))
                                 .foregroundColor(.black)
                             Spacer()
-                            Image(systemName: "pencil")
-                                .foregroundColor(.mainColor)
-                                .frame(width: 16, height: 18)
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.black)
+                                .frame(height: 20)
                         }
+                        .padding(.horizontal)
+                        .frame(width: 345, height: 49)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(Color.placeholderColor, lineWidth: 2)
+                        )
+                        .background(Color.backgroundColor)
                     }
                 } else {
                     // โหมดดู: เป็น Text ธรรมดา
@@ -111,12 +118,13 @@ struct ProfileEmailField: View {
                             .foregroundColor(.black)
                         Spacer()
                     }
+                    .padding(.horizontal)
+                    .frame(width: 345, height: 49)
+                    .background(Color.textFieldColor)
+                    .cornerRadius(20)
                 }
+                    
             }
-            .padding(.horizontal)
-            .frame(width: 345, height: 49)
-            .background(Color.textFieldColor)
-            .cornerRadius(20)
             
             Color.clear
                 .frame(width: 345, height: 20)
@@ -129,7 +137,8 @@ struct ProfilePasswordField: View {
     let title: String
     let password: String
     @Binding var isEditing: Bool
-    @Binding var isPasswordVisible: Bool
+    let currentEmail: String
+//    @Binding var isPasswordVisible: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -138,35 +147,39 @@ struct ProfilePasswordField: View {
             Group {
                 if isEditing {
                     // โหมดแก้ไข: กดแล้วไปหน้ายืนยันอีเมล/รหัสผ่านใหม่
-                    NavigationLink(destination: ConfirmEmailView()) {
+                    NavigationLink(destination: ConfirmEmailView(currentEmail: currentEmail)) {
                         HStack {
-                            Text(isPasswordVisible ? password : String(repeating: "•", count: password.count))
+                            Text(String(repeating: "•", count: 8))
                                 .font(.noto(20, weight: .medium))
                                 .foregroundColor(.black)
                             Spacer()
-                            Image(systemName: "pencil")
+                            Image(systemName: "chevron.right")
                                 .foregroundColor(.mainColor)
-                                .frame(width: 16, height: 18)
+                                .frame(width: 20, height: 20)
                         }
+                        .padding(.horizontal)
+                        .frame(width: 345, height: 49)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(Color.placeholderColor, lineWidth: 2)
+                        )
+                        .background(Color.backgroundColor)
                     }
                 } else {
                     // โหมดดู: มีปุ่มเปิด/ปิดตา
                     HStack {
-                        Text(isPasswordVisible ? password : String(repeating: "•", count: password.count)) // โชว์จุดคงที่เพื่อความปลอดภัย
+                        Text( String(repeating: "•", count: 8))
                             .font(.noto(20, weight: .medium))
                             .foregroundColor(.black)
                         Spacer()
-                        Button(action: { isPasswordVisible.toggle() }) {
-                            Image(systemName: isPasswordVisible ? "eye.fill" : "eye.slash.fill")
-                                .foregroundColor(.mainColor)
-                        }
                     }
+                    .padding(.horizontal)
+                    .frame(width: 345, height: 49)
+                    .background(Color.textFieldColor)
+                    .cornerRadius(20)
+
                 }
             }
-            .padding(.horizontal)
-            .frame(width: 345, height: 49)
-            .background(Color.textFieldColor)
-            .cornerRadius(20)
             
             Color.clear
                 .frame(width: 345, height: 20)

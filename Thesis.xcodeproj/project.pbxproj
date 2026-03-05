@@ -18,6 +18,7 @@
 		BBAD7F072F4E0F3600685B18 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = BBAD7F062F4E0F3600685B18 /* Realtime */; };
 		BBAD7F092F4E0F3600685B18 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = BBAD7F082F4E0F3600685B18 /* Storage */; };
 		BBAD7F0B2F4E0F3600685B18 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = BBAD7F0A2F4E0F3600685B18 /* Supabase */; };
+		BBAD7F112F4F7FEA00685B18 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = BBAD7F102F4F7FEA00685B18 /* Functions */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBAD7F112F4F7FEA00685B18 /* Functions in Frameworks */,
 				BBAD7F0B2F4E0F3600685B18 /* Supabase in Frameworks */,
 				BBAD7F092F4E0F3600685B18 /* Storage in Frameworks */,
 				BBAD7F072F4E0F3600685B18 /* Realtime in Frameworks */,
@@ -130,6 +132,7 @@
 				BBAD7F062F4E0F3600685B18 /* Realtime */,
 				BBAD7F082F4E0F3600685B18 /* Storage */,
 				BBAD7F0A2F4E0F3600685B18 /* Supabase */,
+				BBAD7F102F4F7FEA00685B18 /* Functions */,
 			);
 			productName = Theis;
 			productReference = BBAB21D52EA8CCDE006A0375 /* Thesis.app */;
@@ -435,6 +438,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = BBAD7F012F4E0F3600685B18 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
+		};
+		BBAD7F102F4F7FEA00685B18 /* Functions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BBAD7F012F4E0F3600685B18 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Functions;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
