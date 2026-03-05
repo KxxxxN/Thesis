@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "bin-graphic3.png",
+      "filename" : "bin-icon3.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "bin-graphic3 1.png",
+      "filename" : "bin-icon3 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "bin-graphic3 2.png",
+      "filename" : "bin-icon3 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

@@ -8,21 +8,28 @@
 import SwiftUI
 
 struct DetailSearchView: View {
-
     @Environment(\.dismiss) var dismiss
     @Binding var hideTabBar: Bool
     @State private var showConfirmPhotoView = false
 
+
     let separationSteps = [
-        SeparationStep(imageName: "DetailRecycle1", text: "เทน้ำให้หมด", imageSize: CGSize(width: 40, height: 88)),
-        SeparationStep(imageName: "DetailRecycle2", text: "เอาฝาและฉลากออก", imageSize: CGSize(width: 78, height: 63)),
-        SeparationStep(imageName: "DetailRecycle3", text: "บีบขวดให้แบน", imageSize: CGSize(width: 43, height: 72))
+        SeparationStep(imageName: "DetailRecycle1", text: "เทน้ำให้หมด", imageSize: CGSize(width: 100, height: 100)),
+        SeparationStep(imageName: "DetailRecycle2", text: "เอาฝาและฉลากออก", imageSize: CGSize(width: 120, height: 120)),
+        SeparationStep(imageName: "DetailRecycle3", text: "บีบขวดให้แบน", imageSize: CGSize(width: 100, height: 100))
     ]
-    
+
     let recyclingMethods = [
         "ใช้เป็นกระถางปลูกต้นไม้เล็กๆ",
         "ตัดครึ่งขวดทำเป็นที่ใส่ปากกา",
         "นำไปหลอมเป็นเส้นใยพลาสติก"
+    ]
+    
+    let plasticbottleStep = [
+        PlasticbottleStep(imageName: "bin-icon1", text: "ถังขยะเปียก", imageSize: CGSize(width: 40, height: 40)),
+        PlasticbottleStep(imageName: "bin-icon3", text: "ถังขยะรีไซเคิล", imageSize: CGSize(width: 40, height: 40)),
+        PlasticbottleStep(imageName: "bin-icon2", text: "ถังขยะทั่วไป", imageSize: CGSize(width: 40, height: 40)),
+        PlasticbottleStep(imageName: "bin-icon3", text: "ถังขยะรีไซเคิล", imageSize: CGSize(width: 40, height: 40))
     ]
     
     var body: some View {
@@ -31,7 +38,7 @@ struct DetailSearchView: View {
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
-
+                // MARK: - Header Section
                 ZStack {
                     Text("ค้นหา")
                         .font(.noto(25, weight: .bold))
@@ -42,20 +49,23 @@ struct DetailSearchView: View {
                         Spacer()
                     }
                 }
-                .padding(.bottom,27)
-                    
-                    ScrollView {
-                        
+                .padding(.bottom, 20)
+
+                // MARK: - Content Section
+                ScrollView {
+                    VStack(spacing: 0) {
+                        // 1. รูปภาพสินค้า (อยู่นอกพื้นที่สีครีมเพื่อให้เห็นพื้นหลังสีเขียวข้างหลัง)
                         Image("TypeBottle1")
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                             .frame(width: UIScreen.main.bounds.width - 40, height: 290)
                             .clipShape(RoundedRectangle(cornerRadius: 20))
+                            .padding(.bottom, 30) // ระยะห่างก่อนถึงขอบโค้ง
                         
-                        Spacer().frame(height: 23)
-                        
+                        // 2. พื้นที่เนื้อหาที่มีพื้นหลังสีครีมและขอบโค้ง
                         VStack(alignment: .leading, spacing: 0) {
                             
+                            // ชื่อขยะและวันที่
                             HStack(spacing: 12) {
                                 Text("ขวดพลาสติก")
                                     .font(.noto(25, weight: .bold))
@@ -66,37 +76,38 @@ struct DetailSearchView: View {
                                     .foregroundColor(.black)
                                     .padding(.top, 8)
                             }
-                            .padding(.top, 22)
+                            .padding(.top, 30)
                             .padding(.horizontal, 37)
+
                             
+                            // ประเภทถังขยะ
                             HStack(spacing: 32) {
                                 Image("Bin3")
                                     .resizable()
-                                    .frame(width: 68, height: 107)
+                                    .scaledToFill()
+                                    .frame(width: 180, height: 180)
                                 
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("ประเภทถังขยะ")
                                         .font(.noto(20, weight: .bold))
-                                        .foregroundColor(.black)
                                     
                                     HStack(spacing: 0) {
                                         Text("ถังขยะรีไซเคิล ")
                                             .font(.noto(18, weight: .medium))
-                                            .foregroundColor(.black)
-                                        
                                         Text("(สีเหลือง)")
                                             .font(.noto(18, weight: .bold))
                                             .foregroundColor(.recycleWasteColor)
                                     }
                                 }
                             }
-                            .padding(.horizontal, 58)
-                            .padding(.top, 20)
+                            .padding(.top, 10)
                             
+                            // วิธีการแยกขยะ
                             VStack(alignment: .leading, spacing: -10) {
                                 Text("วิธีการแยกขยะ")
                                     .font(.noto(20, weight: .bold))
                                     .foregroundColor(.black)
+
                                 
                                 HStack(spacing: 0) {
                                     ForEach(separationSteps.indices, id: \.self) { index in
@@ -105,7 +116,7 @@ struct DetailSearchView: View {
                                             Image(systemName: "arrow.right")
                                                 .foregroundColor(.black)
                                                 .font(.system(size: 20))
-                                                .padding(.horizontal, 8)
+                                                .padding(.horizontal, 2)
                                         }
                                         
                                         VStack(spacing: 0) {
@@ -127,29 +138,52 @@ struct DetailSearchView: View {
                                                 .font(.noto(15, weight: .medium))
                                                 .foregroundColor(.black)
                                                 .multilineTextAlignment(.center)
+                                                .lineLimit(nil)
+                                                .fixedSize(horizontal: false, vertical: true)
                                                 .frame(width: 100)
                                         }
                                     }
                                 }
+                                
+                                HStack (spacing: 35){
+                                    ForEach(plasticbottleStep.indices, id: \.self) { index in
+                                        VStack(spacing: 4) {
+                                            Image(plasticbottleStep[index].imageName)
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(
+                                                    width: plasticbottleStep[index].imageSize.width,
+                                                    height: plasticbottleStep[index].imageSize.height
+                                                )
+
+                                            Text(plasticbottleStep[index].text)
+                                                .font(.noto(12, weight: .medium))
+                                                .foregroundColor(.black)
+                                        }
+                                    }
+                                }
+                                .padding(.top, 25)
+                                .padding(.horizontal, 10)
+
                             }
                             .padding(.horizontal, 37)
-                            .padding(.top, 20)
+                            .padding(.top, 25)
                             
-                            VStack(alignment: .leading, spacing: 9) {
+                            // การรีไซเคิล
+                            VStack(alignment: .leading, spacing: 10) {
                                 Text("การรีไซเคิล")
                                     .font(.noto(20, weight: .bold))
-                                    .foregroundColor(.black)
                                 
-                                VStack(alignment: .leading, spacing: -5) {
+                                VStack(alignment: .leading, spacing: 8) {
                                     ForEach(recyclingMethods, id: \.self) { method in
                                         Text("•   \(method)")
-                                            .font(.noto(18, weight: .medium))
-                                            .foregroundColor(.black)
+                                            .font(.noto(17, weight: .medium))
                                     }
                                 }
                             }
                             .padding(.horizontal, 37)
-                            .padding(.top, 20)
+                            .padding(.top, 30)
+                            .padding(.bottom, 50)
                             VStack(alignment: .trailing, spacing: 20) {
                                 Button {
                                     hideTabBar = true
@@ -167,32 +201,38 @@ struct DetailSearchView: View {
                                 .background(Color.mainColor)
                                 .cornerRadius(20)
                             }
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.horizontal, 35)
-                            .padding(.vertical, 20)
-                            .padding(.bottom, 20)
+                            .frame(maxWidth: .infinity, alignment: .trailing)  
+                            .padding(.horizontal, 37)
+                            .padding(.bottom, 30)
+                            
+                            Spacer(minLength: 0)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxWidth: .infinity)
                         .background(
                             Color.knowledgeBackground
-                                .ignoresSafeArea()
-                        )
-                        .cornerRadius(20, corners: [.topLeft, .topRight])
-                    }
-                    .edgesIgnoringSafeArea(.bottom)
+                                .clipShape(TabCorner(radius: 20, corners: [.topLeft, .topRight]))
+                        )                    }
+                    // กำหนดความสูงเริ่มต้นให้เนื้อหาส่วนล่างเพื่อให้ ScrollView คำนวณพื้นที่ได้
+                    .frame(minHeight: 750)
                 }
+                .edgesIgnoringSafeArea(.bottom)
             }
-            .onAppear {
-                hideTabBar = true
-            }
-            .navigationDestination(isPresented: $showConfirmPhotoView) {
-                 ConfirmPhotoView(hideTabBar: $hideTabBar)
-             }
-            .navigationBarHidden(true)
-
+        }
+        .navigationDestination(isPresented: $showConfirmPhotoView) {
+             ConfirmPhotoView(hideTabBar: $hideTabBar)
+         }
+        .navigationBarHidden(true)
+        .onAppear {
+            hideTabBar = true
         }
     }
+}
+    
+struct PlasticbottleStep {
+    let imageName: String
+    let text: String
+    let imageSize: CGSize
+}
 
-                    
-                
-                
+
+
