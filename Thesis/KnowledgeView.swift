@@ -8,21 +8,21 @@
 import SwiftUI
 import Foundation
 
-// โครงสร้าง WasteExample และ WasteCategory ยังคงเดิม
-struct WasteExample: Identifiable {
-    let id = UUID()
-    let image: String
-    let label: String
-}
-
-struct WasteCategory {
-    let name: String
-    let colorName: String
-    let color: Color
-    let description: String
-    let binImage: String
-    let examples: [WasteExample]
-}
+//// โครงสร้าง WasteExample และ WasteCategory ยังคงเดิม
+//struct WasteExample: Identifiable {
+//    let id = UUID()
+//    let image: String
+//    let label: String
+//}
+//
+//struct WasteCategory {
+//    let name: String
+//    let colorName: String
+//    let color: Color
+//    let description: String
+//    let binImage: String
+//    let examples: [WasteExample]
+//}
 
 struct KnowledgeView: View {
     @State private var currentIndex = 0
