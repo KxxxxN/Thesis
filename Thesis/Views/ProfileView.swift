@@ -75,26 +75,10 @@ struct ProfileView: View {
                         }
                     }
                     
-//                    Image("Profile")
-//                        .resizable()
-//                        .frame(width: 85,height: 85)
-//                        .clipShape(Circle())
-//                        .padding(.top,35)
-//                        .padding(.bottom,11).overlay(alignment: .bottomTrailing) {
-//                            if viewModel.isEditing {
-//                                Image(systemName: "pencil.circle.fill")
-//                                    .font(.system(size: 26))
-//                                    .foregroundColor(.mainColor)
-//                                    .background(Color.white.clipShape(Circle()))
-//                                    .offset(x: 4, y: -8)  // ปรับตำแหน่งให้พอดี
-//                            }
-//                        }
-                    
                     let profileImage = viewModel.profileImage
                     let isEditing = viewModel.isEditing
-
                     PhotosPicker(selection: $selectedItem, matching: .images) {
-                        ZStack {
+                        Group {
                             if let image = profileImage {
                                 Image(uiImage: image)
                                     .resizable()
@@ -106,49 +90,22 @@ struct ProfileView: View {
                                     .frame(width: 85, height: 85)
                                     .clipShape(Circle())
                             }
-                            
+                        }
+                        .overlay {
                             if isEditing {
                                 Circle()
                                     .fill(Color.black.opacity(0.3))
-                                    .frame(width: 85, height: 85)
-                                
+                            }
+                        }
+                        .overlay(alignment: .bottomTrailing) {
+                            if isEditing {
                                 Image(systemName: "pencil")
-                                    .foregroundColor(.white)
                                     .font(.system(size: 24))
-                                    .frame(width: 85, height: 85)
+                                    .foregroundColor(.black)
+                                    .offset(x: 8, y: 5)
                             }
                         }
                     }
-                    
-//                    PhotosPicker(selection: $selectedItem, matching: .images) {
-//                        Group {
-//                            if let image = profileImage {
-//                                Image(uiImage: image)
-//                                    .resizable()
-//                                    .frame(width: 85, height: 85)
-//                                    .clipShape(Circle())
-//                            } else {
-//                                Image("Profile")
-//                                    .resizable()
-//                                    .frame(width: 85, height: 85)
-//                                    .clipShape(Circle())
-//                            }
-//                        }
-//                        .overlay {
-//                            if isEditing {
-//                                Circle()
-//                                    .fill(Color.black.opacity(0.3))
-//                            }
-//                        }
-//                        .overlay(alignment: .bottomTrailing) {
-//                            if isEditing {
-//                                Image(systemName: "pencil")
-//                                    .font(.system(size: 24))
-//                                    .foregroundColor(.black)
-//                                    .offset(x: 8, y: 5)
-//                            }
-//                        }
-//                    }
                     
                     .padding(.top, 35)
                     .padding(.bottom, 11)
