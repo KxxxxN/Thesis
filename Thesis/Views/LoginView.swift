@@ -10,10 +10,11 @@ import SwiftUI
 struct LoginView: View {
     
     @StateObject var viewModel = LoginViewModel()
+    @State private var path = NavigationPath()
     
     var body: some View {
         
-        NavigationStack {
+        NavigationStack(path: $path) {
             VStack(alignment: .center) { //เปิด Vstack1
                 
                 Spacer()
@@ -119,6 +120,9 @@ struct LoginView: View {
             } //ปิด Vstack1
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.backgroundColor)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .popToLogin)) { _ in
+            path = NavigationPath()  // ✅ clear stack ทั้งหมด กลับมาที่ LoginView
         }
         .navigationBarBackButtonHidden(true)
         .navigationTitle("")

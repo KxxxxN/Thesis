@@ -11,7 +11,7 @@ import SwiftUI
 struct ConfirmEmailView: View {
     let currentEmail: String
     @StateObject private var viewModel = ConfirmEmailViewModel()
-    @Environment(\.dismiss) var dismiss
+//    @Environment(\.dismiss) var dismiss
     
     var body: some View {
             VStack(spacing: 0) {
@@ -55,9 +55,6 @@ struct ConfirmEmailView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.backgroundColor)
-            .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("PopToProfile"))) { _ in
-                dismiss()
-            }
             .onAppear {
                 viewModel.email = currentEmail
             }

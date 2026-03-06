@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @StateObject private var viewModel: ProfileViewModel
-    
+//    @State private var navigateToAccount = false
     @AppStorage("emailChangeSuccess") var emailChangeSuccess = false
     
     init() {
@@ -26,11 +26,17 @@ struct ProfileView: View {
                             .foregroundColor(Color.black)
                         
                         HStack {
-                            Button(action: {
+//                            Button(action: {
+//                                viewModel.cancelEditing()
+//                            }) {
+//                                BackButton(action: {
+//                                    NotificationCenter.default.post(name: .popToAccount, object: nil)
+//                                })
+//                            }
+                            BackButton(action: {
                                 viewModel.cancelEditing()
-                            }) {
-                                BackButton()
-                            }
+                                NotificationCenter.default.post(name: .popToAccount, object: nil)
+                            })
                             
                             Spacer()
                             
@@ -134,6 +140,7 @@ struct ProfileView: View {
                 .onAppear {
                     emailChangeSuccess = false
                     viewModel.isEditing = false
+                    NotificationCenter.default.post(name: .popToProfile, object: nil)
                 }
             
             if viewModel.showSuccessPopup {

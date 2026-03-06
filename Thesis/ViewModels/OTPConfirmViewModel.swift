@@ -182,10 +182,11 @@ class OTPConfirmViewModel: ObservableObject {
             // ✅ ถ้าสำเร็จ
             switch source {
             case .forgotPassword:  navigateToChangePW = true
-            case .confirmEmail:    navigateToNewPW = true  
+            case .confirmEmail:  navigateToNewPW = true
+//            case .confirmEmail:    NotificationCenter.default.post(name: .navigateToNewPassword, object: nil)
             case .changeEmail:
-                emailChangeSuccess = true
                 showSuccessPopup = true
+                emailChangeSuccess = true
             }
             
         } catch {

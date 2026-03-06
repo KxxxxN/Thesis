@@ -36,6 +36,8 @@ class ProfileViewModel: ObservableObject {
     private var originalLastName: String = ""
     private var originalPhone: String = ""
     
+    @Published var navigateToAccount: Bool = false
+    
     init() {
         Task { await loadProfile() }
     }

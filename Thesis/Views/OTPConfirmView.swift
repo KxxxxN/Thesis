@@ -121,7 +121,7 @@ struct OTPConfirmView: View {
                 .navigationDestination(isPresented: $viewModel.navigateToNewPW) {
                     NewPasswordView()
                 }
-                .navigationDestination(isPresented: $viewModel.emailChangeSuccess) {
+                .navigationDestination(isPresented: $viewModel.navigateToProfile) {
                     ProfileView()
                 }
                 
@@ -132,7 +132,8 @@ struct OTPConfirmView: View {
             if viewModel.showSuccessPopup {
                 SuccessPopupView(message: "แก้ไขอีเมลสำเร็จ") {
                     viewModel.showSuccessPopup = false
-                    viewModel.emailChangeSuccess = true
+//                    viewModel.emailChangeSuccess = true
+                    viewModel.navigateToProfile = true
                 }
             }
             
