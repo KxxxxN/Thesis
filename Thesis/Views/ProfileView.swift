@@ -6,15 +6,46 @@
 //
 
 import SwiftUI
+import PhotosUI
 
+@MainActor
 struct ProfileView: View {
     @StateObject private var viewModel: ProfileViewModel
+    @State private var selectedItem: PhotosPickerItem? = nil
 //    @State private var navigateToAccount = false
     @AppStorage("emailChangeSuccess") var emailChangeSuccess = false
     
     init() {
         _viewModel = StateObject(wrappedValue: ProfileViewModel())
     }
+    
+//    @MainActor
+//    @ViewBuilder
+//    private var profileImageView: some View {
+//        ZStack {
+//            if let image = viewModel.profileImage {
+//                Image(uiImage: image)
+//                    .resizable()
+//                    .frame(width: 85, height: 85)
+//                    .clipShape(Circle())
+//            } else {
+//                Image("Profile")
+//                    .resizable()
+//                    .frame(width: 85, height: 85)
+//                    .clipShape(Circle())
+//            }
+//            
+//            if viewModel.isEditing {
+//                Circle()
+//                    .fill(Color.black.opacity(0.3))
+//                    .frame(width: 85, height: 85)
+//                
+//                Image(systemName: "pencil")
+//                    .foregroundColor(.white)
+//                    .font(.system(size: 24))
+//            }
+//        }
+//    }
     
     var body: some View {
         ZStack {
@@ -26,13 +57,6 @@ struct ProfileView: View {
                             .foregroundColor(Color.black)
                         
                         HStack {
-//                            Button(action: {
-//                                viewModel.cancelEditing()
-//                            }) {
-//                                BackButton(action: {
-//                                    NotificationCenter.default.post(name: .popToAccount, object: nil)
-//                                })
-//                            }
                             BackButton(action: {
                                 viewModel.cancelEditing()
                                 NotificationCenter.default.post(name: .popToAccount, object: nil)
@@ -51,12 +75,93 @@ struct ProfileView: View {
                         }
                     }
                     
-                    Image("Profile")
-                        .resizable()
-                        .frame(width: 85,height: 85)
-                        .clipShape(Circle())
-                        .padding(.top,35)
-                        .padding(.bottom,11)
+//                    Image("Profile")
+//                        .resizable()
+//                        .frame(width: 85,height: 85)
+//                        .clipShape(Circle())
+//                        .padding(.top,35)
+//                        .padding(.bottom,11).overlay(alignment: .bottomTrailing) {
+//                            if viewModel.isEditing {
+//                                Image(systemName: "pencil.circle.fill")
+//                                    .font(.system(size: 26))
+//                                    .foregroundColor(.mainColor)
+//                                    .background(Color.white.clipShape(Circle()))
+//                                    .offset(x: 4, y: -8)  // ปรับตำแหน่งให้พอดี
+//                            }
+//                        }
+                    
+                    let profileImage = viewModel.profileImage
+                    let isEditing = viewModel.isEditing
+
+                    PhotosPicker(selection: $selectedItem, matching: .images) {
+                        ZStack {
+                            if let image = profileImage {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .frame(width: 85, height: 85)
+                                    .clipShape(Circle())
+                            } else {
+                                Image("Profile")
+                                    .resizable()
+                                    .frame(width: 85, height: 85)
+                                    .clipShape(Circle())
+                            }
+                            
+                            if isEditing {
+                                Circle()
+                                    .fill(Color.black.opacity(0.3))
+                                    .frame(width: 85, height: 85)
+                                
+                                Image(systemName: "pencil")
+                                    .foregroundColor(.white)
+                                    .font(.system(size: 24))
+                                    .frame(width: 85, height: 85)
+                            }
+                        }
+                    }
+                    
+//                    PhotosPicker(selection: $selectedItem, matching: .images) {
+//                        Group {
+//                            if let image = profileImage {
+//                                Image(uiImage: image)
+//                                    .resizable()
+//                                    .frame(width: 85, height: 85)
+//                                    .clipShape(Circle())
+//                            } else {
+//                                Image("Profile")
+//                                    .resizable()
+//                                    .frame(width: 85, height: 85)
+//                                    .clipShape(Circle())
+//                            }
+//                        }
+//                        .overlay {
+//                            if isEditing {
+//                                Circle()
+//                                    .fill(Color.black.opacity(0.3))
+//                            }
+//                        }
+//                        .overlay(alignment: .bottomTrailing) {
+//                            if isEditing {
+//                                Image(systemName: "pencil")
+//                                    .font(.system(size: 24))
+//                                    .foregroundColor(.black)
+//                                    .offset(x: 8, y: 5)
+//                            }
+//                        }
+//                    }
+                    
+                    .padding(.top, 35)
+                    .padding(.bottom, 11)
+                    .disabled(!isEditing)  // ✅ ใช้ local variable แทน
+                    .onChange(of: selectedItem) { _, newItem in
+                        Task { @MainActor in  // ✅ เพิ่ม @MainActor
+                            if let data = try? await newItem?.loadTransferable(type: Data.self),
+                               let image = UIImage(data: data) {
+                                viewModel.profileImage = image
+                                await viewModel.uploadProfileImage(image)
+                            }
+                        }
+                    }
                     
                     VStack(alignment: .leading, spacing: 0){
                         
@@ -163,3 +268,4 @@ struct ProfileView: View {
 #Preview {
     ProfileView()
 }
+
