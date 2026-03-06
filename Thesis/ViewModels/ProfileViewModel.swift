@@ -36,6 +36,9 @@ class ProfileViewModel: ObservableObject {
     private var originalLastName: String = ""
     private var originalPhone: String = ""
     
+    @Published var profileImage: UIImage? = nil
+    @Published var navigateToAccount: Bool = false
+    
     init() {
         Task { await loadProfile() }
     }
@@ -45,17 +48,28 @@ class ProfileViewModel: ObservableObject {
             let user = try await supabase.auth.session.user
             let meta = user.userMetadata
             
+            print("avatar_url: \(meta["avatar_url"]?.stringValue ?? "nil")")
+            
             self.email = user.email ?? ""
             self.name = meta["first_name"]?.stringValue ?? ""
             self.lastName = meta["last_name"]?.stringValue ?? ""
             self.phoneNumber = meta["phone"]?.stringValue ?? ""
+            
+            // ✅ โหลดรูปจาก URL
+            if let avatarURLString = meta["avatar_url"]?.stringValue,
+               let url = URL(string: avatarURLString) {
+                let (data, _) = try await URLSession.shared.data(from: url)
+                if let image = UIImage(data: data) {
+                    self.profileImage = image
+                }
+            }
             
             saveOriginalData()
         } catch {
             print("Load profile error: \(error.localizedDescription)")
         }
     }
-    
+
     private func saveOriginalData() {
         originalName = name
         originalLastName = lastName
@@ -99,26 +113,35 @@ class ProfileViewModel: ObservableObject {
         return !isNameInvalid && !isLastNameInvalid && !isPhoneInvalid
     }
     
-    //    func saveProfile() {
-    //        isSubmitted = true
-    //
-    //        if validateForm() {
-    //            // บันทึกค่าใหม่เป็นค่าต้นฉบับ
-    //            saveOriginalData()
-    //
-    //            withAnimation {
-    //                showSuccessPopup = true
-    //                isEditing = false
-    //                isSubmitted = false
-    //            }
-    //            print("Profile updated successfully")
-    //        } else {
-    //            withAnimation {
-    //                showErrorPopup = true
-    //            }
-    //        }
-    //    }
-    //}
+    func uploadProfileImage(_ image: UIImage) async {
+        guard let data = image.jpegData(compressionQuality: 0.8) else { return }
+        
+        do {
+            let user = try await supabase.auth.session.user
+            let fileName = "\(user.id).jpg"
+            
+            try await supabase.storage
+                .from("avatars")
+                .upload(
+                    fileName,
+                    data: data,
+                    options: FileOptions(cacheControl: "3600", upsert: true)
+                )
+            
+            let url = try supabase.storage
+                .from("avatars")
+                .getPublicURL(path: fileName)
+            
+            try await supabase.auth.update(
+                user: UserAttributes(data: [
+                    "avatar_url": .string(url.absoluteString)
+                ])
+            )
+        } catch {
+            print("Upload error: \(error.localizedDescription)")
+        }
+    }
+
     func saveProfile() async {
         isSubmitted = true
         

@@ -102,39 +102,6 @@ struct BackButtonWhite: View {
     }
 }
 
-struct OTPBackButton: View {
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        Button {
-            dismiss()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                dismiss()
-            }
-        } label: {
-            Image(systemName: "chevron.left")
-                .foregroundColor(.black)
-                .font(.system(size: 25))
-        }
-        .padding(.leading, 25)
-    }
-}
-
-struct BackToProfileButton: View {
-    let action: () -> Void
-
-    var body: some View {
-        Button {
-            action()
-        } label: {
-            Image(systemName: "chevron.left")
-                .foregroundColor(.black)
-                .font(.system(size: 25))
-        }
-        .padding(.leading, 25)
-    }
-}
-
 struct XBackButtonWhite: View {
     @Environment(\.dismiss) private var dismiss
 

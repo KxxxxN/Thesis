@@ -10,6 +10,7 @@ import SwiftUI
 struct ChangeEmailView: View {
     @StateObject private var viewModel = ChangeEmailViewModel()
     @Environment(\.dismiss) private var dismiss
+//    @State private var navigateToProfile: Bool = false
     
     var body: some View {
 //        NavigationStack {
@@ -19,7 +20,11 @@ struct ChangeEmailView: View {
                         .font(.noto(25, weight: .bold))
                         .foregroundColor(.black)
                     HStack {
-                            BackButton()
+                        BackButton(
+//                            action: {
+//                                navigateToProfile = true
+//                            }
+                        )
                         
                         Spacer()
                     }
@@ -63,7 +68,9 @@ struct ChangeEmailView: View {
                     email: viewModel.newEmail
                 )
             }
-//        }
+//            .navigationDestination(isPresented: $navigateToProfile) {
+//                ProfileView()
+//            }
         .navigationBarBackButtonHidden(true)
     }
 }

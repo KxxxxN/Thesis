@@ -37,8 +37,8 @@ class NewPasswordViewModel: ObservableObject {
     @Published var navigateToProfile: Bool = false
     
     // MARK: - Navigation
-    @Published var navigateToLogin: Bool = false
-    @AppStorage("isLoggedIn") var isLoggedIn = false
+//    @Published var navigateToLogin: Bool = false
+//    @AppStorage("isLoggedIn") var isLoggedIn = false
     
     // MARK: - Password Checklist Helpers (ดึงจาก ValidationHelper)
     // ใช้สำหรับแสดง Checklist 5 ข้อในหน้า View
@@ -76,19 +76,34 @@ class NewPasswordViewModel: ObservableObject {
     private func updatePassword() async {
         do {
             let session = try await supabase.auth.session
-            try await supabase.auth.signIn(
-                email: session.user.email ?? "",
-                password: oldPassword
-            )
-            print("✅ Re-authenticate สำเร็จ")
             
-            try await supabase.auth.update(user: UserAttributes(password: password))
-            print("✅ เปลี่ยนรหัสผ่านสำเร็จ")
-            showSuccessAlert = true
+            // ขั้นที่ 1: ตรวจสอบรหัสผ่านเก่า
+            do {
+                try await supabase.auth.signIn(
+                    email: session.user.email ?? "",
+                    password: oldPassword
+                )
+                print("✅ Re-authenticate สำเร็จ")
+            } catch {
+                // ✅ รหัสผ่านเก่าผิด → แสดงแค่ขอบแดง
+                print("❌ Re-authenticate Failed: \(error.localizedDescription)")
+                isOldPasswordValid = false
+                return
+            }
+            
+            // ขั้นที่ 2: บันทึกรหัสผ่านใหม่ลง server
+            do {
+                try await supabase.auth.update(user: UserAttributes(password: password))
+                print("✅ เปลี่ยนรหัสผ่านสำเร็จ")
+                showSuccessAlert = true
+            } catch {
+                // ✅ บันทึกลง server ไม่ได้ → แสดง popup
+                print("❌ Update Password Error: \(error.localizedDescription)")
+                showErrorPopup = true
+            }
             
         } catch {
-            print("❌ Update Password Error: \(error.localizedDescription)")
-            isOldPasswordValid = false
+            print("❌ Session Error: \(error.localizedDescription)")
             showErrorPopup = true
         }
     }

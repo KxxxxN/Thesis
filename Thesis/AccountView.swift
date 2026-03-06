@@ -7,15 +7,24 @@
 
 import SwiftUI
 
+enum AccountDestination: Hashable {
+    case profile
+    case translate
+    case helpCenter
+    case contactUs
+//    case newPassword
+//    case confirmEmail(String)
+//    case otp(String)
+}
+
 struct AccountView: View {
     @StateObject private var authViewModel = AuthViewModel()
-    
     @State private var isNotificationOn = true
-    
     @AppStorage("isLoggedIn") var isLoggedIn = false
+    @State private var path = NavigationPath()
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             VStack(spacing: 0) {
                 Spacer()
                 
@@ -36,8 +45,7 @@ struct AccountView: View {
                         AccountMenuRow(
                             title: "แก้ไขโปรไฟล์",
                             imageName: "IconUser",
-                            destination:
-                                ProfileView()
+                            action: { path.append(AccountDestination.profile) }
                         )
                     }
                     
@@ -53,7 +61,7 @@ struct AccountView: View {
                             AccountMenuRow(
                                 title: "เปลี่ยนภาษา",
                                 imageName: "IconTranslate",
-                                destination: TranslateView()
+                                action: { path.append(AccountDestination.translate) }
                             )
                             
                             //Notification
@@ -77,14 +85,14 @@ struct AccountView: View {
                             AccountMenuRow(
                                 title: "ช่วยเหลือ",
                                 imageName: "IconHelp",
-                                destination: HelpCenterView()
+                                action: { path.append(AccountDestination.helpCenter) }
                             )
                             
                             // Contact
                             AccountMenuRow(
                                 title: "ติดต่อเรา",
                                 imageName: "IconSupport",
-                                destination: ContactUsView()
+                                action: { path.append(AccountDestination.contactUs) }
                             )
                         }
                     }
@@ -128,6 +136,42 @@ struct AccountView: View {
                     await authViewModel.getInitialSession()
                 }
             }
+            .navigationDestination(for: AccountDestination.self) { destination in
+                switch destination {
+                case .profile:      ProfileView()
+                case .translate:    TranslateView()
+                case .helpCenter:   HelpCenterView()
+                case .contactUs:    ContactUsView()
+//                case .newPassword: NewPasswordView()
+//                case .confirmEmail(let email):  ConfirmEmailView(currentEmail: email) 
+//                case .otp(let email):           OTPConfirmView(source: .confirmEmail, email: email)
+                }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .popToAccount)) { _ in
+            path = NavigationPath()
+        }
+//        .onReceive(NotificationCenter.default.publisher(for: .navigateToNewPassword)) { _ in
+//            path.append(AccountDestination.newPassword)
+//        }
+//        .onReceive(NotificationCenter.default.publisher(for: .navigateToConfirmEmail)) { notification in
+//            if let email = notification.object as? String {
+//                path.append(AccountDestination.confirmEmail(email))
+//            }
+//        }
+//        .onReceive(NotificationCenter.default.publisher(for: .navigateToNewPassword)) { _ in
+//            withAnimation {
+//                path.append(AccountDestination.newPassword)
+//            }
+//        }
+//        .onReceive(NotificationCenter.default.publisher(for: .navigateToNewPassword)) { _ in
+//            path.append(AccountDestination.newPassword)  // ไม่ต้อง withAnimation
+//        }
+
+        .onReceive(NotificationCenter.default.publisher(for: .popToProfile)) { _ in
+            while path.count > 1 {
+                path.removeLast()
+            }
         }
     }
 }
@@ -135,3 +179,5 @@ struct AccountView: View {
 #Preview {
     AccountView()
 }
+
+
