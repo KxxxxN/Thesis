@@ -31,6 +31,8 @@ struct AiScanView: View {
     @State private var isAnalyzing = false
 
     @State private var aiResult: String = "ขวดพลาสติก"
+    
+    @State private var isScanning = true
 
     private var resultTitle: AttributedString {
         var text = AttributedString("ขยะชิ้นนี้คือ \(aiResult) \nถูกต้องหรือไม่?")
@@ -65,6 +67,7 @@ struct AiScanView: View {
                         } else {
                             // ✅ ส่ง binding capturedImage และ shouldCapture
                             CameraPreview(
+                                isScanning: $isScanning,
                                 isActive: $isCameraActive,
                                 capturedImage: $capturedUIImage,
                                 shouldCapture: shouldCapture

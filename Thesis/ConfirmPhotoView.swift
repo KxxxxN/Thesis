@@ -19,6 +19,8 @@ struct ConfirmPhotoView: View {
     @State private var selectedUIImage: UIImage? = nil
     @State private var isCameraActive = true
     @State private var shouldCapture = false  // ✅ เพิ่ม
+    
+    @State private var isScanning = true
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -35,6 +37,7 @@ struct ConfirmPhotoView: View {
                     } else {
                         // ✅ ส่ง binding ใหม่เข้าไป
                         CameraPreview(
+                            isScanning: $isScanning,
                             isActive: $isCameraActive,
                             capturedImage: $selectedUIImage,
                             shouldCapture: shouldCapture

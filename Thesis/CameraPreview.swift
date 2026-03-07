@@ -9,24 +9,24 @@ import SwiftUI
 import AVFoundation
 
 struct CameraPreview: UIViewRepresentable {
-
+    @Binding var isScanning: Bool
     @Binding var isActive: Bool
     @Binding var capturedImage: UIImage?   // ✅ เพิ่ม
     var shouldCapture: Bool = false        // ✅ trigger capture
     var scanMode: Bool = false
     var onScan: ((String) -> Void)? = nil
-
+    
     class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate, AVCapturePhotoCaptureDelegate {
         let session = AVCaptureSession()
         let photoOutput = AVCapturePhotoOutput()  // ✅ เพิ่ม
         var onScan: ((String) -> Void)?
         var isScanning = true
         var onCapture: ((UIImage) -> Void)?       // ✅ เพิ่ม
-
+        
         init(onScan: ((String) -> Void)?) {
             self.onScan = onScan
         }
-
+        
         // ✅ delegate รับภาพที่ถ่าย
         func photoOutput(_ output: AVCapturePhotoOutput,
                          didFinishProcessingPhoto photo: AVCapturePhoto,
@@ -38,7 +38,7 @@ struct CameraPreview: UIViewRepresentable {
                 self.onCapture?(image)
             }
         }
-
+        
         func metadataOutput(_ output: AVCaptureMetadataOutput,
                             didOutput metadataObjects: [AVMetadataObject],
                             from connection: AVCaptureConnection) {
@@ -49,31 +49,31 @@ struct CameraPreview: UIViewRepresentable {
             onScan?(stringValue)
         }
     }
-
+    
     func makeCoordinator() -> Coordinator {
         Coordinator(onScan: onScan)
     }
-
+    
     func makeUIView(context: Context) -> UIView {
         let view = UIView(frame: .zero)
         let session = context.coordinator.session
         session.sessionPreset = .high
-
+        
         guard
             let device = AVCaptureDevice.default(for: .video),
             let input = try? AVCaptureDeviceInput(device: device),
             session.canAddInput(input)
         else { return view }
-
+        
         session.addInput(input)
-
+        
         // ✅ เพิ่ม photoOutput เสมอ (ยกเว้น scanMode)
         if !scanMode {
             if session.canAddOutput(context.coordinator.photoOutput) {
                 session.addOutput(context.coordinator.photoOutput)
             }
         }
-
+        
         if scanMode {
             let metadataOutput = AVCaptureMetadataOutput()
             if session.canAddOutput(metadataOutput) {
@@ -82,38 +82,41 @@ struct CameraPreview: UIViewRepresentable {
                 metadataOutput.metadataObjectTypes = [.qr]
             }
         }
-
+        
         // ✅ รับภาพแล้วใส่ binding
         context.coordinator.onCapture = { image in
             capturedImage = image
         }
-
+        
         let previewLayer = AVCaptureVideoPreviewLayer(session: session)
         previewLayer.videoGravity = .resizeAspectFill
         previewLayer.frame = UIScreen.main.bounds
         view.layer.addSublayer(previewLayer)
-
+        
         return view
     }
-
+    
     func updateUIView(_ uiView: UIView, context: Context) {
         let session = context.coordinator.session
-
+        
+        context.coordinator.isScanning = isScanning
+        
         if isActive {
             if !session.isRunning {
                 DispatchQueue.global(qos: .userInitiated).async {
                     session.startRunning()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {  // ✅ เพิ่ม delay
+                        context.coordinator.isScanning = isScanning
+                    }
                 }
             }
         } else {
             if session.isRunning { session.stopRunning() }
         }
-
-        // ✅ ถ้า shouldCapture == true → ถ่ายภาพ
+        
         if shouldCapture && session.isRunning {
             let settings = AVCapturePhotoSettings()
-            context.coordinator.photoOutput.capturePhoto(with: settings,
-                                                          delegate: context.coordinator)
+            context.coordinator.photoOutput.capturePhoto(with: settings, delegate: context.coordinator)
         }
     }
 }

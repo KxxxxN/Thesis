@@ -23,6 +23,8 @@ struct BarcodeScanView: View {
     @State private var selectedImage: Image? = nil
     @State private var isCameraActive = true
     @State private var scannedBarcode: String? = nil  // ✅ เพิ่ม
+    
+    @State private var isScanning = true
 
     var body: some View {
         NavigationStack {
@@ -40,6 +42,7 @@ struct BarcodeScanView: View {
                         } else {
                             // ✅ เปิด scanMode และรับค่า barcode
                             CameraPreview(
+                                isScanning: $isScanning,
                                 isActive: $isCameraActive,
                                 capturedImage: .constant(nil),
                                 scanMode: true,

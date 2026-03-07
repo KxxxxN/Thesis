@@ -21,6 +21,7 @@ struct QRScanView: View {
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var selectedImage: Image? = nil
     @State private var isCameraActive = false
+    @State private var isScanning = true
 
     @State private var qrResult: String = "อาคาร COSCI ชั้น 3"
 
@@ -67,13 +68,14 @@ struct QRScanView: View {
                     ZStack {
                         // ✅ อัปเดต CameraPreview ให้ตรง signature ใหม่
                         CameraPreview(
+                            isScanning: $isScanning,
                             isActive: $isCameraActive,
-                            capturedImage: .constant(nil),  // ✅ QR mode ไม่ต้องการ capturedImage
+                            capturedImage: .constant(nil),
                             scanMode: true,
                             onScan: { result in
                                 qrResult = result
                                 isCameraActive = false
-
+                                isScanning = false
                                 if result.contains("COSCI") {
                                     showResultAlert = true
                                 } else {
@@ -124,8 +126,9 @@ struct QRScanView: View {
                         HStack(spacing: 21) {
                             Button {
                                 showResultAlert = false
-                                isCameraActive = true
-                            } label: {
+                                    isScanning = true   // ✅ reset
+                                    isCameraActive = true
+                                } label: {
                                 Text("ยกเลิก")
                                     .font(.noto(16, weight: .bold))
                                     .foregroundColor(.mainColor)
@@ -162,38 +165,10 @@ struct QRScanView: View {
 
             // Error Alert
             if showErrorAlert {
-                ZStack {
-                    Rectangle()
-                        .fill(.ultraThinMaterial)
-                        .opacity(0.8)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            showErrorAlert = false
-                            isCameraActive = true  // ✅ เปิดกล้องใหม่หลังปิด error
-                        }
-
-                    VStack(spacing: 0) {
-                        Image("Errormark")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 137, height: 137)
-
-                        Text("สแกนไม่สำเร็จ")
-                            .font(.noto(25, weight: .bold))
-                            .foregroundColor(.black)
-                            .multilineTextAlignment(.center)
-
-                        Text("กรุณาลองใหม่อีกครั้ง")
-                            .font(.noto(18, weight: .medium))
-                            .foregroundColor(.black)
-                            .multilineTextAlignment(.center)
-                            .padding(.top, 4)
-                    }
-                    .padding(20)
-                    .frame(width: 343, height: 260)
-                    .background(Color.white)
-                    .cornerRadius(20)
-                    .onTapGesture {}
+                ErrorPopupView(title: "สแกนไม่สำเร็จ") {
+                    showErrorAlert = false
+                    isScanning = true
+                    isCameraActive = true
                 }
             }
         }
