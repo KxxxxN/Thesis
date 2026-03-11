@@ -69,7 +69,7 @@ struct KnowledgeView: View {
                     WasteExample(image: "Bottle", label: "ขวดพลาสติก"),
                     WasteExample(image: "Box", label: "กล่องกระดาษ"),
                     WasteExample(image: "Plasticcup", label: "แก้วพลาสติก"),
-                    WasteExample(image: "GlassBottle", label: "ขวดแก้ว"),
+                    WasteExample(image: "paper", label: "กระดาษทั่วไป"),
                     WasteExample(image: "Can", label: "กระป๋อง"),
                     WasteExample(image: "Bag", label: "ถุงพลาสติก")
                 ]
@@ -100,7 +100,7 @@ struct KnowledgeView: View {
                         Image(current.binImage)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 152, height: 235)
+                            .frame(width: 235, height: 235)
                             .padding(.bottom, 20)
                         
                         // ปุ่มลูกศร
@@ -168,7 +168,7 @@ struct KnowledgeView: View {
                         .padding(.bottom, 5)
                         
                         Text(current.description)
-                            .font(.noto(20))
+                            .font(.noto(20, weight: .medium))
                             .foregroundColor(.black)
                             .multilineTextAlignment(.leading)
                             .fixedSize(horizontal: false, vertical: true)
@@ -221,7 +221,7 @@ struct WasteExamplesGrid: View {
         LazyVGrid(columns: columns, spacing: 10) {
             ForEach(wasteExamples) { example in
                 NavigationLink {
-                    DetailWasteTypeView(hideTabBar: $hideTabBar)
+                    DetailWasteTypeView(hideTabBar: $hideTabBar, category: example.label)  // ✅ เพิ่ม category
                 } label: {
                     WasteCard(example: example)
                 }
@@ -253,4 +253,8 @@ struct WasteCard: View {
         .background(Color.wasteCard)
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
+}
+
+#Preview{
+    KnowledgeView(hideTabBar: .constant(false))
 }

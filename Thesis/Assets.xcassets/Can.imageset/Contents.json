@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Can.png",
+      "filename" : "can.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Can 1.png",
+      "filename" : "can 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Can 2.png",
+      "filename" : "can 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

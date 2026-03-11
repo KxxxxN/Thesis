@@ -21,8 +21,10 @@ struct QRScanView: View {
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var selectedImage: Image? = nil
     @State private var isCameraActive = false
+    @State private var isScanning = true
+    @State private var cameraID = UUID()
 
-    @State private var qrResult: String = "อาคาร COSCI ชั้น 3"
+    @State private var qrResult: String = ""
 
     private var resultTitle: AttributedString {
         var text = AttributedString(qrResult)
@@ -51,29 +53,27 @@ struct QRScanView: View {
 
                 VStack(spacing: 0) {
 
-                    Button(action: {
-                        showResultAlert = true
-                    }) {
-                        Text("โปรดสแกนคิวอาร์โค้ด\nที่ติดอยู่บนถังขยะเพื่อเริ่มใช้งาน")
-                            .font(.noto(20, weight: .medium))
-                            .foregroundColor(.black)
-                            .multilineTextAlignment(.center)
-                            .frame(width: 343, height: 115)
-                            .background(Color.textFieldColor)
-                            .cornerRadius(20)
-                    }
+                    Text("โปรดสแกนคิวอาร์โค้ด\nที่ติดอยู่บนถังขยะเพื่อเริ่มใช้งาน")
+                        .font(.noto(20, weight: .medium))
+                        .foregroundColor(.black)
+                        .multilineTextAlignment(.center)
+                        .frame(width: 343, height: 115)
+                        .background(Color.textFieldColor)
+                        .cornerRadius(20)
+                    
                     .padding(.top, 62)
 
                     ZStack {
                         // ✅ อัปเดต CameraPreview ให้ตรง signature ใหม่
                         CameraPreview(
+                            isScanning: $isScanning,
                             isActive: $isCameraActive,
-                            capturedImage: .constant(nil),  // ✅ QR mode ไม่ต้องการ capturedImage
+                            capturedImage: .constant(nil),
                             scanMode: true,
                             onScan: { result in
                                 qrResult = result
                                 isCameraActive = false
-
+                                isScanning = false
                                 if result.contains("COSCI") {
                                     showResultAlert = true
                                 } else {
@@ -81,9 +81,10 @@ struct QRScanView: View {
                                 }
                             }
                         )
+                        .id(cameraID)
                         .frame(width: 288, height: 288)
                         .cornerRadius(20)
-
+                        
                         QRCornerLines()
                     }
                     .frame(width: 288, height: 288)
@@ -124,7 +125,12 @@ struct QRScanView: View {
                         HStack(spacing: 21) {
                             Button {
                                 showResultAlert = false
-                                isCameraActive = true
+                                showResultAlert = false
+                                cameraID = UUID()
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                    isScanning = true
+                                    isCameraActive = true
+                                }
                             } label: {
                                 Text("ยกเลิก")
                                     .font(.noto(16, weight: .bold))
@@ -162,38 +168,13 @@ struct QRScanView: View {
 
             // Error Alert
             if showErrorAlert {
-                ZStack {
-                    Rectangle()
-                        .fill(.ultraThinMaterial)
-                        .opacity(0.8)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            showErrorAlert = false
-                            isCameraActive = true  // ✅ เปิดกล้องใหม่หลังปิด error
-                        }
-
-                    VStack(spacing: 0) {
-                        Image("Errormark")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 137, height: 137)
-
-                        Text("สแกนไม่สำเร็จ")
-                            .font(.noto(25, weight: .bold))
-                            .foregroundColor(.black)
-                            .multilineTextAlignment(.center)
-
-                        Text("กรุณาลองใหม่อีกครั้ง")
-                            .font(.noto(18, weight: .medium))
-                            .foregroundColor(.black)
-                            .multilineTextAlignment(.center)
-                            .padding(.top, 4)
+                ErrorPopupView(title: "สแกนไม่สำเร็จ") {
+                    showErrorAlert = false
+                    cameraID = UUID()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        isScanning = true
+                        isCameraActive = true
                     }
-                    .padding(20)
-                    .frame(width: 343, height: 260)
-                    .background(Color.white)
-                    .cornerRadius(20)
-                    .onTapGesture {}
                 }
             }
         }
