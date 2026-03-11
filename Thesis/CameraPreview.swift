@@ -11,9 +11,10 @@ import AVFoundation
 struct CameraPreview: UIViewRepresentable {
     @Binding var isScanning: Bool
     @Binding var isActive: Bool
-    @Binding var capturedImage: UIImage?   // ✅ เพิ่ม
-    var shouldCapture: Bool = false        // ✅ trigger capture
+    @Binding var capturedImage: UIImage?
+    var shouldCapture: Bool = false
     var scanMode: Bool = false
+    var barcodeMode: Bool = false
     var onScan: ((String) -> Void)? = nil
     
     class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate, AVCapturePhotoCaptureDelegate {
@@ -42,12 +43,17 @@ struct CameraPreview: UIViewRepresentable {
         func metadataOutput(_ output: AVCaptureMetadataOutput,
                             didOutput metadataObjects: [AVMetadataObject],
                             from connection: AVCaptureConnection) {
-            guard isScanning,
-                  let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
-                  let stringValue = metadataObject.stringValue else { return }
-            isScanning = false
-            onScan?(stringValue)
-        }
+             guard isScanning,
+                   let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
+                   let stringValue = metadataObject.stringValue else { return }
+             isScanning = false
+             
+             // ✅ capture ภาพทันทีที่สแกนได้
+             let settings = AVCapturePhotoSettings()
+             photoOutput.capturePhoto(with: settings, delegate: self)
+             
+             onScan?(stringValue)
+         }
     }
     
     func makeCoordinator() -> Coordinator {
@@ -68,10 +74,13 @@ struct CameraPreview: UIViewRepresentable {
         session.addInput(input)
         
         // ✅ เพิ่ม photoOutput เสมอ (ยกเว้น scanMode)
-        if !scanMode {
-            if session.canAddOutput(context.coordinator.photoOutput) {
-                session.addOutput(context.coordinator.photoOutput)
-            }
+//        if !scanMode {
+//            if session.canAddOutput(context.coordinator.photoOutput) {
+//                session.addOutput(context.coordinator.photoOutput)
+//            }
+//        }
+        if session.canAddOutput(context.coordinator.photoOutput) {
+            session.addOutput(context.coordinator.photoOutput)
         }
         
         if scanMode {
@@ -79,7 +88,12 @@ struct CameraPreview: UIViewRepresentable {
             if session.canAddOutput(metadataOutput) {
                 session.addOutput(metadataOutput)
                 metadataOutput.setMetadataObjectsDelegate(context.coordinator, queue: .main)
-                metadataOutput.metadataObjectTypes = [.qr]
+                
+                if onScan != nil && !barcodeMode {
+                    metadataOutput.metadataObjectTypes = [.qr]  // ✅ QR only
+                } else {
+                    metadataOutput.metadataObjectTypes = [.ean13, .ean8, .code128, .code39, .upce]  // ✅ Barcode only
+                }
             }
         }
         
@@ -98,6 +112,10 @@ struct CameraPreview: UIViewRepresentable {
     
     func updateUIView(_ uiView: UIView, context: Context) {
         let session = context.coordinator.session
+        
+        context.coordinator.onCapture = { image in
+            capturedImage = image
+        }
         
         context.coordinator.isScanning = isScanning
         

@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Plasticcup.png",
+      "filename" : "plastic-cups.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Plasticcup 1.png",
+      "filename" : "plastic-cups 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Plasticcup 2.png",
+      "filename" : "plastic-cups 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
