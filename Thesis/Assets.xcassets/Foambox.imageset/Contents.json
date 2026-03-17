@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Foambox.png",
+      "filename" : "food-container.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Foambox 1.png",
+      "filename" : "food-container 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Foambox 2.png",
+      "filename" : "food-container 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
