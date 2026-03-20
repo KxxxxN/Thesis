@@ -80,6 +80,7 @@ struct ScoreHistoryView: View {
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .background(Color.white)
+
         }
         .navigationBarHidden(true)
         .edgesIgnoringSafeArea(.top)
@@ -197,18 +198,26 @@ struct PageView: View {
                 ScrollView {
                     VStack(spacing: 9) {
                         ScoreSortMenu(items: $items, selectedSort: $selectedSort, isDropdownOpen: $isDropdownOpen, currentPage: $currentPage)
-                            .padding(.horizontal, 15)
+                            .padding(.horizontal, 16)
 
                         ForEach(currentItems, id: \.id) { item in
                             ScoreCard(title: item.title,
                                       date: item.date,
                                       points: item.points,
                                       backgroundColor: item.color)
+                            .padding(.horizontal, 16)
+
+
                         }
+
                     }
                     .padding(.bottom, 16)
+                    
                 }
+//                .padding(.horizontal, 16)
                 .contentShape(Rectangle())
+                
+
                 .onTapGesture {
                     if isDropdownOpen {
                         withAnimation {
@@ -231,12 +240,17 @@ struct PageView: View {
             }
             .background(Color.white)
             .cornerRadius(20)
+            .padding(.horizontal, 16)
+
+
 
             CustomPaginationView(currentPage: $currentPage, maxPage: totalPages)
                 .padding(.vertical, 16)
                 .background(Color.white)
                 .cornerRadius(10)
         }
+
+        
     }
 
     var currentItems: [ScoreItem] {
@@ -244,6 +258,7 @@ struct PageView: View {
         let end = min(start + itemsPerPage, items.count)
         return Array(items[start..<end])
     }
+
 }
 
 

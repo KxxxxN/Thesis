@@ -18,7 +18,7 @@ struct ContentView: View {
             VStack(spacing: 0){
                 
                 ZStack{
-                    if self.index == 0 { MainAppView(hideTabBar: $hideTabBar) }
+                    if self.index == 0 { MainAppView(hideTabBar: $hideTabBar, tabIndex: $index) }
                     else if self.index == 1 { QRScanView(hideTabBar: $hideTabBar, index: $index) }
                     else if self.index == 2 { KnowledgeView(hideTabBar: $hideTabBar) }
                     else { AccountView() }

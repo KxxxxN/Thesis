@@ -194,7 +194,7 @@ struct DetailAiScanView: View {
                             
                             Spacer(minLength: 0)
                         }
-                        .frame(maxWidth: .infinity)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(
                             Color.knowledgeBackground
                                 .clipShape(TabCorner(radius: 20, corners: [.topLeft, .topRight]))

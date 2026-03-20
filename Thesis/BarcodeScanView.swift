@@ -53,6 +53,7 @@ struct BarcodeScanView: View {
                                     get: { capturedBarcodeImage },
                                     set: { capturedBarcodeImage = $0 }
                                 ),
+                                isFlashOn: $isFlashOn,
                                 scanMode: true,
                                 barcodeMode: true,
                                 onScan: { barcode in

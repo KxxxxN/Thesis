@@ -144,7 +144,7 @@ struct RecycleWasteDetailContent: View {
             .padding(.top, 30)
             .padding(.bottom, 50)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
             Color.knowledgeBackground
                 .clipShape(TabCorner(radius: 20, corners: [.topLeft, .topRight]))
