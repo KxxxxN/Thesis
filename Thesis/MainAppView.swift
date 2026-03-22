@@ -12,9 +12,9 @@ struct MainAppView: View {
     @Binding var hideTabBar: Bool
     @StateObject private var profileVM = UserProfileViewModel()
     
-    let historyItems = [
-        HistoryItem(title: "ขวดพลาสติก", date: "13/9/2025", points: "+3", pointsLabel: "คะแนน")
-    ]
+//    let historyItems = [
+//        HistoryItem(title: "ขวดพลาสติก", date: "13/9/2025", points: "+3", pointsLabel: "คะแนน")
+//    ]
     
     let recyclableItems = [
         RecyclableItem(imageName: "Bottle", title: "ขวดพลาสติก",countNumber: 33),
@@ -88,7 +88,10 @@ struct MainAppView: View {
             
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 20) {
-                    HistorySection(hideTabBar: $hideTabBar,items: historyItems)
+                    HistorySection(
+                        hideTabBar: $hideTabBar,
+                        items: profileVM.latestHistory.map { [$0] } ?? []
+                    )
                     RewardExchangeSection(hideTabBar: $hideTabBar)
                     FrequentWasteSection(hideTabBar: $hideTabBar, items: recyclableItems)
                     WasteSeparationGuideSection(currentIndex: $currentCarouselIndex, hideTabBar: $hideTabBar)

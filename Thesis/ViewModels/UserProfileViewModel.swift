@@ -32,6 +32,7 @@ class UserProfileViewModel: ObservableObject{
     @Published var totalPoints: Int = 0
     @Published var profileImage: UIImage? = nil
     @Published var isLoading: Bool = false
+    @Published var latestHistory: HistoryItem? = nil
     
     func fetchProfile(userId: UUID) async {
         isLoading = true
@@ -39,6 +40,7 @@ class UserProfileViewModel: ObservableObject{
         
         await fetchName()
         await fetchTotalPoints(userId: userId)
+        await fetchLatestHistory(userId: userId)
     }
     
     // ✅ ดึงชื่อ-นามสกุลจาก table users
@@ -83,6 +85,63 @@ class UserProfileViewModel: ObservableObject{
         } catch {
             totalPoints = 0
             print("❌ fetchTotalPoints error: \(error)")
+        }
+    }
+    
+    private func fetchLatestHistory(userId: UUID) async {
+        do {
+            struct ScanRow: Decodable {
+                let category: String
+                let points: Int
+                let scannedAt: String
+
+                enum CodingKeys: String, CodingKey {
+                    case category
+                    case points
+                    case scannedAt = "scanned_at"
+                }
+            }
+
+            let rows: [ScanRow] = try await supabase
+                .from("scan_history")
+                .select("category, points, scanned_at")
+                .eq("user_id", value: userId.uuidString)
+                .order("scanned_at", ascending: false)
+                .limit(1)
+                .execute()
+                .value
+
+            if let latest = rows.first {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+                formatter.locale = Locale(identifier: "en_US_POSIX")
+
+                let displayDate: String
+                let cleanedDate = String(latest.scannedAt.prefix(19)) // "2026-03-12T10:46:18"
+
+                let parser = DateFormatter()
+                parser.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+                parser.locale = Locale(identifier: "en_US_POSIX")
+
+                if let date = parser.date(from: cleanedDate) {
+                    let display = DateFormatter()
+                    display.dateFormat = "d/M/yyyy"
+                    display.locale = Locale(identifier: "en_US_POSIX")
+                    display.calendar = Calendar(identifier: .gregorian)
+                    displayDate = display.string(from: date)
+                } else {
+                    displayDate = latest.scannedAt
+                }
+
+                latestHistory = HistoryItem(
+                    title: latest.category,
+                    date: displayDate,
+                    points: "+\(latest.points)",
+                    pointsLabel: "คะแนน"
+                )
+            }
+        } catch {
+            print("❌ fetchLatestHistory error: \(error)")
         }
     }
 }
