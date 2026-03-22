@@ -10,6 +10,7 @@ import SwiftUI
 struct MainAppView: View {
     @State private var currentCarouselIndex = 0
     @Binding var hideTabBar: Bool
+    @StateObject private var profileVM = UserProfileViewModel()
     
     let historyItems = [
         HistoryItem(title: "ขวดพลาสติก", date: "13/9/2025", points: "+3", pointsLabel: "คะแนน")
@@ -30,22 +31,41 @@ struct MainAppView: View {
                     .padding(.top, 69)
                 
                 HStack(alignment: .center, spacing: 13) {
-                    Image("Profile")
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 55, height: 55)
-                        .clipShape(Circle())
-                        .shadow(radius: 4)
+                    Group {
+                        if let image = profileVM.profileImage {
+                            Image(uiImage: image)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        } else {
+                            Image("Profile")
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        }
+                    }
+                    .frame(width: 55, height: 55)
+                    .clipShape(Circle())
+                    .shadow(radius: 4)
                     
                     HStack {
-                        Text("สุนิสา จินดาวัฒนา")
-                            .font(.noto(20, weight: .bold))
-                            .foregroundColor(.white)
+//                        Text("สุนิสา จินดาวัฒนา")
+//                            .font(.noto(20, weight: .bold))
+//                            .foregroundColor(.white)
+                        
+                        // ✅ แสดงชื่อจาก Supabase
+                        if profileVM.isLoading {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Text(profileVM.fullName)
+                                .font(.noto(20, weight: .bold))
+                                .foregroundColor(.white)
+                        }
+                        
                         
                         Spacer()
                         
                         VStack(alignment: .trailing) {
-                            Text("333")
+                            Text("\(profileVM.totalPoints)") // ✅ เปลี่ยนจาก profileVM.points
                                 .font(.system(size: 40, weight: .bold))
                                 .foregroundColor(.white)
                             
@@ -80,6 +100,14 @@ struct MainAppView: View {
         }
         .frame(maxHeight: .infinity, alignment: .top)
         .background(Color.backgroundColor)
+        .task {
+            do {
+                let session = try await supabase.auth.session
+                await profileVM.fetchProfile(userId: session.user.id)
+            } catch {
+                print("❌ No session: \(error)")
+            }
+        }
     }
 }
 
@@ -224,4 +252,7 @@ struct RoundedCorner: Shape {
     }
 }
 
+#Preview {
+    MainAppView(hideTabBar: .constant(false))
+}
 

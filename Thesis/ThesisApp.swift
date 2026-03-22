@@ -10,10 +10,17 @@ import SwiftUI
 @main
 struct ThesisApp: App {
     @AppStorage("isLoggedIn") var isLoggedIn = false
+    @StateObject var authViewModel = AuthViewModel()
     
     var body: some Scene {
         WindowGroup {
             RootView()
+                .environmentObject(authViewModel)
+                .onOpenURL { url in          // ✅ เพิ่มตรงนี้
+                    Task {
+                        await authViewModel.handleOAuthCallback(url: url)
+                    }
+                }
         }
     }
 }

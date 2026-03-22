@@ -63,6 +63,43 @@ class AuthViewModel: ObservableObject {
         }
     }
     
+    // ✅ X (Twitter) Login
+    func signInWithX() async {
+        do {
+            let url = try supabase.auth.getOAuthSignInURL(
+                provider: .twitter,
+                redirectTo: URL(string: "binnii://login-callback")!
+            )
+            await UIApplication.shared.open(url)
+        } catch {
+            print("X Sign in Failed: \(error.localizedDescription)")
+        }
+    }
+
+    func signInWithGoogle() async {
+        do {
+            let url = try supabase.auth.getOAuthSignInURL(
+                provider: .google,
+                redirectTo: URL(string: "binnii://login-callback")!
+            )
+            await UIApplication.shared.open(url)
+        } catch {
+            print("Google Sign in Failed: \(error.localizedDescription)")
+        }
+    }
+    
+    // ✅ รับ Callback หลัง X Login สำเร็จ
+    func handleOAuthCallback(url: URL) async {
+        do {
+            let session = try await supabase.auth.session(from: url)
+            self.session = session
+            self.isAuthenticated = true
+            print("X Sign in Success! Email: \(session.user.email ?? "-")")
+        } catch {
+            print("OAuth Callback Failed: \(error.localizedDescription)")
+        }
+    }
+    
     func signOut() async {
         do {
             try await supabase.auth.signOut()

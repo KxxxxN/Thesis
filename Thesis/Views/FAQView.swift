@@ -33,7 +33,7 @@ struct FAQView: View {
     ]
     
     var body: some View {
-        NavigationStack {
+//        NavigationStack {
             VStack(spacing: 0) {
                 ZStack {
                     Text("คำถามที่พบบ่อย")
@@ -63,7 +63,7 @@ struct FAQView: View {
             .navigationBarBackButtonHidden(true)
         }
     }
-}
+//}
 
 #Preview {
     FAQView()
