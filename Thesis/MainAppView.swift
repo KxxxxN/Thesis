@@ -10,17 +10,8 @@ import SwiftUI
 struct MainAppView: View {
     @State private var currentCarouselIndex = 0
     @Binding var hideTabBar: Bool
-    @Binding var tabIndex: Int
-    
-    let historyItems = [
-        HistoryItem(title: "ขวดพลาสติก", date: "13/9/2025", points: "+3", pointsLabel: "คะแนน")
-    ]
-    
-    let recyclableItems = [
-        RecyclableItem(imageName: "Bottle", title: "ขวดพลาสติก",countNumber: 33),
-        RecyclableItem(imageName: "Plasticcup", title: "แก้วพลาสติก", countNumber: 13),
-        RecyclableItem(imageName: "Can", title: "กระป๋อง", countNumber: 3)
-    ]
+    @StateObject private var profileVM = UserProfileViewModel()
+    @StateObject private var wasteVM = FrequentWasteViewModel()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -32,22 +23,41 @@ struct MainAppView: View {
                     .padding(.top, 80)
                 
                 HStack(alignment: .center, spacing: 13) {
-                    Image("Profile")
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 55, height: 55)
-                        .clipShape(Circle())
-                        .shadow(radius: 4)
+                    Group {
+                        if let image = profileVM.profileImage {
+                            Image(uiImage: image)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        } else {
+                            Image("Profile")
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        }
+                    }
+                    .frame(width: 55, height: 55)
+                    .clipShape(Circle())
+                    .shadow(radius: 4)
                     
                     HStack {
-                        Text("สุนิสา จินดาวัฒนา")
-                            .font(.noto(20, weight: .bold))
-                            .foregroundColor(.white)
+//                        Text("สุนิสา จินดาวัฒนา")
+//                            .font(.noto(20, weight: .bold))
+//                            .foregroundColor(.white)
+                        
+                        // ✅ แสดงชื่อจาก Supabase
+                        if profileVM.isLoading {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Text(profileVM.fullName)
+                                .font(.noto(20, weight: .bold))
+                                .foregroundColor(.white)
+                        }
+                        
                         
                         Spacer()
                         
                         VStack(alignment: .trailing) {
-                            Text("333")
+                            Text("\(profileVM.totalPoints)") // ✅ เปลี่ยนจาก profileVM.points
                                 .font(.system(size: 40, weight: .bold))
                                 .foregroundColor(.white)
                             
@@ -70,10 +80,22 @@ struct MainAppView: View {
             
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 20) {
-                    HistorySection(hideTabBar: $hideTabBar,items: historyItems)
+                    HistorySection(
+                        hideTabBar: $hideTabBar,
+                        items: profileVM.latestHistory.map { [$0] } ?? []
+                    )
                     RewardExchangeSection(hideTabBar: $hideTabBar)
-                    FrequentWasteSection(hideTabBar: $hideTabBar, items: recyclableItems)
-                    WasteSeparationGuideSection(currentIndex: $currentCarouselIndex, hideTabBar: $hideTabBar,tabIndex: $tabIndex )
+                    FrequentWasteSection(
+                        hideTabBar: $hideTabBar,
+                        items: wasteVM.wasteItems.prefix(3).map {
+                            RecyclableItem(
+                                imageName: $0.imageName,
+                                title: $0.title,
+                                countNumber: Int($0.count.replacingOccurrences(of: " ครั้ง", with: "")) ?? 0
+                            )
+                        }
+                    )
+                    WasteSeparationGuideSection(currentIndex: $currentCarouselIndex, hideTabBar: $hideTabBar)
                 }
                 .padding()
             }
@@ -82,6 +104,15 @@ struct MainAppView: View {
         }
         .frame(maxHeight: .infinity, alignment: .top)
         .background(Color.backgroundColor)
+        .task {
+            do {
+                let session = try await supabase.auth.session
+                await profileVM.fetchProfile(userId: session.user.id)
+                await wasteVM.fetchWasteCounts() 
+            } catch {
+                print("❌ No session: \(error)")
+            }
+        }
     }
 }
 
@@ -138,7 +169,7 @@ struct FrequentWasteSection: View {
             
             HStack(spacing: 8) {
                 ForEach(items) { item in
-                    NavigationLink(destination: WasteTypeView(hideTabBar: $hideTabBar)) {
+                    NavigationLink(destination: WasteTypeView(hideTabBar: $hideTabBar, category: item.title)) {
                         RecyclableItemCard(item: item)
                             .foregroundColor(.primary)
                     }
@@ -262,4 +293,7 @@ struct RoundedCorner: Shape {
     }
 }
 
+#Preview {
+    MainAppView(hideTabBar: .constant(false))
+}
 

@@ -12,7 +12,7 @@ struct WasteTypeItem: Identifiable {
     let id = UUID()
     let title: String
     let date: String
-    let imageName: String
+    let imageUrl: String?
 }
 
 struct WasteTypeView: View {
@@ -20,30 +20,20 @@ struct WasteTypeView: View {
     @Environment(\.dismiss) var dismiss
     @Binding var hideTabBar: Bool
     @State private var currentPage = 1
+    let category: String
+    @StateObject private var vm = WasteTypeViewModel()
 
-    let wasteItems: [WasteTypeItem] = [
-        WasteTypeItem(title: "ขวดพลาสติก", date: "13/9/2025", imageName: "TypeBottle"),
-        WasteTypeItem(title: "ขวดพลาสติก", date: "11/9/2025", imageName: "TypeBottle2"),
-        WasteTypeItem(title: "ขวดพลาสติก", date: "10/9/2025", imageName: "TypeBottle3"),
-        WasteTypeItem(title: "ขวดพลาสติก", date: "9/9/2025", imageName: "TypeBottle4"),
-        WasteTypeItem(title: "ขวดพลาสติก", date: "1/9/2025", imageName: "TypeBottle5"),
-        WasteTypeItem(title: "ขวดพลาสติก", date: "20/8/2025", imageName: "TypeBottle"),
-        WasteTypeItem(title: "ขวดพลาสติก", date: "27/8/2025", imageName: "TypeBottle2"),
-        WasteTypeItem(title: "ขวดพลาสติก", date: "11/8/2025", imageName: "TypeBottle3"),
-        WasteTypeItem(title: "ขวดพลาสติก", date: "13/8/2025", imageName: "TypeBottle4"),
-        WasteTypeItem(title: "ขวดพลาสติก", date: "1/8/2025", imageName: "TypeBottle5"),
-        WasteTypeItem(title: "ขวดพลาสติก", date: "13/7/2025", imageName: "TypeBottle"),
-        WasteTypeItem(title: "ขวดพลาสติก", date: "11/7/2025", imageName: "TypeBottle2"),
-    ]
+    let itemsPerPage = 5
 
-    var sortedWasteItems: [WasteTypeItem] {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "d/M/yyyy"
-        return wasteItems.sorted {
-            guard let d1 = formatter.date(from: $0.date),
-                  let d2 = formatter.date(from: $1.date) else { return false }
-            return d1 > d2
-        }
+    var totalPages: Int {
+        max(1, Int(ceil(Double(vm.items.count) / Double(itemsPerPage))))
+    }
+
+    var pagedItems: [WasteTypeItem] {
+        let start = (currentPage - 1) * itemsPerPage
+        let end = min(start + itemsPerPage, vm.items.count)
+        guard start < end else { return [] }
+        return Array(vm.items[start..<end])
     }
 
     var body: some View {
@@ -53,37 +43,40 @@ struct WasteTypeView: View {
             VStack(spacing: 0) {
                 
                 headerView
-                
-                ScrollView {
-                    VStack(spacing: 11) {
-                        let itemsPerPage = 5
-                        let startIndex = (currentPage - 1) * itemsPerPage
-                        let endIndex = min(startIndex + itemsPerPage, sortedWasteItems.count)
-
-                        ForEach(sortedWasteItems[startIndex..<endIndex]) { item in
-                            NavigationLink(destination: DetailView(hideTabBar: $hideTabBar)) {
-                                WasteItemCard(
-                                    title: item.title,
-                                    date: item.date,
-                                    imageName: item.imageName,
-                                    cardColor: Color.wasteCard
-                                )
+                if vm.isLoading {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                } else {
+                    ScrollView {
+                        VStack(spacing: 11) {
+                            ForEach(pagedItems) { item in
+                                NavigationLink(destination: DetailView(hideTabBar: $hideTabBar)) {
+                                    WasteItemCard(
+                                        title: item.title,
+                                        date: item.date,
+                                        imageUrl: item.imageUrl
+                                    )
+                                }
+                                .buttonStyle(.plain)
                             }
-                            .buttonStyle(.plain)
                         }
+                        .padding(.horizontal, 15)
+                        .padding(.top, 42)
+                        .padding(.bottom, 125)
                     }
-                    .padding(.horizontal, 15)
-                    .padding(.top, 42)
-                    .padding(.bottom, 125)
+                    
+                    paginationSection
                 }
-
-                paginationSection
             }
             .edgesIgnoringSafeArea(.top)
         }
         .onAppear { hideTabBar = true }
         .onDisappear { hideTabBar = false }
         .navigationBarHidden(true)
+        .task {
+            await vm.fetchItems(category: category) // ✅ โหลดตาม category
+        }
     }
     
     var headerView: some View {
@@ -91,6 +84,7 @@ struct WasteTypeView: View {
             Color.mainColor
 
             ZStack {
+//                Text(category)
                 Text("ขยะแต่ละประเภท")
                     .font(.noto(25, weight: .bold))
                     .foregroundColor(.white)
@@ -112,9 +106,6 @@ struct WasteTypeView: View {
 
     var paginationSection: some View {
         HStack(spacing: 19) {
-            let itemsPerPage = 5
-            let totalPages = Int(ceil(Double(sortedWasteItems.count) / Double(itemsPerPage)))
-
             Button(action: { if currentPage > 1 { currentPage -= 1 } }) {
                 Image(systemName: "chevron.left")
                     .foregroundColor(currentPage == 1 ? .gray : Color.mainColor)
@@ -146,18 +137,26 @@ struct WasteTypeView: View {
 struct WasteItemCard: View {
     let title: String
     let date: String
-    let imageName: String
-    let cardColor: Color
+    let imageUrl: String?
+//    let cardColor: Color
 
     var body: some View {
         HStack(spacing: 49) {
-            Image(imageName)
-                .resizable()
-                .scaledToFill()
+            if let urlString = imageUrl, let url = URL(string: urlString) {
+                AsyncImage(url: url) { image in
+                    image.resizable().scaledToFill()
+                } placeholder: {
+                    Color.thirdColor
+                }
                 .frame(width: 140, height: 92)
                 .clipped()
                 .clipShape(RoundedRectangle(cornerRadius: 30))
-
+            } else {
+                RoundedRectangle(cornerRadius: 30)
+                    .fill(Color.thirdColor)
+                    .frame(width: 140, height: 92)
+            }
+            
             VStack(alignment: .leading, spacing: 7) {
                 Text(title)
                     .font(.noto(20, weight: .bold))

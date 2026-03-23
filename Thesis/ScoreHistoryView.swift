@@ -17,8 +17,10 @@ struct ScoreItem: Identifiable {
 struct ScoreHistoryView: View {
     @State private var currentPage = 0
     @Binding var hideTabBar: Bool
-    @Environment(\.dismiss) var dismiss
-
+    //    @Environment(\.dismiss) var dismiss
+    @StateObject private var historyVM = ScoreHistoryViewModel()
+    @StateObject private var profileVM = UserProfileViewModel()
+    
     var body: some View {
         VStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 0) {
@@ -26,30 +28,40 @@ struct ScoreHistoryView: View {
                     Text("ประวัติคะแนน")
                         .font(.noto(25, weight: .bold))
                         .foregroundColor(.white)
-
+                    
                     HStack {
                         BackButtonWhite()
-
+                        
                         Spacer()
                     }
                 }
                 .padding(.top, 65)
-
+                
                 HStack(alignment: .center, spacing: 13) {
-                    Image("Profile")
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 55, height: 55)
-                        .clipShape(Circle())
-                        .shadow(radius: 4)
-
+                    Group {
+                        if let image = profileVM.profileImage {
+                            Image(uiImage: image)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        } else {
+                            Image("Profile")
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        }
+                    }
+                    .frame(width: 55, height: 55)
+                    .clipShape(Circle())
+                    .shadow(radius: 4)
+                    
                     HStack {
-                        Text("สุนิสา จินดาวัฒนา")
+                        Text(profileVM.fullName)
                             .font(.noto(20, weight: .bold))
                             .foregroundColor(.white)
+                        
                         Spacer()
+                        
                         VStack(alignment: .trailing) {
-                            Text("333")
+                            Text("\(profileVM.totalPoints)")
                                 .font(.system(size: 40, weight: .bold))
                                 .foregroundColor(.white)
                             Text("คะแนน")
@@ -74,9 +86,17 @@ struct ScoreHistoryView: View {
                         )
                     )
             )
-
-            TabView {
-                PageView()
+            
+            if historyVM.isLoading {
+                Spacer()
+                ProgressView()
+                Spacer()
+            } else {
+                TabView {
+                    PageView(items: historyVM.items)
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .background(Color.white)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .background(Color.white)
@@ -87,6 +107,15 @@ struct ScoreHistoryView: View {
         .background(Color.white)
         .onAppear { hideTabBar = true }
         .onDisappear { hideTabBar = false }
+        .task {
+            do {
+                let session = try await supabase.auth.session
+                await profileVM.fetchProfile(userId: session.user.id)
+            } catch {
+                print("❌ No session: \(error)")
+            }
+            await historyVM.fetchHistory()
+        }
     }
 }
 
@@ -127,7 +156,6 @@ struct ScoreSortMenu: View {
                     Text("เรียงจาก")
                         .font(.noto(14, weight: .medium))
                         .foregroundColor(.mainColor)
-
                     Image(isDropdownOpen ? "IconSort2" : "IconSort")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
@@ -143,71 +171,39 @@ struct ScoreSortMenu: View {
 
 struct PageView: View {
     @State private var currentPage = 0
-    @State private var items: [ScoreItem]
+    @State private var items: [ScoreItem]        // ✅ รับจากภายนอก
     @State private var isDropdownOpen = false
     @State private var selectedSort = "ใหม่ที่สุด"
-    
+
     let itemsPerPage = 7
-    
-    init() {
-        let initialData: [ScoreItem] = [
-            ScoreItem(title: "ขวดพลาสติก", date: "13/9/2025", points: "+3", color: .secondColor),
-            ScoreItem(title: "ขวดพลาสติก", date: "11/9/2025", points: "+3", color: .secondColor),
-            ScoreItem(title: "แลกคะแนน", date: "9/9/2025", points: "-300", color: .redeemColor),
-            ScoreItem(title: "แก้วพลาสติก", date: "8/9/2025", points: "+2", color: .secondColor),
-            ScoreItem(title: "กระป๋อง", date: "3/9/2025", points: "+3", color: .secondColor),
-            ScoreItem(title: "ตะเกียบไม้", date: "28/8/2025", points: "+1", color: .secondColor),
-            ScoreItem(title: "ขวดพลาสติก", date: "27/8/2025", points: "+3", color: .secondColor),
-            ScoreItem(title: "ขวดพลาสติก", date: "13/8/2025", points: "+3", color: .secondColor),
-            ScoreItem(title: "ขวดพลาสติก", date: "11/8/2025", points: "+3", color: .secondColor),
-            ScoreItem(title: "แก้วพลาสติก", date: "8/8/2025", points: "+2", color: .secondColor),
-            ScoreItem(title: "แลกคะแนน", date: "9/8/2025", points: "-600", color: .redeemColor),
-            ScoreItem(title: "กระป๋อง", date: "3/8/2025", points: "+3", color: .secondColor),
-            ScoreItem(title: "ตะเกียบไม้", date: "1/8/2025", points: "+1", color: .secondColor),
-            ScoreItem(title: "ขวดพลาสติก", date: "27/7/2025", points: "+3", color: .secondColor),
-            ScoreItem(title: "ขวดพลาสติก", date: "25/7/2025", points: "+3", color: .secondColor),
-            ScoreItem(title: "ขวดพลาสติก", date: "13/7/2025", points: "+3", color: .secondColor),
-            ScoreItem(title: "ขวดพลาสติก", date: "11/7/2025", points: "+3", color: .secondColor),
-            ScoreItem(title: "แก้วพลาสติก", date: "8/7/2025", points: "+2", color: .secondColor),
-            ScoreItem(title: "แลกคะแนน", date: "9/7/2025", points: "-600", color: .redeemColor),
-            ScoreItem(title: "กระป๋อง", date: "3/7/2025", points: "+3", color: .secondColor),
-            ScoreItem(title: "ตะเกียบไม้", date: "1/7/2025", points: "+1", color: .secondColor),
-        ]
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "d/M/yyyy"
-        formatter.locale = Locale(identifier: "en_US_POSIX")
 
-        var sortedItems = initialData
-        
-        sortedItems.sort {
-            let date1 = formatter.date(from: $0.date) ?? Date.distantPast
-            let date2 = formatter.date(from: $1.date) ?? Date.distantPast
-            return date1 > date2
-        }
-
-        _items = State(initialValue: sortedItems)
+    init(items: [ScoreItem]) {
+        _items = State(initialValue: items)
         _currentPage = State(initialValue: 0)
     }
 
     var body: some View {
-        let totalPages = min((items.count - 1) / itemsPerPage, 2)
+        let totalPages = max(0, (items.count - 1) / itemsPerPage)
 
         VStack(spacing: 11) {
             ZStack(alignment: .topTrailing) {
                 ScrollView {
                     VStack(spacing: 9) {
-                        ScoreSortMenu(items: $items, selectedSort: $selectedSort, isDropdownOpen: $isDropdownOpen, currentPage: $currentPage)
-                            .padding(.horizontal, 16)
+                        ScoreSortMenu(
+                            items: $items,
+                            selectedSort: $selectedSort,
+                            isDropdownOpen: $isDropdownOpen,
+                            currentPage: $currentPage
+                        )
+                        .padding(.horizontal, 15)
 
                         ForEach(currentItems, id: \.id) { item in
-                            ScoreCard(title: item.title,
-                                      date: item.date,
-                                      points: item.points,
-                                      backgroundColor: item.color)
-                            .padding(.horizontal, 16)
-
-
+                            ScoreCard(
+                                title: item.title,
+                                date: item.date,
+                                points: item.points,
+                                backgroundColor: item.color
+                            )
                         }
 
                     }
@@ -220,12 +216,10 @@ struct PageView: View {
 
                 .onTapGesture {
                     if isDropdownOpen {
-                        withAnimation {
-                            isDropdownOpen = false
-                        }
+                        withAnimation { isDropdownOpen = false }
                     }
                 }
-                
+
                 if isDropdownOpen {
                     DropdownOverlay(
                         items: $items,
@@ -256,12 +250,15 @@ struct PageView: View {
     var currentItems: [ScoreItem] {
         let start = currentPage * itemsPerPage
         let end = min(start + itemsPerPage, items.count)
+        guard start < end else { return [] }
         return Array(items[start..<end])
     }
 
 }
 
-
+#Preview {
+    ScoreHistoryView(hideTabBar: .constant(true))
+}
 
 
 

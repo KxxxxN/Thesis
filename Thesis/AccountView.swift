@@ -12,6 +12,8 @@ enum AccountDestination: Hashable {
     case translate
     case helpCenter
     case contactUs
+    case confirmPassword
+    case confirmEmail(String)
 //    case newPassword
 //    case confirmEmail(String)
 //    case otp(String)
@@ -142,6 +144,10 @@ struct AccountView: View {
                 case .translate:    TranslateView()
                 case .helpCenter:   HelpCenterView()
                 case .contactUs:    ContactUsView()
+                case .confirmPassword:
+                    ConfirmPasswordView()
+                case .confirmEmail(let email):
+                    ConfirmEmailView(currentEmail: email)
 //                case .newPassword: NewPasswordView()
 //                case .confirmEmail(let email):  ConfirmEmailView(currentEmail: email) 
 //                case .otp(let email):           OTPConfirmView(source: .confirmEmail, email: email)
