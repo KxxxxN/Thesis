@@ -22,17 +22,17 @@ struct WasteTypeView: View {
     @State private var currentPage = 1
 
     let wasteItems: [WasteTypeItem] = [
-        WasteTypeItem(title: "ขวดพลาสติก", date: "13/9/2025", imageName: "TypeBottle1"),
+        WasteTypeItem(title: "ขวดพลาสติก", date: "13/9/2025", imageName: "TypeBottle"),
         WasteTypeItem(title: "ขวดพลาสติก", date: "11/9/2025", imageName: "TypeBottle2"),
         WasteTypeItem(title: "ขวดพลาสติก", date: "10/9/2025", imageName: "TypeBottle3"),
         WasteTypeItem(title: "ขวดพลาสติก", date: "9/9/2025", imageName: "TypeBottle4"),
         WasteTypeItem(title: "ขวดพลาสติก", date: "1/9/2025", imageName: "TypeBottle5"),
-        WasteTypeItem(title: "ขวดพลาสติก", date: "20/8/2025", imageName: "TypeBottle1"),
+        WasteTypeItem(title: "ขวดพลาสติก", date: "20/8/2025", imageName: "TypeBottle"),
         WasteTypeItem(title: "ขวดพลาสติก", date: "27/8/2025", imageName: "TypeBottle2"),
         WasteTypeItem(title: "ขวดพลาสติก", date: "11/8/2025", imageName: "TypeBottle3"),
         WasteTypeItem(title: "ขวดพลาสติก", date: "13/8/2025", imageName: "TypeBottle4"),
         WasteTypeItem(title: "ขวดพลาสติก", date: "1/8/2025", imageName: "TypeBottle5"),
-        WasteTypeItem(title: "ขวดพลาสติก", date: "13/7/2025", imageName: "TypeBottle1"),
+        WasteTypeItem(title: "ขวดพลาสติก", date: "13/7/2025", imageName: "TypeBottle"),
         WasteTypeItem(title: "ขวดพลาสติก", date: "11/7/2025", imageName: "TypeBottle2"),
     ]
 

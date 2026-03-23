@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import AVFoundation
 import PhotosUI
 
 struct QRScanView: View {
@@ -69,6 +70,7 @@ struct QRScanView: View {
                             isScanning: $isScanning,
                             isActive: $isCameraActive,
                             capturedImage: .constant(nil),
+                            isFlashOn: $isFlashOn,
                             scanMode: true,
                             onScan: { result in
                                 qrResult = result

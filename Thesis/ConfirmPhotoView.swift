@@ -40,6 +40,7 @@ struct ConfirmPhotoView: View {
                             isScanning: $isScanning,
                             isActive: $isCameraActive,
                             capturedImage: $selectedUIImage,
+                            isFlashOn: $isFlashOn,
                             shouldCapture: shouldCapture
                         )
                         Color.black.opacity(0.25)

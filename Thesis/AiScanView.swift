@@ -70,6 +70,7 @@ struct AiScanView: View {
                                 isScanning: $isScanning,
                                 isActive: $isCameraActive,
                                 capturedImage: $capturedUIImage,
+                                isFlashOn: $isFlashOn,
                                 shouldCapture: shouldCapture
                             )
                             Color.black.opacity(0.25)

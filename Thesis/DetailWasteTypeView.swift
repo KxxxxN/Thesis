@@ -21,6 +21,18 @@ struct DetailWasteTypeView: View {
         case "กล่องกระดาษ":  return "TypeCardboard"
         case "กระดาษทั่วไป": return "TypePaper"
         case "ถุงพลาสติก":   return "TypePlasticBag"
+        case "เศษอาหาร":  return "TypeFood"
+        case "เปลือกผลไม้":  return "TypeFruit"
+        case "เศษขนม":      return "TypeSnack"
+        case "เปลือกไข่":  return "TypeEgg"
+        case "เครื่องดื่มเหลือ": return "TypeDrink"
+        case "น้ำแข็งเหลือ":   return "TypeIce"
+        case "ซองขนม": return "TypeSnackBag"
+        case "ภาชนะใส่อาหาร": return "TypeContainer"
+        case "หลอด": return "TypeStraw"
+        case "กระดาษทิชชู่": return "TypeTissue"
+        case "ตะเกียบไม้": return "TypeChopstick"
+        case "ช้อน-ส้อมพลาสติก": return "TypeSpoon"
         default:             return "TypeBottle2"
         }
     }
@@ -62,6 +74,19 @@ struct DetailWasteTypeView: View {
                     case "กล่องกระดาษ":  RecycleWasteDetailCardboardBox()
                     case "กระดาษทั่วไป": RecycleWasteDetailPaper()
                     case "ถุงพลาสติก":   RecycleWasteDetailPlasticBag()
+                    case "เศษอาหาร":  WetWasteDetailFoodscraps()
+                    case "เปลือกผลไม้":  WetWasteDetailFruitPeel()
+                    case "เศษขนม":      WetWasteDetailCrumbs()
+                    case "เปลือกไข่":  WetWasteDetailEggshell()
+                    case "เครื่องดื่มเหลือ": WetWasteDetailLeftoverDrinks()
+                    case "น้ำแข็งเหลือ":   WetWasteDetailLeftoverIce()
+                    case "ซองขนม": GeneralWasteDetailSnackBag()
+                    case "ภาชนะใส่อาหาร": GeneralWasteDetailFoodContainer()
+                    case "หลอด": GeneralWasteDetailStraw()
+                    case "กระดาษทิชชู่": GeneralWasteDetailTissue()
+                    case "ตะเกียบไม้": GeneralWasteDetailChopsticks()
+                    case "ช้อน-ส้อมพลาสติก": GeneralWasteDetailSpoon()
+                        
                     default:
                         Text("ไม่พบข้อมูลประเภทขยะนี้")
                             .font(.noto(18, weight: .medium))
