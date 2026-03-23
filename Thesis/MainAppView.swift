@@ -210,14 +210,13 @@ struct WasteSeparationGuideSection: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 410, height: 150)
-                                .cornerRadius(20)
+                                .cornerRadius(25)
                         }
                         .tag(index)
                     }
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 .frame(height: 150)
-                .cornerRadius(20)
                 .onReceive(timer) { _ in
                     withAnimation(.easeInOut(duration: 1.5)) {
                         currentIndex += 1  // เลื่อนไปข้างหน้าเสมอ ไม่มีวนกลับ
