@@ -35,17 +35,8 @@ struct SearchView: View {
                 VStack(spacing: 0) {
                     headerView
                     
-                    ZStack(alignment: .top) {
-                        ScrollView {
-                            SearchWasteExamplesGrid(
-                                hideTabBar: $hideTabBar,
-                                wasteExamples: WasteData.allExamples
-                            )
-                            .padding(.horizontal, 35)
-                            .padding(.top, 80)
-                        }
-                        .opacity((isSearchFocused || !searchText.isEmpty) ? 0.3 : 1.0)
-
+                    VStack(spacing: 0) {
+                        //  SearchSection อยู่นอก ScrollView
                         SearchSection(
                             hideTabBar: $hideTabBar,
                             searchText: $searchText,
@@ -55,22 +46,37 @@ struct SearchView: View {
                         )
                         .padding(.horizontal, 35)
                         .padding(.top, 18)
+                        .padding(.bottom, 10)
                         .zIndex(1)
-                    }
 
-                    Spacer()
-
-                    AiScanBottomNavigationBar(selectedTab: $selectedTabnavigationItem) { index in
-                        hideTabBar = true
-                        switch index {
-                        case 0: showBarcodeView = true
-                        case 1: showAiScanView = true
-                        default: break
+                        //  ScrollView อยู่ข้างล่าง ไม่ทับกัน
+                        ScrollView {
+                            SearchWasteExamplesGrid(
+                                hideTabBar: $hideTabBar,
+                                wasteExamples: WasteData.allExamples
+                            )
+                            .padding(.horizontal, 35)
                         }
+                        .safeAreaInset(edge: .bottom) {
+                            Color.clear.frame(height: 80) //  เว้นพื้นที่ด้านล่าง
+                        }
+                        .opacity((isSearchFocused || !searchText.isEmpty) ? 0.3 : 1.0)
                     }
-                    .padding(.horizontal, 47)
-                    .padding(.bottom, 18)
-                    .opacity(isSearchFocused ? 0 : 1)
+
+//                    Spacer()
+                        .overlay(alignment: .bottom) {
+                            AiScanBottomNavigationBar(selectedTab: $selectedTabnavigationItem) { index in
+                                hideTabBar = true
+                                switch index {
+                                case 0: showBarcodeView = true
+                                case 1: showAiScanView = true
+                                default: break
+                                }
+                            }
+                            .padding(.horizontal, 47)
+                            .padding(.bottom, 18)
+                            .opacity(isSearchFocused ? 0 : 1)
+                        }
                 }
             }
             .navigationDestination(isPresented: $showAiScanView) {
@@ -146,7 +152,7 @@ struct SearchSection: View {
                             ForEach(searchItems.indices, id: \.self) { index in
                                 VStack(spacing: 0) {
                                     NavigationLink {
-                                        DetailSearchView(hideTabBar: $hideTabBar)
+                                        DetailSearchView(hideTabBar: $hideTabBar, category: searchItems[index])
                                     } label: {
                                         HStack {
                                             Text(searchItems[index])
@@ -205,13 +211,28 @@ struct SearchBar: View {
 struct WasteData {
     static let categories: [WasteCategory] = [
         WasteCategory(
+            name: "ถังขยะเปียก",
+            colorName: "(สีเขียว)",
+            color: .wetWasteColor,
+            description: "สำหรับขยะที่ย่อยสลายได้เองตามธรรมชาติ",
+            binImage: "Bin1",
+            examples: [
+                WasteExample(image: "Foodscraps", label: "เศษอาหาร"),
+                WasteExample(image: "Egg", label: "เปลือกไข่"),
+                WasteExample(image: "Fruit", label: "เปลือกผลไม้"),
+                WasteExample(image: "Drink", label: "เครื่องดื่มเหลือ"),
+                WasteExample(image: "Snack", label: "เศษขนม"),
+                WasteExample(image: "Ice", label:"น้ำแข็งเหลือ")
+            ]
+        ),
+        WasteCategory(
             name: "ถังขยะทั่วไป",
             colorName: "(สีน้ำเงิน)",
             color: .generalWasteColor,
             description: "สำหรับขยะทั่วไปไม่สามารถรีไซเคิลได้",
             binImage: "Bin2",
             examples: [
-                WasteExample(image: "Chips", label: "ซองขนม"),
+                WasteExample(image: "SnackBag", label: "ซองขนม"),
                 WasteExample(image: "Tissue", label: "กระดาษทิชชู่"),
                 WasteExample(image: "Foambox", label: "ภาชนะ ใส่อาหาร"),
                 WasteExample(image: "Chopstick", label: "ตะเกียบไม้"),
@@ -254,7 +275,7 @@ struct SearchWasteExamplesGrid: View {
         LazyVGrid(columns: columns, spacing: 10) {
             ForEach(wasteExamples) { example in
                 NavigationLink {
-                    DetailSearchView(hideTabBar: $hideTabBar)
+                    DetailSearchView(hideTabBar: $hideTabBar, category: example.label)
                 } label: {
                     WasteCard(example: example)
                 }

@@ -97,7 +97,7 @@ struct WetWasteDetailContent: View {
                                 .multilineTextAlignment(.center)
                                 .lineLimit(2)
                                 .fixedSize(horizontal: false, vertical: true)
-                                .frame(width: 120)
+                                .frame(width: 150)
                             
                             Spacer()
                             // ✅ ถังตรงกับขั้นตอน
