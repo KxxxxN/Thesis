@@ -11,6 +11,7 @@ struct LoginView: View {
     
     @StateObject var viewModel = LoginViewModel()
     @State private var path = NavigationPath()
+    @EnvironmentObject var authViewModel: AuthViewModel
     
     var body: some View {
         
@@ -108,11 +109,17 @@ struct LoginView: View {
                 VStack(spacing: 16){
                     SocialLoginButton(iconName: "GoogleIcon", title: "ดำเนินการต่อด้วย Google") {
                         print("Google Login Action")
+                        Task {
+                            await authViewModel.signInWithGoogle()  
+                        }
                     }
                     .padding(.top, 21)
                     
                     SocialLoginButton(iconName: "XIcon", title: "ดำเนินการต่อด้วย X (Twitter)") {
                         print("X Login Action")
+                        Task {
+                            await authViewModel.signInWithX()
+                        }
                     }
                 }
                 Spacer()
@@ -121,6 +128,11 @@ struct LoginView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.backgroundColor)
         }
+//        .onOpenURL { url in
+//            Task {
+//                await authViewModel.handleOAuthCallback(url: url)
+//            }
+//        }
         .onReceive(NotificationCenter.default.publisher(for: .popToLogin)) { _ in
             path = NavigationPath()  // ✅ clear stack ทั้งหมด กลับมาที่ LoginView
         }
