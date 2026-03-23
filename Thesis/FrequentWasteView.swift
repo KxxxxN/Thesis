@@ -20,35 +20,16 @@ struct FrequentWasteView: View {
 
     @State private var selectedWaste: WasteItem? = nil    
 
-    let wasteItems = [
-        WasteItem(imageName: "Bottle", title: "ขวดพลาสติก", count: "33 ครั้ง"),
-        WasteItem(imageName: "Plasticcup", title: "แก้วพลาสติก", count: "13 ครั้ง"),
-        WasteItem(imageName: "Can", title: "กระป๋อง", count: "3 ครั้ง"),
-        WasteItem(imageName: "Foodscraps", title: "เศษอาหาร", count: "3 ครั้ง"),
-        WasteItem(imageName: "Chips", title: "ซองขนม", count: "2 ครั้ง"),
-        WasteItem(imageName: "Bag", title: "ถุงพลาสติก", count: "10 ครั้ง"),
-        WasteItem(imageName: "Foambox", title: "กล่องโฟม", count: "11 ครั้ง"),
-        WasteItem(imageName: "GlassBottle", title: "ขวดแก้ว", count: "5 ครั้ง"),
-        WasteItem(imageName: "Egg", title: "เปลือกไข่", count: "3 ครั้ง"),
-        WasteItem(imageName: "Straw", title: "หลอด", count: "3 ครั้ง"),
-        WasteItem(imageName: "Spoon", title: "ช้อนพลาสติก", count: "2 ครั้ง"),
-        WasteItem(imageName: "Stick", title: "ทิชชู่", count: "1 ครั้ง"),
-        WasteItem(imageName: "Fruit", title: "เปลือกผลไม้", count: "2 ครั้ง"),
-        WasteItem(imageName: "Box", title: "กล่องกระดาษ", count: "7 ครั้ง")
-    ]
+    @State private var currentPage = 1
+    @StateObject private var vm = FrequentWasteViewModel() // ✅ เพิ่ม
 
-    var sortedWasteItems: [WasteItem] {
-        wasteItems.sorted {
-            extractNumber($0.count) > extractNumber($1.count)
-        }
-    }
+    let itemsPerPage = 6
+    
+    var sortedWasteItems: [WasteItem] { vm.wasteItems }
 
     func extractNumber(_ text: String) -> Int {
         Int(text.replacingOccurrences(of: " ครั้ง", with: "")) ?? 0
     }
-
-    @State private var currentPage = 1
-    let itemsPerPage = 6
 
     var paginatedItems: [WasteItem] {
         let startIndex = (currentPage - 1) * itemsPerPage
@@ -57,9 +38,9 @@ struct FrequentWasteView: View {
     }
 
     var totalPages: Int {
-        Int(ceil(Double(sortedWasteItems.count) / Double(itemsPerPage)))
+        max(1, Int(ceil(Double(sortedWasteItems.count) / Double(itemsPerPage))))
     }
-
+    
     var headerView: some View {
         ZStack {
             Color.mainColor
@@ -120,35 +101,43 @@ struct FrequentWasteView: View {
 
                 headerView
 
-                ScrollView {
-                    LazyVGrid(
-                        columns: [
-                            GridItem(.flexible(), spacing: 16),
-                            GridItem(.flexible(), spacing: 16)
-                        ],
-                        spacing: 16
-                    ) {
-                        ForEach(paginatedItems, id: \.self) { item in
-                            WasteCardView(item: item)
-                                .onTapGesture {
-                                    selectedWaste = item
-                                }
+                if vm.isLoading {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                } else {
+                    ScrollView {
+                        LazyVGrid(
+                            columns: [
+                                GridItem(.flexible(), spacing: 16),
+                                GridItem(.flexible(), spacing: 16)
+                            ],
+                            spacing: 16
+                        ) {
+                            ForEach(paginatedItems, id: \.self) { item in
+                                WasteCardView(item: item)
+                                    .onTapGesture {
+                                        selectedWaste = item
+                                    }
+                            }
                         }
+                        .padding(.horizontal, 18)
+                        .padding(.top, 43)
                     }
-                    .padding(.horizontal, 18)
-                    .padding(.top, 43)
+                    
+                    paginationSection
                 }
-
-                paginationSection
             }
             .edgesIgnoringSafeArea(.top)
         }
-        .navigationDestination(item: $selectedWaste) { _ in
-            WasteTypeView(hideTabBar: .constant(true))
+        .navigationDestination(item: $selectedWaste) { waste in
+            WasteTypeView(hideTabBar: .constant(true), category: waste.title)
                 .navigationBarBackButtonHidden(true)
         }
+        .task {
+            await vm.fetchWasteCounts() // ✅ โหลดข้อมูล
+        }
     }
-
 }
 
 
@@ -182,4 +171,8 @@ struct WasteCardView: View {
         .background(Color.thirdColor)
         .cornerRadius(20)
     }
+}
+
+#Preview {
+    FrequentWasteView()
 }

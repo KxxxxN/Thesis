@@ -11,16 +11,7 @@ struct MainAppView: View {
     @State private var currentCarouselIndex = 0
     @Binding var hideTabBar: Bool
     @StateObject private var profileVM = UserProfileViewModel()
-    
-//    let historyItems = [
-//        HistoryItem(title: "ขวดพลาสติก", date: "13/9/2025", points: "+3", pointsLabel: "คะแนน")
-//    ]
-    
-    let recyclableItems = [
-        RecyclableItem(imageName: "Bottle", title: "ขวดพลาสติก",countNumber: 33),
-        RecyclableItem(imageName: "Plasticcup", title: "แก้วพลาสติก", countNumber: 13),
-        RecyclableItem(imageName: "Can", title: "กระป๋อง", countNumber: 3)
-    ]
+    @StateObject private var wasteVM = FrequentWasteViewModel()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -93,7 +84,16 @@ struct MainAppView: View {
                         items: profileVM.latestHistory.map { [$0] } ?? []
                     )
                     RewardExchangeSection(hideTabBar: $hideTabBar)
-                    FrequentWasteSection(hideTabBar: $hideTabBar, items: recyclableItems)
+                    FrequentWasteSection(
+                        hideTabBar: $hideTabBar,
+                        items: wasteVM.wasteItems.prefix(3).map {
+                            RecyclableItem(
+                                imageName: $0.imageName,
+                                title: $0.title,
+                                countNumber: Int($0.count.replacingOccurrences(of: " ครั้ง", with: "")) ?? 0
+                            )
+                        }
+                    )
                     WasteSeparationGuideSection(currentIndex: $currentCarouselIndex, hideTabBar: $hideTabBar)
                 }
                 .padding()
@@ -107,6 +107,7 @@ struct MainAppView: View {
             do {
                 let session = try await supabase.auth.session
                 await profileVM.fetchProfile(userId: session.user.id)
+                await wasteVM.fetchWasteCounts() 
             } catch {
                 print("❌ No session: \(error)")
             }
@@ -153,7 +154,7 @@ struct FrequentWasteSection: View {
             
             HStack(spacing: 8) {
                 ForEach(items) { item in
-                    NavigationLink(destination: WasteTypeView(hideTabBar: $hideTabBar)) {
+                    NavigationLink(destination: WasteTypeView(hideTabBar: $hideTabBar, category: item.title)) {
                         RecyclableItemCard(item: item)
                             .foregroundColor(.primary)
                     }
