@@ -24,11 +24,12 @@ struct MainAppView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("LOGO")
-                    .font(.system(size: 24))
-                    .foregroundColor(.white)
-                    .padding(.top, 69)
+            VStack(alignment: .leading, spacing: 4) {
+                Image("logo_white")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 110, height: 44)
+                    .padding(.top, 80)
                 
                 HStack(alignment: .center, spacing: 13) {
                     Image("Profile")
@@ -208,7 +209,7 @@ struct WasteSeparationGuideSection: View {
                             Image("info-banner\(index % totalPages + 1)")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 370, height: 150)
+                                .frame(width: 410, height: 150)
                                 .cornerRadius(20)
                         }
                         .tag(index)
@@ -216,8 +217,6 @@ struct WasteSeparationGuideSection: View {
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 .frame(height: 150)
-                .padding(2)
-                .background(Color.thirdColor)
                 .cornerRadius(20)
                 .onReceive(timer) { _ in
                     withAnimation(.easeInOut(duration: 1.5)) {
