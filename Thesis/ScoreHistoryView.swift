@@ -98,6 +98,9 @@ struct ScoreHistoryView: View {
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 .background(Color.white)
             }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .background(Color.white)
+
         }
         .navigationBarHidden(true)
         .edgesIgnoringSafeArea(.top)
@@ -202,10 +205,15 @@ struct PageView: View {
                                 backgroundColor: item.color
                             )
                         }
+
                     }
                     .padding(.bottom, 16)
+                    
                 }
+//                .padding(.horizontal, 16)
                 .contentShape(Rectangle())
+                
+
                 .onTapGesture {
                     if isDropdownOpen {
                         withAnimation { isDropdownOpen = false }
@@ -226,12 +234,17 @@ struct PageView: View {
             }
             .background(Color.white)
             .cornerRadius(20)
+            .padding(.horizontal, 16)
+
+
 
             CustomPaginationView(currentPage: $currentPage, maxPage: totalPages)
                 .padding(.vertical, 16)
                 .background(Color.white)
                 .cornerRadius(10)
         }
+
+        
     }
 
     var currentItems: [ScoreItem] {
@@ -240,6 +253,7 @@ struct PageView: View {
         guard start < end else { return [] }
         return Array(items[start..<end])
     }
+
 }
 
 #Preview {

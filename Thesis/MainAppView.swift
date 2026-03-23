@@ -15,11 +15,12 @@ struct MainAppView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("LOGO")
-                    .font(.system(size: 24))
-                    .foregroundColor(.white)
-                    .padding(.top, 69)
+            VStack(alignment: .leading, spacing: 4) {
+                Image("logo_white")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 110, height: 44)
+                    .padding(.top, 80)
                 
                 HStack(alignment: .center, spacing: 13) {
                     Group {
@@ -119,24 +120,38 @@ struct MainAppView: View {
 struct SectionHeader<Destination: View>: View {
     let title: String
     let destinationView: Destination
-    
+    var onTapSeeAll: (() -> Void)? = nil  // ✅ เพิ่ม optional action
+
     var body: some View {
         HStack {
             Text(title)
                 .font(.noto(18, weight: .bold))
                 .foregroundColor(.black)
-            
+
             Spacer()
-            
-            NavigationLink(destination: destinationView.navigationBarBackButtonHidden(true)) {
-                HStack(spacing: 4) {
-                    Text("ดูทั้งหมด")
-                        .font(.noto(14, weight: .medium))
-                        .foregroundColor(Color.mainColor)
-                    
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 14))
-                        .foregroundColor(Color.mainColor)
+
+            if let action = onTapSeeAll {
+                // ✅ ถ้ามี action ใช้ Button แทน NavigationLink
+                Button(action: action) {
+                    HStack(spacing: 4) {
+                        Text("ดูทั้งหมด")
+                            .font(.noto(14, weight: .medium))
+                            .foregroundColor(Color.mainColor)
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 14))
+                            .foregroundColor(Color.mainColor)
+                    }
+                }
+            } else {
+                NavigationLink(destination: destinationView.navigationBarBackButtonHidden(true)) {
+                    HStack(spacing: 4) {
+                        Text("ดูทั้งหมด")
+                            .font(.noto(14, weight: .medium))
+                            .foregroundColor(Color.mainColor)
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 14))
+                            .foregroundColor(Color.mainColor)
+                    }
                 }
             }
         }
@@ -198,43 +213,65 @@ struct RecyclableItemCard: View {
     }
 }
 
-
 struct WasteSeparationGuideSection: View {
     @Binding var currentIndex: Int
     @Binding var hideTabBar: Bool
+    @Binding var tabIndex: Int
 
     let totalPages = 3
-    
+    let virtualPages = 300  // infinite scroll
+    let timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
+
     var body: some View {
         VStack(spacing: 7) {
-            SectionHeader(title: "วิธีการแยกขยะ", destinationView: KnowledgeView(hideTabBar: $hideTabBar))
-            
-            VStack(spacing: 12) {
-                ZStack {
-                    Color.white
-                        .cornerRadius(20)
-                    
-                    Image("Solution1")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 307, height: 136)
+            SectionHeader(
+                title: "วิธีการแยกขยะ",
+                destinationView: KnowledgeView(hideTabBar: $hideTabBar),
+                onTapSeeAll: {
+                    withAnimation(.spring(response: 0.45, dampingFraction: 0.75)) {
+                        tabIndex = 2  // ✅ เปลี่ยนไปแท็บความรู้ทั่วไป
+                    }
                 }
+            )
+            VStack(spacing: 12) {
+                TabView(selection: $currentIndex) {
+                    ForEach(0..<virtualPages, id: \.self) { index in
+                        ZStack {
+                            Image("info-banner\(index % totalPages + 1)")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 410, height: 150)
+                                .cornerRadius(25)
+                        }
+                        .tag(index)
+                    }
+                }
+                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 .frame(height: 150)
-                .padding(8)
-                .background(Color.thirdColor)
-                .cornerRadius(20)
-                
+                .onReceive(timer) { _ in
+                    withAnimation(.easeInOut(duration: 1.5)) {
+                        currentIndex += 1  // เลื่อนไปข้างหน้าเสมอ ไม่มีวนกลับ
+                    }
+                }
+
+                // Dot indicator ใช้ % totalPages เพื่อให้ dot ถูกต้อง
                 HStack(spacing: 6) {
                     ForEach(0..<totalPages, id: \.self) { index in
                         Circle()
-                            .fill(index == currentIndex ? Color.mainColor : Color.thirdColor)
-                            .frame(width: 9, height: 9)
+                            .fill(index == currentIndex % totalPages ? Color.mainColor : Color.thirdColor)
+                            .frame(width: index == currentIndex % totalPages ? 10 : 9,
+                                   height: index == currentIndex % totalPages ? 10 : 9)
+                            .animation(.easeInOut(duration: 0.3), value: currentIndex)
                     }
                 }
             }
         }
+        .onAppear {
+            currentIndex = 0  //  เริ่มต้นที่หน้าแรกเสมอ
+        }
     }
 }
+
 
 extension View {
     func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {

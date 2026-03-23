@@ -12,6 +12,7 @@ struct CameraPreview: UIViewRepresentable {
     @Binding var isScanning: Bool
     @Binding var isActive: Bool
     @Binding var capturedImage: UIImage?
+    @Binding var isFlashOn: Bool
     var shouldCapture: Bool = false
     var scanMode: Bool = false
     var barcodeMode: Bool = false
@@ -112,6 +113,13 @@ struct CameraPreview: UIViewRepresentable {
     
     func updateUIView(_ uiView: UIView, context: Context) {
         let session = context.coordinator.session
+        
+        // Flash control
+        if let device = AVCaptureDevice.default(for: .video), device.hasTorch {
+            try? device.lockForConfiguration()
+            device.torchMode = isFlashOn ? .on : .off
+            device.unlockForConfiguration()
+        }
         
         context.coordinator.onCapture = { image in
             capturedImage = image

@@ -39,9 +39,9 @@ struct KnowledgeView: View {
                     WasteExample(image: "Foodscraps", label: "เศษอาหาร"),
                     WasteExample(image: "Egg", label: "เปลือกไข่"),
                     WasteExample(image: "Fruit", label: "เปลือกผลไม้"),
-                    WasteExample(image: "Leaf", label: "ใบไม้"),
-                    WasteExample(image: "Veget", label: "เศษผัก"),
-                    WasteExample(image: "Stick", label:"กิ่งไม้")
+                    WasteExample(image: "Drink", label: "เครื่องดื่มเหลือ"),
+                    WasteExample(image: "Snack", label: "เศษขนม"),
+                    WasteExample(image: "Ice", label:"น้ำแข็งเหลือ")
                 ]
             ),
             WasteCategory(
@@ -51,12 +51,12 @@ struct KnowledgeView: View {
                 description: "สำหรับขยะทั่วไปไม่สามารถรีไซเคิลได้",
                 binImage: "Bin2",
                 examples: [
-                    WasteExample(image: "Chips", label: "ซองขนม"),
+                    WasteExample(image: "SnackBag", label: "ซองขนม"),
                     WasteExample(image: "Tissue", label: "กระดาษทิชชู่"),
-                    WasteExample(image: "Foambox", label: "กล่องโฟม"),
+                    WasteExample(image: "Foambox", label: "ภาชนะใส่อาหาร"),
                     WasteExample(image: "Chopstick", label: "ตะเกียบไม้"),
                     WasteExample(image: "Straw", label: "หลอด"),
-                    WasteExample(image: "Spoon", label: "ช้อน-ส้อม พลาสติก")
+                    WasteExample(image: "Spoon", label: "ช้อน-ส้อมพลาสติก")
                 ]
             ),
             WasteCategory(
