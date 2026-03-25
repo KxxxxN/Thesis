@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  MainAppView.swift
 //  Theis
 //
 //  Created by Kansinee Klinkhachon on 22/10/2568 BE.
@@ -10,6 +10,7 @@ import SwiftUI
 struct MainAppView: View {
     @State private var currentCarouselIndex = 0
     @Binding var hideTabBar: Bool
+    @Binding var tabIndex: Int
     @StateObject private var profileVM = UserProfileViewModel()
     @StateObject private var wasteVM = FrequentWasteViewModel()
 
@@ -87,15 +88,21 @@ struct MainAppView: View {
                     RewardExchangeSection(hideTabBar: $hideTabBar)
                     FrequentWasteSection(
                         hideTabBar: $hideTabBar,
-                        items: wasteVM.wasteItems.prefix(3).map {
-                            RecyclableItem(
-                                imageName: $0.imageName,
-                                title: $0.title,
-                                countNumber: Int($0.count.replacingOccurrences(of: " ครั้ง", with: "")) ?? 0
-                            )
-                        }
+                        items: wasteVM.wasteItems.isEmpty
+                            ? [
+                                RecyclableItem(imageName: "Bottle",     title: "ขวดพลาสติก", countNumber: 0),
+                                RecyclableItem(imageName: "Plasticcup",        title: "แก้วพลาสติก",    countNumber: 0),
+                                RecyclableItem(imageName: "Can",        title: "กระป๋อง",    countNumber: 0)
+                              ]
+                            : wasteVM.wasteItems.prefix(3).map {
+                                RecyclableItem(
+                                    imageName: $0.imageName,
+                                    title: $0.title,
+                                    countNumber: Int($0.count.replacingOccurrences(of: " ครั้ง", with: "")) ?? 0
+                                )
+                              }
                     )
-                    WasteSeparationGuideSection(currentIndex: $currentCarouselIndex, hideTabBar: $hideTabBar)
+                    WasteSeparationGuideSection(currentIndex: $currentCarouselIndex, hideTabBar: $hideTabBar, tabIndex: $tabIndex)
                 }
                 .padding()
             }
@@ -108,7 +115,7 @@ struct MainAppView: View {
             do {
                 let session = try await supabase.auth.session
                 await profileVM.fetchProfile(userId: session.user.id)
-                await wasteVM.fetchWasteCounts() 
+                await wasteVM.fetchWasteCounts()
             } catch {
                 print("❌ No session: \(error)")
             }
@@ -294,6 +301,5 @@ struct RoundedCorner: Shape {
 }
 
 #Preview {
-    MainAppView(hideTabBar: .constant(false))
+    MainAppView(hideTabBar: .constant(false), tabIndex: .constant(0))
 }
-
