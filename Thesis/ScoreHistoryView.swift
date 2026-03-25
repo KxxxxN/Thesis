@@ -98,8 +98,8 @@ struct ScoreHistoryView: View {
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 .background(Color.white)
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .background(Color.white)
+//            .tabViewStyle(.page(indexDisplayMode: .never))
+//            .background(Color.white)
 
         }
         .navigationBarHidden(true)
@@ -186,65 +186,77 @@ struct PageView: View {
         let totalPages = max(0, (items.count - 1) / itemsPerPage)
 
         VStack(spacing: 11) {
-            ZStack(alignment: .topTrailing) {
-                ScrollView {
-                    VStack(spacing: 9) {
-                        ScoreSortMenu(
-                            items: $items,
-                            selectedSort: $selectedSort,
-                            isDropdownOpen: $isDropdownOpen,
-                            currentPage: $currentPage
-                        )
-                        .padding(.horizontal, 15)
+            if items.isEmpty {
+                //  Empty State
+                Spacer()
+                VStack(spacing: 0) {
+                    Image("ListEmpty")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 300, height: 300)
 
-                        ForEach(currentItems, id: \.id) { item in
-                            ScoreCard(
-                                title: item.title,
-                                date: item.date,
-                                points: item.points,
-                                backgroundColor: item.color
+                    Text("ยังไม่มีคะแนน?")
+                        .font(.noto(25, weight: .bold))
+                        .foregroundColor(.textFieldColor)
+
+                    Text("แยกขยะเพื่อเริ่มสะสมคะแนนได้เลย!")
+                        .font(.noto(18, weight: .bold))
+                        .foregroundColor(.textFieldColor)
+                }
+                Spacer()
+            } else {
+                //  มีข้อมูล แสดงปกติ
+                ZStack(alignment: .topTrailing) {
+                    ScrollView {
+                        VStack(spacing: 9) {
+                            ScoreSortMenu(
+                                items: $items,
+                                selectedSort: $selectedSort,
+                                isDropdownOpen: $isDropdownOpen,
+                                currentPage: $currentPage
                             )
+                            .padding(.horizontal, 15)
+
+                            ForEach(currentItems, id: \.id) { item in
+                                ScoreCard(
+                                    title: item.title,
+                                    date: item.date,
+                                    points: item.points,
+                                    backgroundColor: item.color
+                                )
+                            }
                         }
-
+                        .padding(.bottom, 16)
                     }
-                    .padding(.bottom, 16)
-                    
-                }
-//                .padding(.horizontal, 16)
-                .contentShape(Rectangle())
-                
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        if isDropdownOpen {
+                            withAnimation { isDropdownOpen = false }
+                        }
+                    }
 
-                .onTapGesture {
                     if isDropdownOpen {
-                        withAnimation { isDropdownOpen = false }
+                        DropdownOverlay(
+                            items: $items,
+                            currentPage: $currentPage,
+                            isOpen: $isDropdownOpen,
+                            selectedSort: $selectedSort
+                        )
+                        .padding(.top, 0)
+                        .padding(.trailing, 15)
+                        .zIndex(999)
                     }
                 }
-
-                if isDropdownOpen {
-                    DropdownOverlay(
-                        items: $items,
-                        currentPage: $currentPage,
-                        isOpen: $isDropdownOpen,
-                        selectedSort: $selectedSort
-                    )
-                    .padding(.top, 0)
-                    .padding(.trailing, 15)
-                    .zIndex(999)
-                }
-            }
-            .background(Color.white)
-            .cornerRadius(20)
-            .padding(.horizontal, 16)
-
-
-
-            CustomPaginationView(currentPage: $currentPage, maxPage: totalPages)
-                .padding(.vertical, 16)
                 .background(Color.white)
-                .cornerRadius(10)
-        }
+                .cornerRadius(20)
+                .padding(.horizontal, 16)
 
-        
+                CustomPaginationView(currentPage: $currentPage, maxPage: totalPages)
+                    .padding(.vertical, 16)
+                    .background(Color.white)
+                    .cornerRadius(10)
+            }
+        }
     }
 
     var currentItems: [ScoreItem] {
