@@ -43,32 +43,43 @@ struct WasteTypeView: View {
             VStack(spacing: 0) {
                 
                 headerView
-                if vm.isLoading {
-                    Spacer()
-                    ProgressView()
-                    Spacer()
-                } else {
-                    ScrollView {
-                        VStack(spacing: 11) {
-                            ForEach(pagedItems) { item in
-                                NavigationLink(destination: DetailView(hideTabBar: $hideTabBar)) {
-                                    WasteItemCard(
-                                        title: item.title,
-                                        date: item.date,
-                                        imageUrl: item.imageUrl
-                                    )
-                                }
-                                .buttonStyle(.plain)
-                            }
+                    if vm.items.isEmpty {
+                        // ✅ Empty State เหมือน ScoreHistoryView
+                        Spacer()
+                        VStack(spacing: 0) {
+                            Image("ListEmpty")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 300, height: 300)
+
+                            Text("ไม่มีประวัติการแยกขยะ")
+                                .font(.noto(25, weight: .bold))
+                                .foregroundColor(.textFieldColor)
+
                         }
-                        .padding(.horizontal, 15)
-                        .padding(.top, 42)
-                        .padding(.bottom, 125)
+                        Spacer()
+                    } else {
+                        ScrollView {
+                            VStack(spacing: 11) {
+                                ForEach(pagedItems) { item in
+                                    NavigationLink(destination: DetailView(hideTabBar: $hideTabBar)) {
+                                        WasteItemCard(
+                                            title: item.title,
+                                            date: item.date,
+                                            imageUrl: item.imageUrl
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
+                            .padding(.horizontal, 15)
+                            .padding(.top, 42)
+                            .padding(.bottom, 125)
+                        }
+
+                        paginationSection
                     }
-                    
-                    paginationSection
                 }
-            }
             .edgesIgnoringSafeArea(.top)
         }
         .onAppear { hideTabBar = true }
