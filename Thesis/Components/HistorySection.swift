@@ -11,8 +11,24 @@ struct HistorySection: View {
     @Binding var hideTabBar: Bool
     let items: [HistoryItem]
     
+    // 1. ตรวจสอบ Size Class
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    
     var body: some View {
-        VStack(spacing: 7) {
+        let isIPad = horizontalSizeClass == .regular
+        
+        // 2. กำหนดตัวแปรสำหรับขนาดต่างๆ เพื่อลดความซ้ำซ้อนในโค้ด
+        let titleFontSize: CGFloat = isIPad ? 24 : 20
+        let subtitleFontSize: CGFloat = isIPad ? 18 : 14
+        let pointFontSize: CGFloat = isIPad ? 36 : 25
+        let pointLabelSize: CGFloat = isIPad ? 20 : 15
+        let cardHeight: CGFloat = isIPad ? 110 : 75
+        let cardPadding: CGFloat = isIPad ? 24 : 16
+        let cornerRad: CGFloat = isIPad ? 25 : 20
+        let vStackSpacing: CGFloat = isIPad ? 12 : 7
+        let textSpacing: CGFloat = isIPad ? 6 : 3
+        
+        VStack(spacing: vStackSpacing) {
             SectionHeader(
                 title: "ประวัติคะแนน",
                 destinationView: ScoreHistoryView(hideTabBar: $hideTabBar)
@@ -20,48 +36,47 @@ struct HistorySection: View {
             
             if items.isEmpty {
                 // ✅ Empty state card
-                    NavigationLink(destination: ScoreHistoryView(hideTabBar: $hideTabBar)) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text("ยังไม่มีคะแนน?")
-                                    .font(.noto(20, weight: .bold))
-                                    .foregroundColor(.white)
-                                
-                                Text("แยกขยะเพื่อเริ่มสะสมคะแนนได้เลย!")
-                                    .font(.noto(14, weight: .medium))
-                                    .foregroundColor(.white)
-                            }
+                NavigationLink(destination: ScoreHistoryView(hideTabBar: $hideTabBar)) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: textSpacing) {
+                            Text("ยังไม่มีคะแนน?")
+                                .font(.noto(titleFontSize, weight: .bold))
+                                .foregroundColor(.white)
                             
-                            Spacer()
-                            
-                            VStack(alignment: .trailing, spacing: 0) {
-                                Text("0")
-                                    .font(.system(size: 25, weight: .bold))
-                                    .foregroundColor(.white)
-                                
-                                Text("คะแนน")
-                                    .font(.noto(15, weight: .bold))
-                                    .foregroundColor(.white)
-                            }
+                            Text("แยกขยะเพื่อเริ่มสะสมคะแนนได้เลย!")
+                                .font(.noto(subtitleFontSize, weight: .medium))
+                                .foregroundColor(.white)
                         }
-                        .padding(.horizontal, 16)
-                        .frame(maxWidth: 410)
-                        .frame(height: 75)
-                        .background(Color.secondColor)
-                        .cornerRadius(20)
-                        .frame(maxWidth: .infinity)
+                        
+                        Spacer()
+                        
+                        VStack(alignment: .trailing, spacing: 0) {
+                            Text("0")
+                                .font(.system(size: pointFontSize, weight: .bold))
+                                .foregroundColor(.white)
+                            
+                            Text("คะแนน")
+                                .font(.noto(pointLabelSize, weight: .bold))
+                                .foregroundColor(.white)
+                        }
                     }
+                    .padding(.horizontal, cardPadding)
+                    .frame(maxWidth: .infinity) // ปรับให้ขยายเต็มพื้นที่ที่กำหนดใน MainAppView
+                    .frame(height: cardHeight)
+                    .background(Color.secondColor)
+                    .cornerRadius(cornerRad)
+                }
             } else {
                 ForEach(items) { item in
                     NavigationLink(destination: ScoreHistoryView(hideTabBar: $hideTabBar)) {
                         HStack {
-                            VStack(alignment: .leading, spacing: 3) {
+                            VStack(alignment: .leading, spacing: textSpacing) {
                                 Text(item.title)
-                                    .font(.noto(20, weight: .bold))
+                                    .font(.noto(titleFontSize, weight: .bold))
                                     .foregroundColor(.white)
                                 
                                 Text(item.date)
-                                    .font(.system(size: 14, weight: .medium))
+                                    .font(.system(size: subtitleFontSize, weight: .medium))
                                     .foregroundColor(.white)
                             }
                             
@@ -69,24 +84,22 @@ struct HistorySection: View {
                             
                             VStack(alignment: .trailing, spacing: 0) {
                                 Text(item.points)
-                                    .font(.system(size: 25, weight: .bold))
+                                    .font(.system(size: pointFontSize, weight: .bold))
                                     .foregroundColor(.white)
                                 
                                 Text(item.pointsLabel)
-                                    .font(.noto(15, weight: .bold))
+                                    .font(.noto(pointLabelSize, weight: .bold))
                                     .foregroundColor(.white)
                             }
                         }
-                        .padding(.horizontal, 16)
-                        .frame(maxWidth: 410)
-                        .frame(height: 75)
+                        .padding(.horizontal, cardPadding)
+                        .frame(maxWidth: .infinity) // ปรับให้ขยายเต็มพื้นที่ที่กำหนดใน MainAppView
+                        .frame(height: cardHeight)
                         .background(Color.secondColor)
-                        .cornerRadius(20)
-                        .frame(maxWidth: .infinity)
+                        .cornerRadius(cornerRad)
                     }
                 }
             }
         }
     }
 }
-

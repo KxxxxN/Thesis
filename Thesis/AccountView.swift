@@ -25,165 +25,147 @@ struct AccountView: View {
     @AppStorage("isLoggedIn") var isLoggedIn = false
     @State private var path = NavigationPath()
     
+    // 1. ตรวจสอบ Size Class (Compact = iPhone ส่วนใหญ่, Regular = iPad หรือ iPhone แนวนอน)
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @Environment(\.verticalSizeClass) var verticalSizeClass
+
     var body: some View {
         NavigationStack(path: $path) {
-            VStack(spacing: 0) {
-                Spacer()
+            GeometryReader { geo in
+                // 2. คำนวณค่าตัวแปรตามขนาดหน้าจอ
+                let isIPad = horizontalSizeClass == .regular
+                let screenWidth = geo.size.width
+                let screenHeight = geo.size.height
                 
-                Text("บัญชีผู้ใช้")
-                    .font(.noto(25, weight: .bold))
-                    .padding(.bottom, 28)
-                
-                VStack(spacing: 22) {
-                    
-                    // --- กลุ่ม: ข้อมูลผู้ใช้ ---
-                    VStack(alignment: .leading, spacing: 7) {
-                        Text("ข้อมูลผู้ใช้")
-                            .font(.noto(16, weight: .bold))
-                            .foregroundColor(Color.black)
-                            .padding(.horizontal, 20)
+                // ปรับขนาด Font และ Spacing ตามขนาดหน้าจอ
+                let titleFontSize: CGFloat = isIPad ? 36 : 25
+                let sectionFontSize: CGFloat = isIPad ? 20 : 16
+                let groupSpacing: CGFloat = isIPad ? 30 : 22
+                let topPadding: CGFloat = screenHeight * (isIPad ? 0.07 : 0.07)
+
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 0) {
                         
-                        //Profile
-                        AccountMenuRow(
-                            title: "แก้ไขโปรไฟล์",
-                            imageName: "IconUser",
-                            action: { path.append(AccountDestination.profile) }
-                        )
-                    }
-                    
-                    // --- กลุ่ม: ตั้งค่า ---
-                    VStack(alignment: .leading, spacing: 7) {
-                        Text("ตั้งค่า")
-                            .font(.noto(16, weight: .bold))
-                            .foregroundColor(Color.black)
-                            .padding(.horizontal, 20)
+                        // Header Title
+                        Text("บัญชีผู้ใช้")
+                            .font(.noto(titleFontSize, weight: .bold))
+                            .padding(.top, topPadding)
+                            .padding(.bottom, isIPad ? 40 : 28)
                         
-                        VStack(spacing: 0) {
-                            //Translate
-                            AccountMenuRow(
-                                title: "เปลี่ยนภาษา",
-                                imageName: "IconTranslate",
-                                action: { path.append(AccountDestination.translate) }
-                            )
+                        // Main Content Group
+                        VStack(spacing: groupSpacing) {
                             
-                            //Notification
-                            AccountToggleRow(
-                                title: "การแจ้งเตือน",
-                                imageName: "IconNotification",
-                                isOn: $isNotificationOn
-                            )
-                        }
-                    }
-                    
-                    // --- กลุ่ม: ทั่วไป ---
-                    VStack(alignment: .leading, spacing: 7) {
-                        Text("ทั่วไป")
-                            .font(.noto(16, weight: .bold))
-                            .foregroundColor(Color.black)
-                            .padding(.horizontal, 20)
-                        
-                        VStack(spacing: 0) {
-                            // Help Center
-                            AccountMenuRow(
-                                title: "ช่วยเหลือ",
-                                imageName: "IconHelp",
-                                action: { path.append(AccountDestination.helpCenter) }
-                            )
+                            // --- กลุ่ม: ข้อมูลผู้ใช้ ---
+                            menuSection(title: "ข้อมูลผู้ใช้", fontSize: sectionFontSize) {
+                                AccountMenuRow(
+                                    title: "แก้ไขโปรไฟล์",
+                                    imageName: "IconUser",
+                                    action: { path.append(AccountDestination.profile) }
+                                )
+                            }
                             
-                            // Contact
-                            AccountMenuRow(
-                                title: "ติดต่อเรา",
-                                imageName: "IconSupport",
-                                action: { path.append(AccountDestination.contactUs) }
-                            )
-                        }
-                    }
-                    
-                    // --- กลุ่ม: บัญชี ---
-                    VStack(alignment: .leading, spacing: 7) {
-                        Text("บัญชี")
-                            .font(.noto(16, weight: .bold))
-                            .foregroundColor(Color.clear)
-                            .padding(.horizontal, 20)
-                        
-                        VStack(spacing: 0) {
-                            // ออกจากระบบ (Button)
-                            AccountMenuRow(
-                                title: "ออกจากระบบ",
-                                imageName: "IconLogout",
-                                action: {
-                                    Task {
-                                        await authViewModel.signOut()
-                                        isLoggedIn = false
-                                    }
+                            // --- กลุ่ม: ตั้งค่า ---
+                            menuSection(title: "ตั้งค่า", fontSize: sectionFontSize) {
+                                VStack(spacing: 0) {
+                                    AccountMenuRow(
+                                        title: "เปลี่ยนภาษา",
+                                        imageName: "IconTranslate",
+                                        action: { path.append(AccountDestination.translate) }
+                                    )
+                                    AccountToggleRow(
+                                        title: "การแจ้งเตือน",
+                                        imageName: "IconNotification",
+                                        isOn: $isNotificationOn
+                                    )
                                 }
-                            )
+                            }
                             
-                            // ลบบัญชี (Button)
-                            AccountMenuRow(
-                                title: "ลบบัญชี",
-                                imageName: "IconDelete",
-                                action: { print("Delete Account") }
-                            )
+                            // --- กลุ่ม: ทั่วไป ---
+                            menuSection(title: "ทั่วไป", fontSize: sectionFontSize) {
+                                VStack(spacing: 0) {
+                                    AccountMenuRow(
+                                        title: "ช่วยเหลือ",
+                                        imageName: "IconHelp",
+                                        action: { path.append(AccountDestination.helpCenter) }
+                                    )
+                                    AccountMenuRow(
+                                        title: "ติดต่อเรา",
+                                        imageName: "IconSupport",
+                                        action: { path.append(AccountDestination.contactUs) }
+                                    )
+                                }
+                            }
+                            
+                            // --- กลุ่ม: บัญชี ---
+                            menuSection(title: "บัญชี", fontSize: sectionFontSize, titleColor: .clear) {
+                                VStack(spacing: 0) {
+                                    AccountMenuRow(
+                                        title: "ออกจากระบบ",
+                                        imageName: "IconLogout",
+                                        action: {
+                                            Task {
+                                                await authViewModel.signOut()
+                                                isLoggedIn = false
+                                            }
+                                        }
+                                    )
+                                    AccountMenuRow(
+                                        title: "ลบบัญชี",
+                                        imageName: "IconDelete",
+                                        action: { print("Delete Account") }
+                                    )
+                                }
+                            }
                         }
+                        
+                        Spacer(minLength: 50)
                     }
+                    .frame(width: screenWidth) // ให้ VStack หลักกว้างเท่าหน้าจอเพื่อให้จัดกลางได้
                 }
-                Spacer()
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .background(Color.backgroundColor)
+            .background(Color.backgroundColor.ignoresSafeArea())
             .navigationBarHidden(true)
             .onAppear {
-                Task {
-                    await authViewModel.getInitialSession()
-                }
+                Task { await authViewModel.getInitialSession() }
             }
             .navigationDestination(for: AccountDestination.self) { destination in
                 switch destination {
-                case .profile:      ProfileView()
-                case .translate:    TranslateView()
-                case .helpCenter:   HelpCenterView()
-                case .contactUs:    ContactUsView()
-                case .confirmPassword:
-                    ConfirmPasswordView()
-                case .confirmEmail(let email):
-                    ConfirmEmailView(currentEmail: email)
-//                case .newPassword: NewPasswordView()
-//                case .confirmEmail(let email):  ConfirmEmailView(currentEmail: email) 
-//                case .otp(let email):           OTPConfirmView(source: .confirmEmail, email: email)
+                case .profile:        ProfileView()
+                case .translate:      TranslateView()
+                case .helpCenter:     HelpCenterView()
+                case .contactUs:      ContactUsView()
+                case .confirmPassword: ConfirmPasswordView()
+                case .confirmEmail(let email): ConfirmEmailView(currentEmail: email)
                 }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .popToAccount)) { _ in
             path = NavigationPath()
         }
-//        .onReceive(NotificationCenter.default.publisher(for: .navigateToNewPassword)) { _ in
-//            path.append(AccountDestination.newPassword)
-//        }
-//        .onReceive(NotificationCenter.default.publisher(for: .navigateToConfirmEmail)) { notification in
-//            if let email = notification.object as? String {
-//                path.append(AccountDestination.confirmEmail(email))
-//            }
-//        }
-//        .onReceive(NotificationCenter.default.publisher(for: .navigateToNewPassword)) { _ in
-//            withAnimation {
-//                path.append(AccountDestination.newPassword)
-//            }
-//        }
-//        .onReceive(NotificationCenter.default.publisher(for: .navigateToNewPassword)) { _ in
-//            path.append(AccountDestination.newPassword)  // ไม่ต้อง withAnimation
-//        }
-
         .onReceive(NotificationCenter.default.publisher(for: .popToProfile)) { _ in
-            while path.count > 1 {
-                path.removeLast()
-            }
+            while path.count > 1 { path.removeLast() }
+        }
+    }
+
+    // 3. Helper View สำหรับสร้าง Section เพื่อให้โค้ดสะอาดและ Responsive
+    @ViewBuilder
+    private func menuSection<Content: View>(
+        title: String,
+        fontSize: CGFloat,
+        titleColor: Color = .black,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 7) {
+            Text(title)
+                .font(.noto(fontSize, weight: .bold))
+                .foregroundColor(titleColor)
+                .padding(.horizontal, 20)
+            
+            content()
         }
     }
 }
-
 #Preview {
     AccountView()
 }
-
 

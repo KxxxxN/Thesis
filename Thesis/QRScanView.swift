@@ -10,6 +10,7 @@ import PhotosUI
 struct QRScanView: View {
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @Binding var hideTabBar: Bool
     @State private var showDetailView = false
     @Binding var index: Int
@@ -27,18 +28,48 @@ struct QRScanView: View {
 
     @State private var qrResult: String = ""
 
+    // MARK: - Responsive Dimensions (คำนวณค่าตัวแปรตามขนาดหน้าจอ)
+    private var isIPad: Bool { horizontalSizeClass == .regular }
+    
+    // โครงสร้างทั่วไป
+    private var contentMaxWidth: CGFloat { isIPad ? 500 : 343 }
+    
+    // ส่วน Header
+    private var headerTopPadding: CGFloat { isIPad ? 80 : 65 }
+    private var headerSidePadding: CGFloat { isIPad ? 30 : 10 }
+    private var headerTitleFont: CGFloat { isIPad ? 36 : 25 }
+    private var headerIconSize: CGFloat { isIPad ? 45 : 35 }
+    
+    // ส่วนข้อความแนะนำ
+    private var instructionFont: CGFloat { isIPad ? 28 : 20 }
+    private var instructionPaddingV: CGFloat { isIPad ? 30 : 20 }
+    private var instructionPaddingTop: CGFloat { isIPad ? 80 : 40 }
+    
+    // ส่วนกล้องสแกน
+    private var cameraSize: CGFloat { isIPad ? 450 : 288 }
+    private var cameraPaddingTop: CGFloat { isIPad ? 80 : 60 }
+    
+    // ส่วน Popup Alert
+    private var alertIconSize: CGFloat { isIPad ? 140 : 111 }
+    private var alertTitleFont: CGFloat { isIPad ? 32 : 25 }
+    private var alertResultFont: CGFloat { isIPad ? 24 : 18 }
+    private var alertButtonSpacing: CGFloat { isIPad ? 30 : 21 }
+    private var buttonHeight: CGFloat { isIPad ? 50 : 40 }
+    private var buttonFont: CGFloat { isIPad ? 20 : 16 }
+
+    // MARK: - Result Title Formatting
     private var resultTitle: AttributedString {
         var text = AttributedString(qrResult)
-        text.font = .noto(18, weight: .medium)
+        text.font = .noto(alertResultFont, weight: .medium)
         if let range = text.range(of: "COSCI") {
-            text[range].font = .inter(18, weight: .medium)
+            text[range].font = .inter(alertResultFont, weight: .medium)
         }
         return text
     }
 
+    // MARK: - Body
     var body: some View {
         ZStack(alignment: .top) {
-
             GeometryReader { geo in
                 Image("QRBackground")
                     .resizable()
@@ -49,23 +80,21 @@ struct QRScanView: View {
             .ignoresSafeArea()
 
             VStack(spacing: 0) {
-
                 headerView
 
                 VStack(spacing: 0) {
-
                     Text("โปรดสแกนคิวอาร์โค้ด\nที่ติดอยู่บนถังขยะเพื่อเริ่มใช้งาน")
-                        .font(.noto(20, weight: .medium))
+                        .font(.noto(instructionFont, weight: .medium))
                         .foregroundColor(.black)
                         .multilineTextAlignment(.center)
-                        .frame(width: 343, height: 115)
+                        .padding(.vertical, instructionPaddingV)
+                        .frame(maxWidth: contentMaxWidth)
                         .background(Color.textFieldColor)
                         .cornerRadius(20)
-                    
-                    .padding(.top, 62)
+                        .padding(.horizontal, 20)
+                        .padding(.top, instructionPaddingTop)
 
                     ZStack {
-                        // ✅ อัปเดต CameraPreview ให้ตรง signature ใหม่
                         CameraPreview(
                             isScanning: $isScanning,
                             isActive: $isCameraActive,
@@ -84,20 +113,19 @@ struct QRScanView: View {
                             }
                         )
                         .id(cameraID)
-                        .frame(width: 288, height: 288)
                         .cornerRadius(20)
                         
                         QRCornerLines()
                     }
-                    .frame(width: 288, height: 288)
-                    .padding(.top, 93)
+                    .frame(width: cameraSize, height: cameraSize)
+                    .padding(.top, cameraPaddingTop)
 
                     Spacer()
                     Color.clear.frame(height: 50)
                 }
             }
 
-            // Result Alert
+            // MARK: - Result Alert
             if showResultAlert {
                 ZStack {
                     Rectangle()
@@ -109,14 +137,12 @@ struct QRScanView: View {
                         Image("Passmark")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 111, height: 111)
-                            .multilineTextAlignment(.center)
+                            .frame(width: alertIconSize, height: alertIconSize)
                             .padding(.top, 25)
 
                         Text("ยืนยันถังขยะ")
-                            .font(.noto(25, weight: .bold))
+                            .font(.noto(alertTitleFont, weight: .bold))
                             .foregroundColor(.black)
-                            .multilineTextAlignment(.center)
                             .padding(.top, 10)
 
                         Text(resultTitle)
@@ -124,9 +150,8 @@ struct QRScanView: View {
                             .multilineTextAlignment(.center)
                             .padding(.top, 4)
 
-                        HStack(spacing: 21) {
+                        HStack(spacing: alertButtonSpacing) {
                             Button {
-                                showResultAlert = false
                                 showResultAlert = false
                                 cameraID = UUID()
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -135,13 +160,14 @@ struct QRScanView: View {
                                 }
                             } label: {
                                 Text("ยกเลิก")
-                                    .font(.noto(16, weight: .bold))
+                                    .font(.noto(buttonFont, weight: .bold))
                                     .foregroundColor(.mainColor)
-                                    .frame(width: 120, height: 40)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: buttonHeight)
                                     .background(Color.white)
-                                    .cornerRadius(20)
+                                    .cornerRadius(25)
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 20)
+                                        RoundedRectangle(cornerRadius: 25)
                                             .stroke(Color.mainColor, lineWidth: 2)
                                     )
                             }
@@ -152,23 +178,25 @@ struct QRScanView: View {
                                 showAiScanView = true
                             } label: {
                                 Text("ยืนยัน")
-                                    .font(.noto(16, weight: .bold))
+                                    .font(.noto(buttonFont, weight: .bold))
                                     .foregroundColor(.white)
-                                    .frame(width: 120, height: 40)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: buttonHeight)
                                     .background(Color.mainColor)
-                                    .cornerRadius(20)
+                                    .cornerRadius(25)
                             }
                         }
                         .padding(25)
                     }
                     .padding(20)
-                    .frame(width: 343, height: 320)
+                    .frame(maxWidth: contentMaxWidth)
                     .background(Color.white)
                     .cornerRadius(20)
+                    .padding(.horizontal, 30)
                 }
             }
 
-            // Error Alert
+            // MARK: - Error Alert
             if showErrorAlert {
                 ErrorPopupView(title: "สแกนไม่สำเร็จ") {
                     showErrorAlert = false
@@ -193,15 +221,18 @@ struct QRScanView: View {
         }
     }
 
+    // MARK: - Header View
     private var headerView: some View {
         HStack {
             XBackButtonBlack(index: $index)
+                .padding(.leading, headerSidePadding)
+            
             Color.clear.frame(width: 10, height: 10)
 
             Spacer()
 
             Text("สแกนคิวอาร์โค้ดถังขยะ")
-                .font(.noto(25, weight: .bold))
+                .font(.noto(headerTitleFont, weight: .bold))
                 .foregroundColor(.black)
 
             Spacer()
@@ -210,11 +241,11 @@ struct QRScanView: View {
                 Image(isFlashOn ? "FlashOn" : "FlashOff")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 35, height: 35)
-                    .padding(.trailing, 25)
+                    .frame(width: headerIconSize, height: headerIconSize)
+                    .padding(.trailing, headerSidePadding)
             }
         }
-        .padding(.top, 65)
+        .padding(.top, headerTopPadding)
         .padding(.bottom, 20)
         .frame(maxWidth: .infinity)
         .background(Color.backgroundColor.ignoresSafeArea(edges: .top))
@@ -224,16 +255,17 @@ struct QRScanView: View {
 // MARK: - QR Frame View
 struct QRScanFrameView: View {
     var body: some View {
-        ZStack {
-            Image("QR")
-                .resizable()
-                .scaledToFill()
-                .frame(width: 288, height: 288)
-                .clipped()
-            QRCornerLines()
+        GeometryReader { geo in
+            ZStack {
+                Image("QR")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .clipped()
+                QRCornerLines()
+            }
+            .background(Color.white)
         }
-        .frame(width: 288, height: 288)
-        .background(Color.white)
     }
 }
 

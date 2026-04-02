@@ -7,9 +7,10 @@
 
 import SwiftUI
 
-
 // MARK: - Shared Component
 struct WetWasteDetailContent: View {
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    
     let category: String
     var wasteDetail: String? = nil
     let separationSteps: [WasteSeparationStep]
@@ -17,98 +18,114 @@ struct WetWasteDetailContent: View {
     let recyclingMethods: [String]
     var showDate: Bool = false
 
+    // MARK: - Responsive Dimensions (เหมือน GeneralWasteDetailContent)
+    private var isIPad: Bool { horizontalSizeClass == .regular }
+    private var contentPaddingH: CGFloat { isIPad ? 60 : 37 }
+    
+    private var titleFontSize: CGFloat { isIPad ? 36 : 25 }
+    private var sectionTitleFontSize: CGFloat { isIPad ? 28 : 20 }
+    private var bodyFontSize: CGFloat { isIPad ? 22 : 17 }
+    private var stepTextFontSize: CGFloat { isIPad ? 20 : 15 }
+    private var binTextFontSize: CGFloat { isIPad ? 16 : 12 }
+    
+    private var mainBinHeight: CGFloat { isIPad ? 150 : 108 }
+    private var stepImageSize: CGFloat { isIPad ? 120 : 80 }
+    private var binIconSize: CGFloat { isIPad ? 60 : 40 }
+    private var arrowSize: CGFloat { isIPad ? 30 : 20 }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             
             // ชื่อขยะและวันที่
             HStack(spacing: 12) {
                 Text(category)
-                    .font(.noto(25, weight: .bold))
+                    .font(.noto(titleFontSize, weight: .bold))
                     .foregroundColor(.black)
                 
                 if showDate {
                     Text(Date().formatted(date: .numeric, time: .shortened))
-                        .font(.noto(15, weight: .medium))
+                        .font(.noto(stepTextFontSize, weight: .medium))
                         .foregroundColor(.black)
-                        .padding(.top, 8)
+                        .padding(.top, isIPad ? 12 : 8)
                 }
             }
             .padding(.top, 24)
-            .padding(.horizontal, 37)
+            .padding(.horizontal, contentPaddingH)
             
-            //รายละเอียดตัวอย่างขยะ
+            // รายละเอียดตัวอย่างขยะ
             if let wasteDetail = wasteDetail {
                 Text(wasteDetail)
-                    .font(.noto(18, weight: .medium))
+                    .font(.noto(isIPad ? 24 : 18, weight: .medium))
                     .foregroundColor(.gray)
-                    .padding(.horizontal, 37)
+                    .padding(.horizontal, contentPaddingH)
             }
             
             // ประเภทถังขยะ
             HStack(spacing: 13) {
-                Image("Bin1")
+                Image("Bin1") // ถังขยะเปียกสีเขียว
                     .resizable()
                     .scaledToFit()
-                    .frame(height: 108)
+                    .frame(height: mainBinHeight)
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("ประเภทถังขยะ")
-                        .font(.noto(20, weight: .bold))
+                        .font(.noto(sectionTitleFontSize, weight: .bold))
                     HStack(spacing: 0) {
-                        Text("ถังขยะเปียก")
-                            .font(.noto(18, weight: .medium))
+                        Text("ถังขยะเปียก ")
+                            .font(.noto(isIPad ? 24 : 18, weight: .medium))
                         Text("(สีเขียว)")
-                            .font(.noto(18, weight: .bold))
+                            .font(.noto(isIPad ? 24 : 18, weight: .bold))
                             .foregroundColor(.wetWasteColor)
                     }
                 }
             }
             .padding(.top, 25)
-            .padding(.horizontal, 37)
+            .padding(.horizontal, contentPaddingH)
             
             // วิธีการแยกขยะ
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 10) {
                 Text("วิธีการแยกขยะ")
-                    .font(.noto(20, weight: .bold))
+                    .font(.noto(sectionTitleFontSize, weight: .bold))
                     .foregroundColor(.black)
-                    .padding(.horizontal, 27)
+                    .padding(.horizontal, contentPaddingH)
                 
-                HStack(spacing: 0) {
+                HStack(alignment: .top, spacing: 0) {
                     ForEach(separationSteps.indices, id: \.self) { index in
                         if index > 0 {
                             Image(systemName: "arrow.right")
                                 .foregroundColor(.black)
-                                .font(.system(size: 20))
+                                .font(.system(size: arrowSize))
                                 .padding(.horizontal, 2)
-                                .padding(.bottom, 60)
+                                .padding(.top, stepImageSize / 2 - (arrowSize / 2)) // จัดให้อยู่กึ่งกลางรูปภาพ
                         }
                         
-                        // ✅ รูปขั้นตอน + ถังตรงกัน
                         VStack(spacing: 0) {
                             Image(separationSteps[index].imageName)
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: 80, height: 80)
+                                .frame(width: stepImageSize, height: stepImageSize)
                                 .padding(.bottom, 10)
                             
                             Text(separationSteps[index].text)
-                                .font(.noto(15, weight: .medium))
+                                .font(.noto(stepTextFontSize, weight: .medium))
                                 .foregroundColor(.black)
                                 .multilineTextAlignment(.center)
                                 .lineLimit(2)
                                 .fixedSize(horizontal: false, vertical: true)
-                                .frame(width: 150)
+                                // กำหนด minHeight เพื่อให้ถังขยะด้านล่างบรรทัดเท่ากัน
+                                .frame(maxWidth: .infinity, minHeight: isIPad ? 60 : 45, alignment: .top)
                             
-                            Spacer()
-                            // ✅ ถังตรงกับขั้นตอน
+                            Spacer().frame(height: 10)
+                            
+                            // ถังขยะขนาดเล็กด้านล่างขั้นตอน
                             if index < binSteps.count {
                                 VStack(spacing: 2) {
                                     Image(binSteps[index].imageName)
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(width: 40, height: 40)
+                                        .frame(width: binIconSize, height: binIconSize)
                                     Text(binSteps[index].text)
-                                        .font(.noto(12, weight: .medium))
+                                        .font(.noto(binTextFontSize, weight: .medium))
                                         .foregroundColor(.black)
                                         .multilineTextAlignment(.center)
                                 }
@@ -117,26 +134,26 @@ struct WetWasteDetailContent: View {
                         .frame(maxWidth: .infinity)
                     }
                 }
+                .padding(.horizontal, isIPad ? 20 : 10)
             }
             .padding(.top, 30)
-            .padding(.horizontal, 10)
             
             // การรีไซเคิล
             VStack(alignment: .leading, spacing: 10) {
                 Text("การรีไซเคิล")
-                    .font(.noto(20, weight: .bold))
-                VStack(alignment: .leading, spacing: 0) {
+                    .font(.noto(sectionTitleFontSize, weight: .bold))
+                VStack(alignment: .leading, spacing: 6) {
                     ForEach(recyclingMethods, id: \.self) { method in
-                        Text("•   \(method)")
-                            .font(.noto(17, weight: .medium))
+                        Text("•   \(method)")
+                            .font(.noto(bodyFontSize, weight: .medium))
                     }
                 }
             }
-            .padding(.horizontal, 37)
+            .padding(.horizontal, contentPaddingH)
             .padding(.top, 30)
             .padding(.bottom, 50)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(
             Color.knowledgeBackground
                 .clipShape(TabCorner(radius: 20, corners: [.topLeft, .topRight]))
