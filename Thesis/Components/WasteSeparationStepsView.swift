@@ -2,6 +2,14 @@
 //  WasteSeparationStepsView.swift
 //  Thesis
 //
+//  Created by Penpitcha Sureepitak on 9/4/2569 BE.
+//
+
+
+//
+//  WasteSeparationStepsView.swift
+//  Thesis
+//
 //  Shared component สำหรับแสดง steps + bin icons
 //  ใช้ร่วมกันใน WetWasteDetailContent, GeneralWasteDetailContent, RecycleWasteDetailContent
 //

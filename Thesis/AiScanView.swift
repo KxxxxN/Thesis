@@ -13,7 +13,9 @@ import Vision
 struct AiScanView: View {
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @Binding var hideTabBar: Bool
+    
     @State private var showDetailView = false
     @State private var showBarcodeView = false
     @State private var showSearchView = false
@@ -34,38 +36,38 @@ struct AiScanView: View {
     
     @State private var isScanning = true
 
-    private var resultTitle: AttributedString {
+    private func resultTitle(config: ResponsiveConfig) -> AttributedString {
         var text = AttributedString("ขยะชิ้นนี้คือ \(aiResult) \nถูกต้องหรือไม่?")
         if let range = text.range(of: aiResult) {
-            text[range].font = .noto(25, weight: .bold)
+            text[range].font = .noto(config.alertTitleFont, weight: .bold)
         }
         return text
     }
 
     var body: some View {
         NavigationStack {
-
-            ZStack(alignment: .top) {
-
-                GeometryReader { geo in
+            GeometryReader { geo in
+                let config = ResponsiveConfig(horizontalSizeClass: sizeClass, geo: geo)
+                
+                ZStack(alignment: .top) {
+                    
+                    // MARK: - ส่วน Background (ภาพหรือกล้อง)
                     ZStack {
-                        // ✅ ถ้ามีภาพที่ถ่ายหรือเลือกจาก gallery → แสดงภาพนั้น
                         if let uiImage = capturedUIImage {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFill()
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .frame(width: geo.size.width, height: geo.size.height)
                                 .clipped()
                                 .background(Color.cameraBackground)
                         } else if let selectedImage {
                             selectedImage
                                 .resizable()
                                 .scaledToFill()
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .frame(width: geo.size.width, height: geo.size.height)
                                 .clipped()
                                 .background(Color.cameraBackground)
                         } else {
-                            // ✅ ส่ง binding capturedImage และ shouldCapture
                             CameraPreview(
                                 isScanning: $isScanning,
                                 isActive: $isCameraActive,
@@ -77,153 +79,156 @@ struct AiScanView: View {
                         }
                     }
                     .ignoresSafeArea()
-                }
 
-                VStack(spacing: 0) {
+                    // MARK: - ส่วน Foreground (UI ซ้อนทับด้านบน)
+                    VStack(spacing: 0) {
 
-                    headerView
+                        headerView(config: config)
 
-                    VStack {
-                        Text("กรุณาสแกนขยะทีละชิ้นเพื่อแยกประเภท")
-                            .font(.noto(20, weight: .medium))
-                            .foregroundColor(.black)
-                            .multilineTextAlignment(.center)
-                            .frame(width: 343, height: 60)
-                            .background(Color.textFieldColor)
-                            .cornerRadius(20)
-
-                        Spacer()
-                            .frame(height: 505)
-
-                        HStack {
-                            GalleryPickerButton(selectedItem: $selectedItem)
-                                .onChange(of: selectedItem) { _, newItem in
-                                    loadImage(from: newItem)
-                                }
-
-                            Spacer()
-
-                            Button {
-                                // ✅ ถ้ามีรูปจาก gallery → วิเคราะห์เลย
-                                // ถ้ายังไม่มี → ถ่ายภาพจากกล้องก่อน
-                                if capturedUIImage != nil || selectedImage != nil {
-                                    analyzeImage()
-                                } else {
-                                    shouldCapture = true
-                                }
-                            } label: {
-                                ZStack {
-                                    Circle()
-                                        .stroke(Color.mainColor, lineWidth: 3)
-                                        .frame(width: 85, height: 85)
-
-                                    Circle()
-                                        .fill(Color.mainColor)
-                                        .frame(width: 73, height: 73)
-
-                                    Image("Tabler_ai")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 57, height: 57)
-                                }
-                            }
-
-                            Spacer()
-                            Color.clear.frame(width: 55, height: 1)
-                        }
-                        .frame(maxWidth: 343)
-
-                        AiScanBottomNavigationBar(
-                            selectedTab: $selectedTabnavigationItem
-                        ) { index in
-                            hideTabBar = true
-                            switch index {
-                            case 0: showBarcodeView = true
-                            case 1: break
-                            case 2: showSearchView = true
-                            default: break
-                            }
-                        }
-                        .padding(.bottom, 25)
-                        .padding(.top, 21)
-                    }
-                }
-
-                // Alert overlay
-                if showResultAlert {
-                    ZStack {
-                        Rectangle()
-                            .fill(.ultraThinMaterial)
-                            .opacity(0.8)
-                            .ignoresSafeArea()
-
-                        VStack(spacing: 16) {
-                            Text(resultTitle)
-                                .font(.noto(25, weight: .medium))
+                        VStack {
+                            Text("กรุณาสแกนขยะทีละชิ้นเพื่อแยกประเภท")
+                                .font(.noto(config.fontBody, weight: .medium))
                                 .foregroundColor(.black)
                                 .multilineTextAlignment(.center)
+                                .padding(.horizontal, config.paddingSmall)
+                                .padding(.vertical, config.paddingSmall)
+                                .frame(maxWidth: config.qrContentMaxWidth, minHeight: config.isIPad ? 80 : 60)
+                                .background(Color.textFieldColor)
+                                .cornerRadius(config.bannerCornerRadius)
+                                .padding(.horizontal, config.paddingMedium)
 
-                            Text("ผลการสแกนตรงกับขยะของคุณหรือไม่?\nหากไม่ถูกต้อง กรุณาสแกนใหม่")
-                                .font(.noto(16, weight: .medium))
-                                .foregroundColor(.gray)
-                                .multilineTextAlignment(.center)
+                            Spacer()
 
-                            HStack(spacing: 21) {
+                            HStack {
+                                GalleryPickerButton(selectedItem: $selectedItem)
+                                    .onChange(of: selectedItem) { _, newItem in
+                                        loadImage(from: newItem)
+                                    }
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+
                                 Button {
-                                    // ✅ reset ทั้งหมดเพื่อสแกนใหม่
-                                    capturedUIImage = nil
-                                    selectedImage = nil
-                                    selectedItem = nil
-                                    shouldCapture = false
-                                    showResultAlert = false
+                                    if capturedUIImage != nil || selectedImage != nil {
+                                        analyzeImage()
+                                    } else {
+                                        shouldCapture = true
+                                    }
                                 } label: {
-                                    Text("สแกนใหม่")
-                                        .font(.noto(16, weight: .bold))
-                                        .foregroundColor(.mainColor)
-                                        .frame(width: 120, height: 40)
-                                        .background(Color.white)
-                                        .cornerRadius(20)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 20)
-                                                .stroke(Color.mainColor, lineWidth: 2)
-                                        )
+                                    ZStack {
+                                        Circle()
+                                            .stroke(Color.mainColor, lineWidth: config.aiButtonOuterLineWidth)
+                                            .frame(width: config.aiButtonOuterSize, height: config.aiButtonOuterSize)
+
+                                        Circle()
+                                            .fill(Color.mainColor)
+                                            .frame(width: config.aiButtonInnerSize, height: config.aiButtonInnerSize)
+
+                                         Image("Tabler_ai")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: config.aiButtonIconSize, height: config.aiButtonIconSize)
+                                    }
                                 }
 
-                                Button {
-                                    showResultAlert = false
-                                    showDetailView = true
-                                } label: {
-                                    Text("ถูกต้อง")
-                                        .font(.noto(16, weight: .bold))
-                                        .foregroundColor(.white)
-                                        .frame(width: 120, height: 40)
-                                        .background(Color.mainColor)
-                                        .cornerRadius(20)
+                                Color.clear
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                            }
+                            .padding(.horizontal, config.paddingStandard)
+
+                            AiScanBottomNavigationBar(
+                                selectedTab: $selectedTabnavigationItem
+                            ) { index in
+                                hideTabBar = true
+                                switch index {
+                                case 0: showBarcodeView = true
+                                case 1: break
+                                case 2: showSearchView = true
+                                default: break
                                 }
                             }
+                            .padding(.bottom, config.paddingStandard)
+                            .padding(.top, config.spacingSmall)
                         }
-                        .padding(20)
-                        .frame(width: 343, height: 255)
-                        .background(Color.white)
-                        .cornerRadius(20)
                     }
-                }
 
-                if isAnalyzing {
-                    ZStack {
-                        Rectangle()
-                            .fill(.ultraThinMaterial)
-                            .ignoresSafeArea()
+                    // MARK: - Alert overlay
+                    if showResultAlert {
+                        ZStack {
+                            Rectangle()
+                                .fill(.ultraThinMaterial)
+                                .opacity(0.8)
+                                .ignoresSafeArea()
 
-                        ProgressView()
-                            .scaleEffect(1.5)
-                            .padding(30)
+                            VStack(spacing: config.spacingMedium) {
+                                Text(resultTitle(config: config))
+                                    .font(.noto(config.alertTitleFont, weight: .medium))
+                                    .foregroundColor(.black)
+                                    .multilineTextAlignment(.center)
+                                    .fixedSize(horizontal: false, vertical: true)
+
+                                Text("ผลการสแกนตรงกับขยะของคุณหรือไม่?\nหากไม่ถูกต้อง กรุณาสแกนใหม่")
+                                    .font(.noto(config.alertResultFont, weight: .medium))
+                                    .foregroundColor(.gray)
+                                    .multilineTextAlignment(.center)
+                                    .fixedSize(horizontal: false, vertical: true)
+
+                                HStack(spacing: config.alertButtonSpacing) {
+                                    Button {
+                                        capturedUIImage = nil
+                                        selectedImage = nil
+                                        selectedItem = nil
+                                        shouldCapture = false
+                                        showResultAlert = false
+                                    } label: {
+                                        Text("สแกนใหม่")
+                                            .font(.noto(config.buttonFont, weight: .bold))
+                                            .foregroundColor(.mainColor)
+                                            .frame(maxWidth: .infinity, minHeight: config.buttonHeight)
+                                            .background(Color.white)
+                                            .cornerRadius(config.buttonHeight / 2)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: config.buttonHeight / 2)
+                                                    .stroke(Color.mainColor, lineWidth: 2)
+                                            )
+                                    }
+
+                                    Button {
+                                        showResultAlert = false
+                                        showDetailView = true
+                                    } label: {
+                                        Text("ถูกต้อง")
+                                            .font(.noto(config.buttonFont, weight: .bold))
+                                            .foregroundColor(.white)
+                                            .frame(maxWidth: .infinity, minHeight: config.buttonHeight)
+                                            .background(Color.mainColor)
+                                            .cornerRadius(config.buttonHeight / 2)
+                                    }
+                                }
+                                .padding(.top, config.spacingSmall)
+                            }
+                            .padding(config.paddingStandard)
+                            .frame(maxWidth: config.qrContentMaxWidth)
                             .background(Color.white)
-                            .cornerRadius(20)
+                            .cornerRadius(config.bannerCornerRadius)
+                            .padding(.horizontal, config.paddingStandard)
+                        }
+                    }
+
+                    // MARK: - Analyzing overlay
+                    if isAnalyzing {
+                        ZStack {
+                            Rectangle()
+                                .fill(.ultraThinMaterial)
+                                .ignoresSafeArea()
+
+                            ProgressView()
+                                .scaleEffect(config.isIPad ? 2.5 : 1.5)
+                                .padding(config.paddingStandard)
+                                .background(Color.white)
+                                .cornerRadius(config.bannerCornerRadius)
+                        }
                     }
                 }
             }
-            // ✅ เมื่อถ่ายภาพได้ → วิเคราะห์อัตโนมัติ
             .onChange(of: capturedUIImage) { _, newImage in
                 if newImage != nil {
                     shouldCapture = false
@@ -248,36 +253,32 @@ struct AiScanView: View {
         }
     }
 
-    private var headerView: some View {
+    private func headerView(config: ResponsiveConfig) -> some View {
         HStack {
             BackButton()
-            Color.clear.frame(width: 10, height: 10)
-
-            Spacer()
-
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
             HStack(alignment: .firstTextBaseline, spacing: 0) {
                 Text("สแกนด้วย ")
-                    .font(.noto(25, weight: .bold))
+                    .font(.noto(config.titleFontSize, weight: .bold))
                 Text("AI")
-                    .font(.inter(25, weight: .bold))
+                    .font(.inter(config.titleFontSize, weight: .bold))
             }
             .foregroundColor(.black)
-
-            Spacer()
-
+            .layoutPriority(1)
+            
             Button { isFlashOn.toggle() } label: {
                 Image(isFlashOn ? "FlashOn" : "FlashOff")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 35, height: 35)
-                    .padding(.trailing, 25)
+                    .frame(width: config.headerIconSize, height: config.headerIconSize)
             }
+            .frame(maxWidth: .infinity, alignment: .trailing)
         }
-        .padding(.top, 69)
-        .padding(.bottom, 18)
-        .frame(maxWidth: .infinity)
+        .padding(.horizontal, config.headerSidePadding)
+        .padding(.top, config.headerTopPadding)
+        .padding(.bottom, config.paddingMedium)
         .background(Color.backgroundColor.ignoresSafeArea(edges: .top))
-        .edgesIgnoringSafeArea(.all)
     }
 
     private func loadImage(from item: PhotosPickerItem?) {
@@ -287,7 +288,6 @@ struct AiScanView: View {
                 if case .success(let data) = result,
                    let data,
                    let uiImage = UIImage(data: data) {
-                    // ✅ เก็บเป็น UIImage ด้วยเพื่อส่งวิเคราะห์ได้
                     capturedUIImage = uiImage
                     selectedImage = Image(uiImage: uiImage)
                 }
