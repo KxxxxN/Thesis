@@ -78,6 +78,7 @@ struct MainAppView: View {
                 .padding(.leading, config.mainHorizontalPadding)
                 .background(Color.mainColor)
                 .clipShape(RoundedCorner(radius: 20, corners: [.bottomLeft, .bottomRight]))
+
                 
                 // --- Scrollable Content ---
                 ScrollView(showsIndicators: false) {

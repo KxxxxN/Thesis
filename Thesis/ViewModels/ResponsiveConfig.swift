@@ -157,6 +157,27 @@ struct ResponsiveConfig {
     var barcodeShutterIconSize: CGFloat     { isIPad ? 57 : 45 }
     var barcodeShutterSpacerHeight: CGFloat { screenHeight * (isIPad ? 0.60 : 0.63) }
     
+    // MARK: - QR Scan View 
+ 
+    /// ความสูง banner คำแนะนำด้านบน
+    var qrBannerHeight: CGFloat           { isIPad ? 150 : 115 }
+ 
+    /// padding top ของ banner
+    var qrBannerTopPadding: CGFloat       { isIPad ? 80 : 62 }
+ 
+    /// padding top ของกล้อง QR
+    var qrCameraTopPadding: CGFloat       { isIPad ? 120 : 93 }
+ 
+    /// ความยาวเส้นมุม QR frame
+    var qrCornerLineLength: CGFloat       { isIPad ? 45 : 30 }
+ 
+    /// ความสูง Result Alert popup
+    var qrAlertHeight: CGFloat            { isIPad ? 420 : 320 }
+ 
+    /// ความกว้าง/สูงปุ่มใน Alert
+    var qrAlertButtonWidth: CGFloat       { isIPad ? 160 : 120 }
+    var qrAlertButtonHeight: CGFloat      { isIPad ? 52 : 40 }
+    
     // MARK: - Confirm Photo View
     var confirmBannerHeight: CGFloat      { isIPad ? 80 : 60 }
     var confirmBannerTopPadding: CGFloat  { isIPad ? 50 : 35 }
@@ -185,7 +206,6 @@ struct ResponsiveConfig {
  
     /// padding top ของ sort menu (ต่างจาก paddingStandard 28/40)
     var sortMenuTopPadding: CGFloat       { isIPad ? 32 : 24 }
- 
     /// ขนาดรูป empty state
     var emptyStateImageSize: CGFloat      { isIPad ? 420 : 300 }
     
@@ -201,4 +221,12 @@ struct ResponsiveConfig {
     var profileImageSize: CGFloat { isIPad ? 120 : 85 }
     var profileMaxWidth: CGFloat { isIPad ? 600 : .infinity }
     var profileButtonWidth: CGFloat { isIPad ? 220 : 155 }
+    
+    // MARK: - Account Row 
+    var accountRowHeight: CGFloat { isIPad ? 90 : 70 }
+    var accountRowIconSize: CGFloat { isIPad ? 55 : 40 }
+    var accountRowIconLeading: CGFloat { isIPad ? 50 : 35 }
+    var accountRowSpacing: CGFloat { isIPad ? 22 : 15 }
+    var accountRowFontSize: CGFloat { isIPad ? 26 : 20 }
+    var accountRowChevronSize: CGFloat { isIPad ? 32 : 24 }
 }

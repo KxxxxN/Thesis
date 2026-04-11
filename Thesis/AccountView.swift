@@ -50,7 +50,7 @@ struct AccountView: View {
                             menuSection(title: "ข้อมูลผู้ใช้", fontSize: config.sectionFontSize) {
                                 AccountMenuRow(
                                     title: "แก้ไขโปรไฟล์",
-                                    imageName: "IconUser",
+                                    imageName: "IconUser", config: config,
                                     action: { path.append(AccountDestination.profile) }
                                 )
                             }
@@ -60,13 +60,13 @@ struct AccountView: View {
                                 VStack(spacing: 0) {
                                     AccountMenuRow(
                                         title: "เปลี่ยนภาษา",
-                                        imageName: "IconTranslate",
+                                        imageName: "IconTranslate", config: config,
                                         action: { path.append(AccountDestination.translate) }
                                     )
                                     AccountToggleRow(
                                         title: "การแจ้งเตือน",
                                         imageName: "IconNotification",
-                                        isOn: $isNotificationOn
+                                        isOn: $isNotificationOn, config: config,
                                     )
                                 }
                             }
@@ -76,12 +76,12 @@ struct AccountView: View {
                                 VStack(spacing: 0) {
                                     AccountMenuRow(
                                         title: "ช่วยเหลือ",
-                                        imageName: "IconHelp",
+                                        imageName: "IconHelp", config: config,
                                         action: { path.append(AccountDestination.helpCenter) }
                                     )
                                     AccountMenuRow(
                                         title: "ติดต่อเรา",
-                                        imageName: "IconSupport",
+                                        imageName: "IconSupport", config: config,
                                         action: { path.append(AccountDestination.contactUs) }
                                     )
                                 }
@@ -92,7 +92,7 @@ struct AccountView: View {
                                 VStack(spacing: 0) {
                                     AccountMenuRow(
                                         title: "ออกจากระบบ",
-                                        imageName: "IconLogout",
+                                        imageName: "IconLogout", config: config,
                                         action: {
                                             Task {
                                                 await authViewModel.signOut()
@@ -102,7 +102,7 @@ struct AccountView: View {
                                     )
                                     AccountMenuRow(
                                         title: "ลบบัญชี",
-                                        imageName: "IconDelete",
+                                        imageName: "IconDelete", config: config,
                                         action: { print("Delete Account") }
                                     )
                                 }

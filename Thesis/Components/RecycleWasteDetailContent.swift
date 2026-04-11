@@ -144,6 +144,7 @@ struct RecycleWasteDetailContent: View {
         .background(
             Color.knowledgeBackground
                 .clipShape(TabCorner(radius: 20, corners: [.topLeft, .topRight]))
+                .ignoresSafeArea(.container, edges: .horizontal)
         )
     }
 }

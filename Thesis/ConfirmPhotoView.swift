@@ -59,14 +59,14 @@ struct ConfirmPhotoView: View {
                     VStack {
 
                         Text("กรุณาถ่ายรูปขยะทีละชิ้น ให้ตรงกับที่ค้นหา")
-                            .font(.noto(config.fontHeader, weight: .medium))        // เดิม: 20 → fontHeader 20/28
+                            .font(.noto(config.fontHeader, weight: .medium))
                             .foregroundColor(.black)
                             .multilineTextAlignment(.center)
-                            .frame(maxWidth: config.qrContentMaxWidth,             // เดิม: 343 → qrContentMaxWidth 343/500
-                                   minHeight: config.confirmBannerHeight)           // ใหม่: 60 → confirmBannerHeight 60/80
+                            .frame(maxWidth: config.qrContentMaxWidth,
+                                   minHeight: config.confirmBannerHeight)
                             .background(Color.textFieldColor)
-                            .cornerRadius(config.bannerCornerRadius)               // เดิม: 20 → bannerCornerRadius 20/25
-                            .padding(.top, config.confirmBannerTopPadding)         // ใหม่: 35 → confirmBannerTopPadding 35/50
+                            .cornerRadius(config.bannerCornerRadius)
+                            .padding(.top, config.confirmBannerTopPadding)
                             .padding(.horizontal, config.paddingMedium)
 
                         Spacer()
@@ -89,17 +89,16 @@ struct ConfirmPhotoView: View {
                             } label: {
                                 ZStack {
                                     Circle()
-                                        .stroke(Color.mainColor, lineWidth: config.aiButtonOuterLineWidth)  // เดิม: 3
-                                        .frame(width: config.aiButtonOuterSize, height: config.aiButtonOuterSize)  // เดิม: 85
+                                        .stroke(Color.mainColor, lineWidth: config.aiButtonOuterLineWidth)
+                                        .frame(width: config.aiButtonOuterSize, height: config.aiButtonOuterSize)
 
                                     Circle()
                                         .fill(Color.mainColor)
-                                        .frame(width: config.aiButtonInnerSize, height: config.aiButtonInnerSize)  // เดิม: 73
-
+                                        .frame(width: config.aiButtonInnerSize, height: config.aiButtonInnerSize)
                                     Image("Camera")
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(width: config.barcodeShutterIconSize,   // เดิม: 45 → barcodeShutterIconSize 45/57
+                                        .frame(width: config.barcodeShutterIconSize,
                                                height: config.barcodeShutterIconSize)
                                 }
                             }
@@ -107,10 +106,26 @@ struct ConfirmPhotoView: View {
                             Spacer()
                             Color.clear.frame(width: 55, height: 1)
                         }
-                        .frame(maxWidth: config.qrContentMaxWidth)                 // เดิม: 343
-                        .padding(.bottom, config.paddingStandard)                  // เดิม: 25 → paddingStandard 28/40
+                        .frame(maxWidth: config.qrContentMaxWidth)
+                        .padding(.bottom, config.paddingStandard)
                     }
                 }
+            }
+            
+            .onAppear {
+                // ✅ 1. ล็อกหน้าจอเป็นแนวตั้งเมื่อเข้าหน้านี้
+                OrientationHelper.setOrientation(.portrait)
+                            
+                // ตั้งค่าอื่นๆ
+                hideTabBar = true
+                isCameraActive = true
+            }
+            .onDisappear {
+                // ✅ 2. ปลดล็อกหน้าจอให้หมุนได้อิสระเมื่อออกจากหน้านี้
+                // (หรือเปลี่ยนเป็นแนวที่โปรเจกต์คุณใช้เป็นหลัก)
+                OrientationHelper.setOrientation(.all)
+                            
+                isCameraActive = false
             }
             .onChange(of: selectedUIImage) { _, newImage in
                 if newImage != nil {
@@ -146,11 +161,11 @@ struct ConfirmPhotoView: View {
                 Image(isFlashOn ? "FlashOn" : "FlashOff")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: config.headerIconSize, height: config.headerIconSize)  // เดิม: 35 → headerIconSize 35/45
-                    .padding(.trailing, config.paddingStandard)                          // เดิม: 25 → paddingStandard 28/40
+                    .frame(width: config.headerIconSize, height: config.headerIconSize)
+                    .padding(.trailing, config.paddingStandard)
             }
         }
-        .padding(.bottom, config.paddingMedium)        // เดิม: 18 → paddingMedium 16/24
+        .padding(.bottom, config.paddingMedium)
         .frame(maxWidth: .infinity)
         .background(Color.backgroundColor.ignoresSafeArea(edges: .top))
     }

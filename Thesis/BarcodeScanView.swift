@@ -84,6 +84,9 @@ struct BarcodeScanView: View {
                     VStack(spacing: 0) {
 
                         headerView(config: config)
+                        
+                        Spacer(minLength: 0)
+
 
                         VStack {
                             Spacer()
@@ -139,6 +142,8 @@ struct BarcodeScanView: View {
                             .padding(.bottom, config.paddingStandard)
                             .padding(.top, config.spacingSmall)
                         }
+                        .frame(maxWidth: config.qrContentMaxWidth)                  // เดิม: 343 → qrContentMaxWidth
+
                     }
 
                     // MARK: - Loading Overlay
@@ -156,8 +161,15 @@ struct BarcodeScanView: View {
                         }
                     }
                 }
-                .onAppear { hideTabBar = true }
-                .onDisappear { hideTabBar = false }
+                .onAppear {
+                    hideTabBar = true
+                    OrientationHelper.setOrientation(.portrait)
+
+                }
+                .onDisappear {
+                    hideTabBar = false
+                    OrientationHelper.setOrientation(.all)
+                }
             }
             .navigationDestination(isPresented: $showAiScanView) {
                 AiScanView(hideTabBar: $hideTabBar)
